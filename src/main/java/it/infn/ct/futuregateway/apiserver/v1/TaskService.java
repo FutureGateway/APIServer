@@ -22,8 +22,10 @@
 package it.infn.ct.futuregateway.apiserver.v1;
 
 import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -32,13 +34,24 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 
 /**
+ * The TaskService provide the REST APIs for the tasks as defined in the
+ * documentation.
  *
+ * @see http://docs.csgfapis.apiary.io/#reference/v1.0/task
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 @Path("tasks")
 public class TaskService {
+    /**
+     * Logger object.
+     * Based on apache commons logging.
+     */
+    private final Log log = LogFactory.getLog(TaskService.class);
 
     /**
      * Used to retrieve the JPA EntityManager.
@@ -52,9 +65,23 @@ public class TaskService {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public final String listTasks() {
+    public final List<Task> listTasks() {
+        List<Task> tasks = null;
         EntityManager em = getEntityManager();
-        return "{\"message\"=\"Hello, tasks!\"}";
+        EntityTransaction et = null;
+        try {
+            et = em.getTransaction();
+            et.begin();
+            tasks = em.createNamedQuery("findTasks").getResultList();
+            et.commit();
+        } catch (RuntimeException re) {
+            if (et != null && et.isActive()) {
+                et.rollback();
+            }
+            log.error("Impossible to retrieve the task list");
+            log.error(re);
+        }
+        return tasks;
     }
 
     /**
@@ -68,9 +95,19 @@ public class TaskService {
     @Produces(MediaType.APPLICATION_JSON)
     public final Task createTask(final Task task) {
         EntityManager em = getEntityManager();
-        em.getTransaction().begin();
-        em.persist(task);
-        em.getTransaction().commit();
+        EntityTransaction et = null;
+        try {
+            et = em.getTransaction();
+            et.begin();
+            em.persist(task);
+            et.commit();
+        } catch (RuntimeException re) {
+            if (et != null && et.isActive()) {
+                et.rollback();
+            }
+            log.error("Impossible to create the task: " + task);
+            log.error(re);
+        }
         return task;
     }
 

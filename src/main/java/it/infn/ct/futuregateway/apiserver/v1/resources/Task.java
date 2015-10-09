@@ -35,6 +35,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -44,6 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
+@NamedQuery(name = "findTasks", query = "Select task from Task task")
 @XmlRootElement
 @Entity
 @Table(name = "Task")
@@ -99,6 +101,11 @@ public class Task {
      * Arguments to provide to the application.
      */
     private List<String> arguments;
+
+    /**
+     * Arguments to provide to the application.
+     */
+    private List<String> outputFiles;
 
     /**
      * Input file for the application.
@@ -215,6 +222,32 @@ public class Task {
      */
     public final void setArguments(final List<String> someArguments) {
         this.arguments = someArguments;
+    }
+
+    /**
+     * Retrieve the list of output files of the application.
+     * This is the list of files the system has to retrieve after the
+     * application or the service has completed its execution.
+     *
+     * @return The output files
+     */
+    @ElementCollection
+    @CollectionTable(name = "application_arguments",
+            joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "arguments")
+    public final List<String> getOutputFiles() {
+        return outputFiles;
+    }
+
+    /**
+     * Set the list of output files of the application.
+     * This is the list of files the system has to retrieve after the
+     * application or the service has completed its execution.
+     *
+     * @param someOutputFiles A list with the output files
+     */
+    public final void setOutputFiles(final List<String> someOutputFiles) {
+        this.outputFiles = someOutputFiles;
     }
 
     /**
