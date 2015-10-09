@@ -19,9 +19,25 @@
  * limitations under the License.
  ***********************************************************************/
 
+package it.infn.ct.futuregateway.apiserver.v1;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
 /**
- * The package contains .....
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-package it.infn.ct.futuregateway.apiserver.v1;
+public class InfrastructureService {
+
+    /**
+     *
+     * @return The json
+     */
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    public final String sayHtmlHello() {
+        return "{\"TO BE IMPLEMENTED\"}";
+    }
+}

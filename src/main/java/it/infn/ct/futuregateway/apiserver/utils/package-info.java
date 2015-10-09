@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2011:
+ * Copyright (c) 2015:
  * Istituto Nazionale di Fisica Nucleare (INFN), Italy
  * Consorzio COMETA (COMETA), Italy
  *
@@ -19,27 +19,9 @@
  * limitations under the License.
  ***********************************************************************/
 
-package it.infn.ct.futuregateway.apiserver.v1;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
 /**
+ * This Package ......
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-@Path("/tasks")
-public class Tasks {
-
-    /**
-     *
-     * @return The json
-     */
-    @GET
-    @Produces(MediaType.TEXT_HTML)
-    public final String sayHtmlHello() {
-        return "Hello, tasks! ";
-    }
-}
+package it.infn.ct.futuregateway.apiserver.utils;

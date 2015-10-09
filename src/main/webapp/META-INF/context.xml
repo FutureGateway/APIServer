@@ -1,2 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context antiJARLocking="true" path=""/>
+<Context antiJARLocking="true" path="">
+    <!--
+    <Resource name="jdbc/FutureGatewayDB" auth="Container"
+              type="javax.sql.DataSource"
+              maxActive="20"
+              maxIdle="30"
+              maxWait="10000"
+              username="SA"
+              driverClassName="org.hsqldb.jdbc.JDBCDriver"
+              url="jdbc:hsqldb:file:///tmp/futuregateway"/>
+    -->
+</Context>

@@ -1,5 +1,5 @@
 /***********************************************************************
- * Copyright (c) 2011:
+ * Copyright (c) 2015:
  * Istituto Nazionale di Fisica Nucleare (INFN), Italy
  * Consorzio COMETA (COMETA), Italy
  *
@@ -19,12 +19,9 @@
  * limitations under the License.
  ***********************************************************************/
 
-package it.infn.ct.futuregateway.apiserver.v1;
-
 /**
+ * This Package ......
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-public class Applications {
-
-}
+package it.infn.ct.futuregateway.apiserver.v1.resources;
