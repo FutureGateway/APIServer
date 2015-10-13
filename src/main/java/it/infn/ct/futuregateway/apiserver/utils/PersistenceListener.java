@@ -21,6 +21,10 @@
  */
 package it.infn.ct.futuregateway.apiserver.utils;
 
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.servlet.ServletContextEvent;
@@ -56,8 +60,23 @@ public class PersistenceListener implements ServletContextListener {
         sce.getServletContext().setAttribute(
                 "SessionFactory", entityManagerFactory
         );
-        System.out.println("Ciccio non va");
         log.info("Created the Hibernate SessionFactory for the context");
+
+        String path = sce.getServletContext().getInitParameter("CacheDir");
+        if (path == null || path.isEmpty()) {
+            path = sce.getServletContext().getRealPath("/")
+                    + ".." + FileSystems.getDefault().getSeparator()
+                    + ".." + FileSystems.getDefault().getSeparator()
+                    + "FutureGatewayData";
+        }
+        try {
+            Files.createDirectory(Paths.get(path));
+        } catch (FileAlreadyExistsException faee) {
+            log.debug("Message for '" + path + "':" + faee.getMessage());
+        } catch (Exception e) {
+            log.error("Impossible to initialise the temporary store");
+        }
+        log.info("Cache dir enabled");
     }
 
     @Override

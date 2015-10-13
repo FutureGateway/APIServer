@@ -60,6 +60,9 @@ public class TaskService {
     private HttpServletRequest httpRequest;
 
     /**
+     * Retrieve the list of tasks.
+     *
+     * The list includes only the tasks associated to the user.
      *
      * @return The json
      */
@@ -96,6 +99,10 @@ public class TaskService {
     public final Task createTask(final Task task) {
         EntityManager em = getEntityManager();
         EntityTransaction et = null;
+//        List<String> pippo = new LinkedList<>();
+//        pippo.add("Paperino.html");
+//        pippo.add("Pluto.xml");
+//        task.setInputFiles(pippo);
         try {
             et = em.getTransaction();
             et.begin();
@@ -123,5 +130,16 @@ public class TaskService {
                 (EntityManagerFactory) httpRequest.getServletContext().
                         getAttribute("SessionFactory");
         return emf.createEntityManager();
+    }
+
+    /**
+     * Create the dir to store the input.
+     * Create a directory inside the temporary store with path
+     * "inputs/<taskId>". This is used to store the input file before the
+     * submission.
+     *
+     * @param taskId The ID of the task to associate the files
+     */
+    private void createInputDir(final String taskId) {
     }
 }
