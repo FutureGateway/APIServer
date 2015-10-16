@@ -22,11 +22,14 @@
 package it.infn.ct.futuregateway.apiserver.v1;
 
 import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -34,6 +37,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -60,6 +64,12 @@ public class TaskService {
     private HttpServletRequest httpRequest;
 
     /**
+     * Used to customise the response header.
+     */
+    @Context
+    private HttpServletResponse response;
+
+    /**
      * Retrieve the list of tasks.
      *
      * The list includes only the tasks associated to the user.
@@ -69,20 +79,37 @@ public class TaskService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public final List<Task> listTasks() {
-        List<Task> tasks = null;
+        List<Task> tasks = new LinkedList<>();
         EntityManager em = getEntityManager();
         EntityTransaction et = null;
+        List<Object[]> taskList = null;
         try {
             et = em.getTransaction();
             et.begin();
-            tasks = em.createNamedQuery("findTasks").getResultList();
+            taskList = em.createNamedQuery("findTasks").
+                    setParameter("user", getUser()).
+                    getResultList();
             et.commit();
         } catch (RuntimeException re) {
             if (et != null && et.isActive()) {
                 et.rollback();
             }
+            response.setStatus(
+                    Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
             log.error("Impossible to retrieve the task list");
             log.error(re);
+        }
+        if (taskList == null || taskList.isEmpty()) {
+            response.setStatus(Response.Status.NOT_FOUND.getStatusCode());
+        }
+        for (Object[] elem: taskList) {
+            int idElem = 0;
+            Task tmpTask = new Task();
+            tmpTask.setId((Long) elem[idElem++]);
+            tmpTask.setDescription((String) elem[idElem++]);
+            tmpTask.setStatus((Task.STATUS) elem[idElem++]);
+            tmpTask.setDate((Date) elem[idElem]);
+            tasks.add(tmpTask);
         }
         return tasks;
     }
@@ -97,12 +124,13 @@ public class TaskService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public final Task createTask(final Task task) {
+        Date now = new Date();
+        task.setDate(now);
+        task.setLastChange(now);
+        task.setStatus(Task.STATUS.WAITING);
+        task.setUser(getUser());
         EntityManager em = getEntityManager();
         EntityTransaction et = null;
-//        List<String> pippo = new LinkedList<>();
-//        pippo.add("Paperino.html");
-//        pippo.add("Pluto.xml");
-//        task.setInputFiles(pippo);
         try {
             et = em.getTransaction();
             et.begin();
@@ -132,6 +160,16 @@ public class TaskService {
         return emf.createEntityManager();
     }
 
+    /**
+     * Retrieve the user performing the request.
+     * The user name is extrapolated from the authorisation token.
+     *
+     * @return The user name
+     */
+    private String getUser() {
+        log.error("This method is not yet implemented");
+        return "pippo";
+    }
     /**
      * Create the dir to store the input.
      * Create a directory inside the temporary store with path

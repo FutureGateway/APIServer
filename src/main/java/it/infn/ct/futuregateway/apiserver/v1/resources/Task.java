@@ -21,10 +21,8 @@
  */
 package it.infn.ct.futuregateway.apiserver.v1.resources;
 
-import java.net.URL;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -51,8 +49,10 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-@NamedQuery(name = "findTasks", query = "Select task from Task task")
-@XmlRootElement
+@NamedQuery(name = "findTasks",
+        query = "Select task.id, task.description, task.status, task.date"
+                + " from Task task where task.user = :user")
+@XmlRootElement(name = "tasks")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Entity
 @Table(name = "Task")
@@ -92,7 +92,7 @@ public class Task {
     /**
      * The identifier of the task.
      */
-    @XmlElement(name = "task")
+    @XmlElement(name = "id")
     private Long id;
 
     /**
@@ -114,13 +114,13 @@ public class Task {
      * Arguments to provide to the application.
      */
     @XmlElement(name = "output_files")
-    private Map<String, URL> outputFiles;
+    private List<TaskFileOutput> outputFiles;
 
     /**
      * Input file for the application.
      */
     @XmlElement(name = "input_files")
-    private List<InputFile> inputFiles;
+    private List<TaskFileInput> inputFiles;
 
     /**
      * The current status of the task.
@@ -241,12 +241,10 @@ public class Task {
      *
      * @return The output files
      */
-    @ElementCollection
-    @CollectionTable(name = "application_outputs",
-            joinColumns = @JoinColumn(name = "id"))
-//    @Column(name = "url")
-    public final Map<String, URL> getOutputFiles() {
-        return outputFiles;
+    @OneToMany(cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER)
+    public final List<TaskFileOutput> getOutputFiles() {
+        return this.outputFiles;
     }
 
     /**
@@ -256,7 +254,8 @@ public class Task {
      *
      * @param someOutputFiles A list with the output files
      */
-    public final void setOutputFiles(final Map<String, URL> someOutputFiles) {
+    public final void setOutputFiles(
+            final List<TaskFileOutput> someOutputFiles) {
         this.outputFiles = someOutputFiles;
     }
 
@@ -270,14 +269,10 @@ public class Task {
      *
      * @return The input files
      */
-//    @ElementCollection
-//    @CollectionTable(name = "application_inputs",
-//            joinColumns = @JoinColumn(name = "id"))
-//    @Column(name = "status")
     @OneToMany(cascade = CascadeType.ALL,
             fetch = FetchType.EAGER)
-    public final List<InputFile> getInputFiles() {
-        return inputFiles;
+    public final List<TaskFileInput> getInputFiles() {
+        return this.inputFiles;
     }
 
     /**
@@ -290,26 +285,9 @@ public class Task {
      *
      * @param someInputFiles A map with the input files.
      */
-    public final void setInputFiles(final List<InputFile> someInputFiles) {
+    public final void setInputFiles(final List<TaskFileInput> someInputFiles) {
         this.inputFiles = someInputFiles;
     }
-
-    /**
-     * Set the input files for the application.
-     * This is a map of files sent to the remote infrastructure for the
-     * execution of the application and/or service. The map key is the file
-     * name and the map value is an URL locating the file.
-     * <p>
-     * The URL can be local or remote to the service.
-     *
-     * @param someInputFiles A list of files to provide as input.
-     */
-//    public final void setInputFiles(final List<String> someInputFiles) {
-//        this.inputFiles = new HashMap<String, INPUTSTATUS>();
-//        for (String input: someInputFiles) {
-//            this.inputFiles.put(input, null);
-//        }
-//    }
 
     /**
      * Get the status of the task.
@@ -391,5 +369,4 @@ public class Task {
     public final void setLastChange(final Date newChangeDate) {
         this.lastChange = newChangeDate;
     }
-
 }
