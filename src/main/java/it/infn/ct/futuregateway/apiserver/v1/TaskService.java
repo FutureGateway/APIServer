@@ -21,6 +21,7 @@
 
 package it.infn.ct.futuregateway.apiserver.v1;
 
+import it.infn.ct.futuregateway.apiserver.utils.annotations.Status;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
 import java.util.Date;
 import java.util.LinkedList;
@@ -98,9 +99,10 @@ public class TaskService {
                     Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
             log.error("Impossible to retrieve the task list");
             log.error(re);
+            throw new RuntimeException("Impossible to access the task list");
         }
         if (taskList == null || taskList.isEmpty()) {
-            response.setStatus(Response.Status.NOT_FOUND.getStatusCode());
+            return null;
         }
         for (Object[] elem: taskList) {
             int idElem = 0;
@@ -121,6 +123,7 @@ public class TaskService {
      * @return The task registered
      */
     @POST
+    @Status(Response.Status.CREATED)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public final Task createTask(final Task task) {
@@ -143,6 +146,8 @@ public class TaskService {
             log.error("Impossible to create the task: " + task);
             log.error(re);
         }
+        response.setStatus(Response.Status.CREATED.getStatusCode());
+        response.setHeader("Ciccio", "Mi Piace");
         return task;
     }
 

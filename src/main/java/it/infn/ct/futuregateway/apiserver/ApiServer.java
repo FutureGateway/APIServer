@@ -21,26 +21,27 @@
  */
 package it.infn.ct.futuregateway.apiserver;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import it.infn.ct.futuregateway.apiserver.utils.StatusFilter;
+import it.infn.ct.futuregateway.apiserver.v1.TaskService;
+import java.util.HashSet;
+import java.util.Set;
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
 
 /**
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-@Path("/")
-public class Core {
+@ApplicationPath("/v1.0")
+public class ApiServer extends Application {
 
-    /**
-     *
-     * @return The json
-     */
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public final String sayHtmlHello() {
-        return "{\"TO BE IMPLEMENTED\"}";
+    @Override
+    public final Set<Class<?>> getClasses() {
+        final Set<Class<?>> classes = new HashSet<>();
+        classes.add(StatusFilter.class);
+        classes.add(TaskService.class);
+        return classes;
     }
+
 
 }
