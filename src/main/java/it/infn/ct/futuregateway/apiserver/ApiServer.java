@@ -21,8 +21,6 @@
  */
 package it.infn.ct.futuregateway.apiserver;
 
-import it.infn.ct.futuregateway.apiserver.utils.StatusFilter;
-import it.infn.ct.futuregateway.apiserver.v1.TaskService;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.ApplicationPath;
@@ -32,14 +30,13 @@ import javax.ws.rs.core.Application;
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-@ApplicationPath("/v1.0")
+@ApplicationPath("/")
 public class ApiServer extends Application {
 
     @Override
     public final Set<Class<?>> getClasses() {
         final Set<Class<?>> classes = new HashSet<>();
-        classes.add(StatusFilter.class);
-        classes.add(TaskService.class);
+        classes.add(BaseService.class);
         return classes;
     }
 
