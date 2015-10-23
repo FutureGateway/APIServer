@@ -21,6 +21,8 @@
  */
 package it.infn.ct.futuregateway.apiserver.v1.resources;
 
+import it.infn.ct.futuregateway.apiserver.utils.LinkJaxbAdapter;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -38,10 +40,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.ws.rs.core.Link;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.glassfish.jersey.linking.InjectLink;
+import org.glassfish.jersey.linking.InjectLinks;
 
 /**
  * The Task represents  any activity a user send to an infrastructure, such as
@@ -50,13 +57,13 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 @NamedQuery(name = "findTasks",
-        query = "Select task.id, task.description, task.status, task.date"
-                + " from Task task where task.user = :user")
-@XmlRootElement(name = "tasks")
+        query = "Select t.id, t.description, t.status, t.date"
+                + " from Task t where t.user = :user")
+@XmlRootElement(name = "task")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Entity
 @Table(name = "Task")
-public class Task {
+public class Task implements Serializable {
 
     /**
      * Possible status for the task.
@@ -88,6 +95,16 @@ public class Task {
          */
         CANCELLED
     };
+
+    /**
+     * List of references.
+     */
+    @InjectLinks({
+        @InjectLink(value = "tasks/{id}", rel = "self")
+    })
+    @XmlElement(name = "_links")
+    @XmlJavaTypeAdapter(value = LinkJaxbAdapter.class)
+    private List<Link> links;
 
     /**
      * The identifier of the task.
@@ -368,5 +385,24 @@ public class Task {
      */
     public final void setLastChange(final Date newChangeDate) {
         this.lastChange = newChangeDate;
+    }
+
+    /**
+     * Get the references for this entity.
+     *
+     * @return The list of Link references
+     */
+    @Transient
+    public final List<Link> getLinks() {
+        return links;
+    }
+
+    /**
+     * Set the references for this entity.
+     *
+     * @param someLinks The list of link references
+     */
+    public final void setLinks(final List<Link> someLinks) {
+        this.links = someLinks;
     }
 }

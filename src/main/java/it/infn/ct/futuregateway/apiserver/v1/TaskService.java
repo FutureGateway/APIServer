@@ -23,6 +23,7 @@ package it.infn.ct.futuregateway.apiserver.v1;
 
 import it.infn.ct.futuregateway.apiserver.utils.annotations.Status;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
+import java.net.URI;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,8 +38,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -62,7 +65,7 @@ public class TaskService {
      * Used to retrieve the JPA EntityManager.
      */
     @Context
-    private HttpServletRequest httpRequest;
+    private HttpServletRequest request;
 
     /**
      * Used to customise the response header.
@@ -113,6 +116,11 @@ public class TaskService {
             tmpTask.setDate((Date) elem[idElem]);
             tasks.add(tmpTask);
         }
+        URI self = UriBuilder.fromUri(request.getServletPath()).
+                path(getClass()).build();
+
+        Link link = Link.fromUri(self).rel("self").build();
+        response.setHeader("Link", link.toString());
         return tasks;
     }
 
@@ -146,8 +154,6 @@ public class TaskService {
             log.error("Impossible to create the task: " + task);
             log.error(re);
         }
-        response.setStatus(Response.Status.CREATED.getStatusCode());
-        response.setHeader("Ciccio", "Mi Piace");
         return task;
     }
 
@@ -160,7 +166,7 @@ public class TaskService {
      */
     private EntityManager getEntityManager() {
         EntityManagerFactory emf =
-                (EntityManagerFactory) httpRequest.getServletContext().
+                (EntityManagerFactory) request.getServletContext().
                         getAttribute("SessionFactory");
         return emf.createEntityManager();
     }

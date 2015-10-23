@@ -22,24 +22,23 @@
 package it.infn.ct.futuregateway.apiserver.v1;
 
 import it.infn.ct.futuregateway.apiserver.utils.StatusFilter;
-import java.util.HashSet;
-import java.util.Set;
 import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+import org.glassfish.jersey.linking.DeclarativeLinkingFeature;
+import org.glassfish.jersey.server.ResourceConfig;
 
 /**
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 @ApplicationPath("/v1.0")
-public class ApiServer extends Application {
+public class ApiServer extends ResourceConfig {
 
-    @Override
-    public final Set<Class<?>> getClasses() {
-        final Set<Class<?>> classes = new HashSet<>();
-        classes.add(StatusFilter.class);
-        classes.add(TaskService.class);
-        return classes;
+    /**
+     * Register resources.
+     */
+    public ApiServer() {
+        packages("it.infn.ct.futuregateway.apiserver.v1");
+        register(StatusFilter.class);
+        register(DeclarativeLinkingFeature.class);
     }
-
 }
