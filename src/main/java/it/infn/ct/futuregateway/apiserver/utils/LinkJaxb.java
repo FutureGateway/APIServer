@@ -35,7 +35,7 @@ import javax.xml.namespace.QName;
  * reading-and-writing-jax-rs-link-objects.html">
  * http://kingsfleet.blogspot.it/2014/05/
  * reading-and-writing-jax-rs-link-objects.html</a>.
- * 
+ *
  * The class represent the Link in a JAXB compatible format so conversion is
  * possible for MOXy engine.
  *
