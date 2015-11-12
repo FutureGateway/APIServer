@@ -100,7 +100,8 @@ public class Task implements Serializable {
      * List of references.
      */
     @InjectLinks({
-        @InjectLink(value = "tasks/{id}", rel = "self")
+        @InjectLink(value = "tasks/{id}", rel = "self"),
+        @InjectLink(value = "tasks/{id}/input", rel = "input")
     })
     @XmlElement(name = "_links")
     @XmlJavaTypeAdapter(value = LinkJaxbAdapter.class)
