@@ -41,7 +41,7 @@ import org.glassfish.jersey.linking.InjectLinks;
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 @InjectLinks({
-    @InjectLink(value = "tasks", rel = "self"),
+    @InjectLink(value = "tasks", rel = "self")
 })
 @XmlRootElement(name = "TaskList")
 
@@ -100,12 +100,14 @@ public class TaskList {
             log.error("Impossible to retrieve the task list");
             log.error(re);
             throw new RuntimeException("Impossible to access the task list");
+        } finally {
+            em.close();
         }
         if (taskList != null && !taskList.isEmpty()) {
             for (Object[] elem: taskList) {
                 int idElem = 0;
                 Task tmpTask = new Task();
-                tmpTask.setId((Long) elem[idElem++]);
+                tmpTask.setId((String) elem[idElem++]);
                 tmpTask.setDescription((String) elem[idElem++]);
                 tmpTask.setStatus((Task.STATUS) elem[idElem++]);
                 tmpTask.setDate((Date) elem[idElem]);

@@ -25,6 +25,7 @@ import it.infn.ct.futuregateway.apiserver.utils.LinkJaxbAdapter;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -33,12 +34,11 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.ws.rs.core.Link;
@@ -59,10 +59,16 @@ import org.glassfish.jersey.linking.InjectLinks;
 @NamedQuery(name = "findTasks",
         query = "Select t.id, t.description, t.status, t.date"
                 + " from Task t where t.user = :user")
-@XmlRootElement(name = "task")
-@XmlAccessorType(XmlAccessType.FIELD)
 @Entity
 @Table(name = "Task")
+
+@InjectLinks({
+    @InjectLink(value = "tasks/{id}", rel = "self"),
+    @InjectLink(value = "tasks/{id}/input", rel = "input")
+})
+
+@XmlRootElement(name = "task")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Task implements Serializable {
 
     /**
@@ -111,12 +117,12 @@ public class Task implements Serializable {
      * The identifier of the task.
      */
     @XmlElement(name = "id")
-    private Long id;
+    private String id;
 
     /**
      * The id of the application associated with the task.
      */
-    private Long application;
+    private String application;
 
     /**
      * A user provided description of the task.
@@ -166,9 +172,8 @@ public class Task implements Serializable {
      * @return The identifier of this task
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    public final Long getId() {
+    public final String getId() {
         return id;
     }
 
@@ -177,8 +182,23 @@ public class Task implements Serializable {
      *
      * @param anId The task identifier
      */
-    public final void setId(final Long anId) {
+    public final void setId(final String anId) {
         this.id = anId;
+    }
+
+    /**
+     * Initialise the id.
+     *
+     * The id for the task is generated with a random uuid. There is not a
+     * collision control at this level. If the persistence failed because of
+     * this Id is repeated the code at higher level should manage the situation
+     * by replacing the Id.
+     */
+    @PrePersist
+    private void generateId() {
+        if (this.id == null || this.id.isEmpty()) {
+            this.id = UUID.randomUUID().toString();
+        }
     }
 
     /**
@@ -186,7 +206,7 @@ public class Task implements Serializable {
      *
      * @return The id of the application associated with the task
      */
-    public final Long getApplication() {
+    public final String getApplication() {
         return application;
     }
 
@@ -195,7 +215,7 @@ public class Task implements Serializable {
      *
      * @param anApplication The application identifier
      */
-    public final void setApplication(final Long anApplication) {
+    public final void setApplication(final String anApplication) {
         this.application = anApplication;
     }
 
@@ -228,7 +248,7 @@ public class Task implements Serializable {
      *
      * @return The list of arguments
      */
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "application_arguments",
             joinColumns = @JoinColumn(name = "id"))
     @Column(name = "arguments")

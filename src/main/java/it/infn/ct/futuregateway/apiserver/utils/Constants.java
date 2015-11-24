@@ -33,6 +33,12 @@ public final class Constants {
     public static final int LONGTEXT = 1024;
 
     /**
+     * Mime type produced by the server.
+     */
+    public static final String MIMETYPE =
+            "application/vnd.indigo-datacloud.apiserver+json";
+
+    /**
      * Avoid the class be instantiable.
      */
     private Constants() { }

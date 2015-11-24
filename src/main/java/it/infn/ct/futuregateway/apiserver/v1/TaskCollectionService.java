@@ -21,21 +21,18 @@
 
 package it.infn.ct.futuregateway.apiserver.v1;
 
+import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.utils.annotations.Status;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
 import it.infn.ct.futuregateway.apiserver.v1.resources.TaskList;
 import java.util.Date;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.logging.Log;
@@ -50,40 +47,29 @@ import org.apache.commons.logging.LogFactory;
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 @Path("/tasks")
-public class TaskCollectionService {
+public class TaskCollectionService extends BaseService {
     /**
      * Logger object.
      * Based on apache commons logging.
      */
     private final Log log = LogFactory.getLog(TaskCollectionService.class);
 
-    /**
-     * Used to retrieve the JPA EntityManager.
-     */
-    @Context
-    private HttpServletRequest request;
-
-    /**
-     * Used to customise the response header.
-     */
-    @Context
-    private HttpServletResponse response;
 
     /**
      * Retrieve the list of tasks.
      *
      * The list includes only the tasks associated to the user.
      *
-     * @return The json
+     * @return The task collection
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(Constants.MIMETYPE)
     public final TaskList listTasks() {
         TaskList tasks;
         try {
             tasks = new TaskList(getEntityManager(), getUser());
         } catch (RuntimeException re) {
-            response.setStatus(
+            getResponse().setStatus(
                     Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
             throw re;
         }
@@ -99,7 +85,7 @@ public class TaskCollectionService {
     @POST
     @Status(Response.Status.CREATED)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(Constants.MIMETYPE)
     public final Task createTask(final Task task) {
         Date now = new Date();
         task.setDate(now);
@@ -119,34 +105,12 @@ public class TaskCollectionService {
             }
             log.error("Impossible to create the task: " + task);
             log.error(re);
+        } finally {
+            em.close();
         }
         return task;
     }
 
-    /**
-     * Return the EntityManager.
-     * Create a JPA EntityManger from the EntityMangerFactory registered
-     * for this servlet context
-     *
-     * @return The EntityManager
-     */
-    private EntityManager getEntityManager() {
-        EntityManagerFactory emf =
-                (EntityManagerFactory) request.getServletContext().
-                        getAttribute("SessionFactory");
-        return emf.createEntityManager();
-    }
-
-    /**
-     * Retrieve the user performing the request.
-     * The user name is extrapolated from the authorisation token.
-     *
-     * @return The user name
-     */
-    private String getUser() {
-        log.error("This method is not yet implemented");
-        return "pippo";
-    }
     /**
      * Create the dir to store the input.
      * Create a directory inside the temporary store with path
