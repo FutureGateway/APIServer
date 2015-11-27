@@ -63,7 +63,7 @@ public class TaskCollectionService extends BaseService {
      * @return The task collection
      */
     @GET
-    @Produces(Constants.MIMETYPE)
+    @Produces(Constants.INDIGOMIMETYPE)
     public final TaskList listTasks() {
         TaskList tasks;
         try {
@@ -85,7 +85,7 @@ public class TaskCollectionService extends BaseService {
     @POST
     @Status(Response.Status.CREATED)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(Constants.MIMETYPE)
+    @Produces(Constants.INDIGOMIMETYPE)
     public final Task createTask(final Task task) {
         Date now = new Date();
         task.setDate(now);
@@ -111,14 +111,4 @@ public class TaskCollectionService extends BaseService {
         return task;
     }
 
-    /**
-     * Create the dir to store the input.
-     * Create a directory inside the temporary store with path
-     * "inputs/<taskId>". This is used to store the input file before the
-     * submission.
-     *
-     * @param taskId The ID of the task to associate the files
-     */
-    private void createInputDir(final String taskId) {
-    }
 }

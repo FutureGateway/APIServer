@@ -96,4 +96,18 @@ public abstract class BaseService {
     protected final HttpServletResponse getResponse() {
         return response;
     }
+
+    /**
+     * Retrieve the file cache directory path.
+     * Get the path to the cache directory from the context parameter. The
+     * name of the variable holding the value is <i>CacheDir</i>. If it does not
+     * exist the path is <i><servlet_context_path>/../../FutureGatewayData</i>.
+     *
+     * @return The path where file are temporary stored
+     */
+    protected final String getCacheDirPath() {
+        return (String) getRequest().
+                getServletContext().
+                getAttribute("CacheDir");
+    }
 }

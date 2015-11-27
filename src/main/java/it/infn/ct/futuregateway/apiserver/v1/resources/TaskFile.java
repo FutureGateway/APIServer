@@ -125,7 +125,7 @@ public class TaskFile implements Serializable {
     /**
      * Get the value of name.
      *
-     * @return the value of name
+     * @return The file name
      */
     public final String getName() {
         return name;
@@ -134,7 +134,7 @@ public class TaskFile implements Serializable {
     /**
      * Set the value of name.
      *
-     * @param aName new value of name
+     * @param aName The name to associate with the file
      */
     public final void setName(final String aName) {
         this.name = aName;
@@ -143,7 +143,7 @@ public class TaskFile implements Serializable {
     /**
      * Get the value of url.
      *
-     * @return Tthe value of url
+     * @return The file url
      */
     @Column(length = Constants.LONGTEXT)
     public final String getUrl() {
@@ -153,7 +153,7 @@ public class TaskFile implements Serializable {
     /**
      * Set the value of url.
      *
-     * @param aUrl New value of url
+     * @param aUrl New value for the file url
      */
     public final void setUrl(final String aUrl) {
         this.url = aUrl;

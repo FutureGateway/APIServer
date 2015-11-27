@@ -35,7 +35,7 @@ public final class Constants {
     /**
      * Mime type produced by the server.
      */
-    public static final String MIMETYPE =
+    public static final String  INDIGOMIMETYPE =
             "application/vnd.indigo-datacloud.apiserver+json";
 
     /**

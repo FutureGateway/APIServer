@@ -69,14 +69,16 @@ public class PersistenceListener implements ServletContextListener {
                     + ".." + FileSystems.getDefault().getSeparator()
                     + "FutureGatewayData";
         }
+        sce.getServletContext().setAttribute("CacheDir", path);
         try {
-            Files.createDirectory(Paths.get(path));
+            Files.createDirectories(Paths.get(path));
+            log.info("Cache dir enabled");
         } catch (FileAlreadyExistsException faee) {
             log.debug("Message for '" + path + "':" + faee.getMessage());
+            log.info("Cache dir enabled");
         } catch (Exception e) {
             log.error("Impossible to initialise the temporary store");
         }
-        log.info("Cache dir enabled");
     }
 
     @Override

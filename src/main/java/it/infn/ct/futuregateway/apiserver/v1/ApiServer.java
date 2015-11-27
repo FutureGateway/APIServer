@@ -24,6 +24,7 @@ package it.infn.ct.futuregateway.apiserver.v1;
 import it.infn.ct.futuregateway.apiserver.utils.StatusFilter;
 import javax.ws.rs.ApplicationPath;
 import org.glassfish.jersey.linking.DeclarativeLinkingFeature;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
 /**
@@ -40,5 +41,6 @@ public class ApiServer extends ResourceConfig {
         packages("it.infn.ct.futuregateway.apiserver.v1");
         register(StatusFilter.class);
         register(DeclarativeLinkingFeature.class);
+        register(MultiPartFeature.class);
     }
 }
