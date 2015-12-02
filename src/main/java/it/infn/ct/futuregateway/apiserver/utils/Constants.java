@@ -33,6 +33,26 @@ public final class Constants {
     public static final int LONGTEXT = 1024;
 
     /**
+     * Default thread pool size.
+     * The size of thread pool if not differently specified.
+     */
+    public static final int DEFAULTTHREADPOOLSIZETIMES = 20;
+
+    /**
+     * Maximum multiple of thread pool size.
+     * The thread pool can increase the size until the number of threads is
+     * MAXIMUMTHREADPOOLSIZETIMES * the base number of threads.
+     */
+    public static final int MAXIMUMTHREADPOOLSIZETIMES = 4;
+
+    /**
+     * Maximum lifetime of idle thread.
+     * Idle thread exceeding the base capacity of a pool are removed if idle
+     * for more than MAXIMUMTHREADIDLELIFE minutes.
+     */
+    public static final int MAXIMUMTHREADIDLELIFE = 2;
+
+    /**
      * Mime type produced by the server.
      */
     public static final String  INDIGOMIMETYPE =

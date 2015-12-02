@@ -68,7 +68,12 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
-            <version>4.3.1.Final</version>
+            <version>LATEST</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.transaction</groupId>
+            <artifactId>jta</artifactId>
+            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>org.hsqldb</groupId>
@@ -118,6 +123,7 @@
                         <id>validate</id>
                         <phase>validate</phase>
                         <configuration>
+                            <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
                             <encoding>UTF-8</encoding>
                             <consoleOutput>true</consoleOutput>
                             <failsOnError>true</failsOnError>

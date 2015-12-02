@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context antiJARLocking="true" path="">
-  <!--
-    <Resource name="jdbc/FutureGatewayDB" auth="Container"
+<Context path="">
+    <Resource auth="Container" driverClassName="org.hsqldb.jdbc.JDBCDriver"
+              maxIdle="30" maxWaitMillis="10000"
+              name="jdbc/FutureGatewayDB" password="futuregateway"
               type="javax.sql.DataSource"
-              maxActive="20"
-              maxIdle="30"
-              maxWait="10000"
-              username="SA"
-              driverClassName="org.hsqldb.jdbc.JDBCDriver"
-              url="jdbc:hsqldb:file:///tmp/futuregateway"/>
-    -->
+              url="jdbc:hsqldb:file:///tmp/futuregatewayTmp;shutdown=true;hsqldb.lock_file=true"
+              username="futuregateway"/>
 </Context>

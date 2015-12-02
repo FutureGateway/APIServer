@@ -1,4 +1,5 @@
-/***********************************************************************
+/**
+ * *********************************************************************
  * Copyright (c) 2015:
  * Istituto Nazionale di Fisica Nucleare (INFN), Italy
  * Consorzio COMETA (COMETA), Italy
@@ -17,8 +18,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- ***********************************************************************/
-
+ **********************************************************************
+ */
 package it.infn.ct.futuregateway.apiserver.v1;
 
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
@@ -50,25 +51,24 @@ import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 /**
- * The TaskService provide the REST APIs for the task
- * as defined in the documentation.
+ * The TaskService provide the REST APIs for the task as defined in the
+ * documentation.
  *
  * @see http://docs.csgfapis.apiary.io/#reference/v1.0/task
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 @Path("/tasks/{id}")
 public class TaskService extends BaseService {
+
     /**
-     * Logger object.
-     * Based on apache commons logging.
+     * Logger object. Based on apache commons logging.
      */
     private final Log log = LogFactory.getLog(TaskService.class);
 
     /**
-     * Retrieve the task details.
-     * Task details include all the field a task consist of as described in the
-     * documentation. This include all the information included in the task
-     * collection and many others.
+     * Retrieve the task details. Task details include all the field a task
+     * consist of as described in the documentation. This include all the
+     * information included in the task collection and many others.
      *
      * @param id The task id. This is a path parameter retrieved from the url
      * @return The task
@@ -91,12 +91,10 @@ public class TaskService extends BaseService {
         return task;
     }
 
-
     /**
-     * Upload input files.
-     * The method store input files for the specified task. Input files are
-     * provided as a <i>multipart form data</i> using the field file. This can
-     * contains multiple file using the html input attribute
+     * Upload input files. The method store input files for the specified task.
+     * Input files are provided as a <i>multipart form data</i> using the field
+     * file. This can contains multiple file using the html input attribute
      * <i>multiple="multiple"</i> which allows to associate multiple files with
      * a single field.
      *
@@ -116,7 +114,7 @@ public class TaskService extends BaseService {
         if (task == null) {
             throw new NotFoundException("Task " + id + " does not exist");
         }
-        for (FormDataBodyPart fdbp: lstFiles) {
+        for (FormDataBodyPart fdbp : lstFiles) {
             final String fName =
                     fdbp.getFormDataContentDisposition().getFileName();
             try {
@@ -127,13 +125,15 @@ public class TaskService extends BaseService {
                     et.begin();
                     TaskFileInput tfi = IterableUtils.find(task.getInputFiles(),
                             new Predicate<TaskFileInput>() {
-                                @Override
-                                public boolean evaluate(final TaskFileInput t) {
-                                    return t.getName().equals(fName);
-                                }
-                            });
-                    tfi.setStatus(TaskFile.FILESTATUS.READY);
-                    et.commit();
+                        @Override
+                        public boolean evaluate(final TaskFileInput t) {
+                            return t.getName().equals(fName);
+                        }
+                    });
+                    if (tfi != null) {
+                        tfi.setStatus(TaskFile.FILESTATUS.READY);
+                        et.commit();
+                    }
                 } catch (RuntimeException re) {
                     if (et != null && et.isActive()) {
                         et.rollback();
@@ -153,12 +153,10 @@ public class TaskService extends BaseService {
         em.close();
     }
 
-
     /**
-     * Create the directory to store the input.
-     * Create a directory inside the temporary store with path
-     * "<taskId>/input". This is used to store the input file before the
-     * submission.
+     * Create the directory to store the input. Create a directory inside the
+     * temporary store with path "<taskId>/input". This is used to store the
+     * input file before the submission.
      *
      * @param taskId The ID of the task to associate the files
      * @param input InputStream of the file to store
@@ -167,10 +165,11 @@ public class TaskService extends BaseService {
      */
     private void storeFile(final String taskId, final InputStream input,
             final String destinationName) throws IOException {
-        java.nio.file.Path filePath =
-                Paths.get(getCacheDirPath(), taskId, "input", destinationName);
+        java.nio.file.Path filePath = Paths.get(
+                getCacheDirPath(), taskId, "input", destinationName);
 
         Files.createDirectories(filePath.getParent());
+        Files.deleteIfExists(filePath);
         Files.copy(input, filePath);
     }
 }

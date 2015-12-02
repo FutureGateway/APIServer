@@ -110,7 +110,7 @@ public class TaskList {
                 tmpTask.setId((String) elem[idElem++]);
                 tmpTask.setDescription((String) elem[idElem++]);
                 tmpTask.setStatus((Task.STATUS) elem[idElem++]);
-                tmpTask.setDate((Date) elem[idElem]);
+                tmpTask.setDateCreated((Date) elem[idElem]);
                 lstTasks.add(tmpTask);
             }
         }

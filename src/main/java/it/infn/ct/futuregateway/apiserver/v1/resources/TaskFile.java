@@ -91,7 +91,7 @@ public class TaskFile implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
     @Column(name = "id")
-    public final Long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -100,7 +100,7 @@ public class TaskFile implements Serializable {
      *
      * @param anId The identifier
      */
-    public final void setId(final Long anId) {
+    public void setId(final Long anId) {
         this.id = anId;
     }
 
@@ -109,7 +109,7 @@ public class TaskFile implements Serializable {
      *
      * @return the value of status
      */
-    public final FILESTATUS getStatus() {
+    public FILESTATUS getStatus() {
         return status;
     }
 
@@ -118,7 +118,7 @@ public class TaskFile implements Serializable {
      *
      * @param aStatus new value of status
      */
-    public final void setStatus(final FILESTATUS aStatus) {
+    public void setStatus(final FILESTATUS aStatus) {
         this.status = aStatus;
     }
 
@@ -127,7 +127,7 @@ public class TaskFile implements Serializable {
      *
      * @return The file name
      */
-    public final String getName() {
+    public String getName() {
         return name;
     }
 
@@ -136,7 +136,7 @@ public class TaskFile implements Serializable {
      *
      * @param aName The name to associate with the file
      */
-    public final void setName(final String aName) {
+    public void setName(final String aName) {
         this.name = aName;
     }
 
@@ -146,7 +146,7 @@ public class TaskFile implements Serializable {
      * @return The file url
      */
     @Column(length = Constants.LONGTEXT)
-    public final String getUrl() {
+    public String getUrl() {
         return url;
     }
 
@@ -155,7 +155,7 @@ public class TaskFile implements Serializable {
      *
      * @param aUrl New value for the file url
      */
-    public final void setUrl(final String aUrl) {
+    public void setUrl(final String aUrl) {
         this.url = aUrl;
     }
 

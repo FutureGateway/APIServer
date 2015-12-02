@@ -3,23 +3,29 @@
     <display-name>FutureGateway API Server</display-name>
     <context-param>
         <description>
-            Path where files are temporary stored. Default value is
-            'FutureGatewayData' directory outside the webapp directory.
+            The context for the FutureGateway API initialises the file cache
+            directory and the thread pools for the job management.
+            The following parameters should be specified:
+            - CacheDir: path where files are temporary stored. Default value is
+              'FutureGatewayData' directory outside the webapp directory;
+            - SubmissionThreadPoolSize: size of thread pool used for the task
+              submission. The maximum size is the 4 times this value. Default
+              value is 10.
         </description>
         <param-name>CacheDir</param-name>
         <param-value>/tmp/FutureGateway</param-value>
+        <param-name>SubmissionThreadPoolSize</param-name>
+        <param-value>10</param-value>
     </context-param>
     <session-config>
         <session-timeout>
             30
         </session-timeout>
     </session-config>
-    <!--
     <resource-ref>
+        <description>Connection to the DB used for JPA</description>
         <res-ref-name>jdbc/FutureGatewayDB</res-ref-name>
         <res-type>javax.sql.DataSource</res-type>
         <res-auth>Container</res-auth>
-        <res-sharing-scope>Shareable</res-sharing-scope>
     </resource-ref>
-    -->
 </web-app>

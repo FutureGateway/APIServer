@@ -40,6 +40,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
 import javax.persistence.Transient;
 import javax.ws.rs.core.Link;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -57,8 +58,8 @@ import org.glassfish.jersey.linking.InjectLinks;
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 @NamedQuery(name = "findTasks",
-        query = "Select t.id, t.description, t.status, t.date"
-                + " from Task t where t.user = :user")
+        query = "Select t.id, t.description, t.status, t.dateCreated"
+                + " from Task t where t.userName = :user")
 @Entity
 @Table(name = "Task")
 
@@ -154,12 +155,14 @@ public class Task implements Serializable {
     /**
      * The user name submitting the task.
      */
-    private String user;
+    @XmlElement(name = "user")
+    private String userName;
 
     /**
      * The date when the task was created.
      */
-    private Date date;
+    @XmlElement(name = "date")
+    private Date dateCreated;
 
     /**
      * The date of last task status update.
@@ -173,7 +176,7 @@ public class Task implements Serializable {
      */
     @Id
     @Column(name = "id")
-    public final String getId() {
+    public String getId() {
         return id;
     }
 
@@ -182,7 +185,7 @@ public class Task implements Serializable {
      *
      * @param anId The task identifier
      */
-    public final void setId(final String anId) {
+    public void setId(final String anId) {
         this.id = anId;
     }
 
@@ -206,7 +209,7 @@ public class Task implements Serializable {
      *
      * @return The id of the application associated with the task
      */
-    public final String getApplication() {
+    public String getApplication() {
         return application;
     }
 
@@ -215,7 +218,7 @@ public class Task implements Serializable {
      *
      * @param anApplication The application identifier
      */
-    public final void setApplication(final String anApplication) {
+    public void setApplication(final String anApplication) {
         this.application = anApplication;
     }
 
@@ -224,7 +227,7 @@ public class Task implements Serializable {
      *
      * @return The user description
      */
-    public final String getDescription() {
+    public String getDescription() {
         return description;
     }
 
@@ -232,7 +235,7 @@ public class Task implements Serializable {
      * Set a description for the task.
      * @param aDescription Task description
      */
-    public final void setDescription(final String aDescription) {
+    public void setDescription(final String aDescription) {
         this.description = aDescription;
     }
 
@@ -252,7 +255,7 @@ public class Task implements Serializable {
     @CollectionTable(name = "application_arguments",
             joinColumns = @JoinColumn(name = "id"))
     @Column(name = "arguments")
-    public final List<String> getArguments() {
+    public List<String> getArguments() {
         return arguments;
     }
 
@@ -268,7 +271,7 @@ public class Task implements Serializable {
      *
      * @param someArguments The arguments to provide to the application
      */
-    public final void setArguments(final List<String> someArguments) {
+    public void setArguments(final List<String> someArguments) {
         this.arguments = someArguments;
     }
 
@@ -281,7 +284,7 @@ public class Task implements Serializable {
      */
     @OneToMany(cascade = CascadeType.ALL,
             fetch = FetchType.EAGER)
-    public final List<TaskFileOutput> getOutputFiles() {
+    public List<TaskFileOutput> getOutputFiles() {
         return this.outputFiles;
     }
 
@@ -292,7 +295,7 @@ public class Task implements Serializable {
      *
      * @param someOutputFiles A list with the output files
      */
-    public final void setOutputFiles(
+    public void setOutputFiles(
             final List<TaskFileOutput> someOutputFiles) {
         this.outputFiles = someOutputFiles;
     }
@@ -309,7 +312,7 @@ public class Task implements Serializable {
      */
     @OneToMany(cascade = CascadeType.ALL,
             fetch = FetchType.EAGER)
-    public final List<TaskFileInput> getInputFiles() {
+    public List<TaskFileInput> getInputFiles() {
         return this.inputFiles;
     }
 
@@ -323,7 +326,7 @@ public class Task implements Serializable {
      *
      * @param someInputFiles A map with the input files.
      */
-    public final void setInputFiles(final List<TaskFileInput> someInputFiles) {
+    public void setInputFiles(final List<TaskFileInput> someInputFiles) {
         this.inputFiles = someInputFiles;
     }
 
@@ -334,7 +337,7 @@ public class Task implements Serializable {
      * @see it.infn.ct.futuregateway.apiserver.v1.resources.Task.STATUS
      */
     @Enumerated(EnumType.STRING)
-    public final STATUS getStatus() {
+    public STATUS getStatus() {
         return status;
     }
 
@@ -344,7 +347,7 @@ public class Task implements Serializable {
      * @param aStatus The status to associate with the task
      * @see it.infn.ct.futuregateway.apiserver.v1.resources.Task.STATUS
      */
-    public final void setStatus(final STATUS aStatus) {
+    public void setStatus(final STATUS aStatus) {
         this.status = aStatus;
     }
 
@@ -356,8 +359,8 @@ public class Task implements Serializable {
      *
      * @return The user identifier
      */
-    public final String getUser() {
-        return user;
+    public String getUserName() {
+        return userName;
     }
 
     /**
@@ -368,8 +371,8 @@ public class Task implements Serializable {
      *
      * @param aUser The user identifier
      */
-    public final void setUser(final String aUser) {
-        this.user = aUser;
+    public void setUserName(final String aUser) {
+        this.userName = aUser;
     }
 
     /**
@@ -377,8 +380,9 @@ public class Task implements Serializable {
      *
      * @return Creation time
      */
-    public final Date getDate() {
-        return date;
+    @Temporal(javax.persistence.TemporalType.DATE)
+    public Date getDateCreated() {
+        return dateCreated;
     }
 
     /**
@@ -386,8 +390,8 @@ public class Task implements Serializable {
      *
      * @param creationDate The creation time
      */
-    public final void setDate(final Date creationDate) {
-        this.date = creationDate;
+    public void setDateCreated(final Date creationDate) {
+        this.dateCreated = creationDate;
     }
 
     /**
@@ -395,7 +399,8 @@ public class Task implements Serializable {
      *
      * @return The time of last status change
      */
-    public final Date getLastChange() {
+    @Temporal(javax.persistence.TemporalType.DATE)
+    public Date getLastChange() {
         return lastChange;
     }
 
@@ -404,7 +409,7 @@ public class Task implements Serializable {
      *
      * @param newChangeDate The time of last status change
      */
-    public final void setLastChange(final Date newChangeDate) {
+    public void setLastChange(final Date newChangeDate) {
         this.lastChange = newChangeDate;
     }
 
@@ -414,7 +419,7 @@ public class Task implements Serializable {
      * @return The list of Link references
      */
     @Transient
-    public final List<Link> getLinks() {
+    public List<Link> getLinks() {
         return links;
     }
 

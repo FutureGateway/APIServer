@@ -88,10 +88,10 @@ public class TaskCollectionService extends BaseService {
     @Produces(Constants.INDIGOMIMETYPE)
     public final Task createTask(final Task task) {
         Date now = new Date();
-        task.setDate(now);
+        task.setDateCreated(now);
         task.setLastChange(now);
         task.setStatus(Task.STATUS.WAITING);
-        task.setUser(getUser());
+        task.setUserName(getUser());
         EntityManager em = getEntityManager();
         EntityTransaction et = null;
         try {
