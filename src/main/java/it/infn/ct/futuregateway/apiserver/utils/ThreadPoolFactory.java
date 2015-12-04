@@ -24,6 +24,7 @@ package it.infn.ct.futuregateway.apiserver.utils;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -88,15 +89,28 @@ public class ThreadPoolFactory implements ObjectFactory {
                 default:
             }
         }
-        ThreadPoolExecutor tpe = new ThreadPoolExecutor(
+        log.info("A new thread pool created with name: " + name.toString());
+        return (ThreadPoolFactory.getThreadPool(threadPoolSize,
+                maxThreadPoolSize, maxThreadIdleTime));
+    }
+
+    /**
+     * Create a new ExecutorService.
+     * The ExecutorService is based on the ThreadPoolExecutor but only
+     * a subset of parameter can be specified.
+     *
+     * @param threadPoolSize The initial and minimum size of the pool
+     * @param maxThreadPoolSize The maximum size of the pool
+     * @param maxThreadIdleTime The time in milliseconds a thread can be idle
+     * @return The new ExecutorService
+     */
+    public static ExecutorService getThreadPool(final int threadPoolSize,
+                final int maxThreadPoolSize, final int maxThreadIdleTime) {
+        return new ThreadPoolExecutor(
                 threadPoolSize,
                 maxThreadPoolSize,
                 maxThreadIdleTime,
                 TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>());
-        log.info("A new thread pool created with name: " + name.toString());
-        return (tpe);
-
     }
-
 }

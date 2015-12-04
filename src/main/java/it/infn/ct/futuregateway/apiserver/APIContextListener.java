@@ -19,15 +19,15 @@
  * the License.
  **********************************************************************
  */
-package it.infn.ct.futuregateway.apiserver.utils;
+package it.infn.ct.futuregateway.apiserver;
 
+import it.infn.ct.futuregateway.apiserver.utils.Constants;
+import it.infn.ct.futuregateway.apiserver.utils.ThreadPoolFactory;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -110,12 +110,10 @@ public class APIContextListener implements ServletContextListener {
                         + " value or it is not present. Default value "
                         + "10 is used");
             }
-            ThreadPoolExecutor tpe = new ThreadPoolExecutor(
+            ExecutorService tpe = ThreadPoolFactory.getThreadPool(
                     threadPoolSize,
                     Constants.MAXTHREADPOOLSIZETIMES * threadPoolSize,
-                    Constants.MAXTHREADIDLELIFE,
-                    TimeUnit.MINUTES,
-                    new LinkedBlockingQueue<Runnable>());
+                    Constants.MAXTHREADIDLELIFE);
             sce.getServletContext().setAttribute("SubmissionThreadPool", tpe);
         }
     }
