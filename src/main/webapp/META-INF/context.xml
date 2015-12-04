@@ -6,4 +6,9 @@
               type="javax.sql.DataSource"
               url="jdbc:hsqldb:file:///tmp/futuregatewayTmp;shutdown=true;hsqldb.lock_file=true"
               username="futuregateway"/>
+
+    <Resource auth="Container" name="threads/Submitter"
+              type="java.util.concurrent.ExecutorService"
+              factory="it.infn.ct.futuregateway.apiserver.utils.ThreadPoolFactory"
+              poolSize="4" maxPoolSize="20" maxThreadIdleTimeMills="30000"/>
 </Context>

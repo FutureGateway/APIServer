@@ -25,6 +25,13 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.servlet.ServletContextEvent;
@@ -58,12 +65,8 @@ public class APIContextListener implements ServletContextListener {
             entityManagerFactory = Persistence.createEntityManagerFactory(
                     "it.infn.ct.futuregateway.apiserver.container"
             );
-//            Context ctx = new InitialContext();
-//            DataSource ds = (DataSource)
-//                    ctx.lookup("java:comp/env/jdbc/FutureGatewayDB");
-//            Connection conn = ds.getConnection();
         } catch (Exception ex) {
-            log.info("Resource 'jdbc/FutureGatewayDB' not defined in the "
+            log.warn("Resource 'jdbc/FutureGatewayDB' not defined in the "
                     + "context. The server will use its default DB on file.");
             entityManagerFactory = Persistence.createEntityManagerFactory(
                     "it.infn.ct.futuregateway.apiserver.app"
@@ -72,7 +75,6 @@ public class APIContextListener implements ServletContextListener {
         sce.getServletContext().setAttribute(
                 "SessionFactory", entityManagerFactory
         );
-        log.info("Created the Hibernate SessionFactory for the context");
         String path = sce.getServletContext().getInitParameter("CacheDir");
         if (path == null || path.isEmpty()) {
             path = sce.getServletContext().getRealPath("/")
@@ -80,6 +82,7 @@ public class APIContextListener implements ServletContextListener {
                     + ".." + FileSystems.getDefault().getSeparator()
                     + "FutureGatewayData";
         }
+        log.info("Created the cache directory: " + path);
         sce.getServletContext().setAttribute("CacheDir", path);
         try {
             Files.createDirectories(Paths.get(path));
@@ -91,25 +94,51 @@ public class APIContextListener implements ServletContextListener {
             log.error("Impossible to initialise the temporary store");
         }
 
-        int threadPoolSize = Constants.DEFAULTTHREADPOOLSIZETIMES;
         try {
-            threadPoolSize = Integer.parseInt(sce.getServletContext().
-                getInitParameter("SubmissioneThreadPoolSize"));
-        } catch (NumberFormatException nfe) {
-            log.info("Parameter 'SubmissioneThreadPoolSize' has a wrong value"
-                    + " or it is not present. Default value 10 is used");
+            Context ctx = new InitialContext();
+            ctx.lookup("java:comp/env/threads/Submitter");
+        } catch (NamingException ex) {
+            log.warn("Submitter thread not defined in the container. A thread "
+                    + "pool is created using provided configuration parameters "
+                    + "and defaults values");
+            int threadPoolSize = Constants.DEFAULTTHREADPOOLSIZE;
+            try {
+                threadPoolSize = Integer.parseInt(sce.getServletContext().
+                    getInitParameter("SubmissioneThreadPoolSize"));
+            } catch (NumberFormatException nfe) {
+                log.info("Parameter 'SubmissioneThreadPoolSize' has a wrong"
+                        + " value or it is not present. Default value "
+                        + "10 is used");
+            }
+            ThreadPoolExecutor tpe = new ThreadPoolExecutor(
+                    threadPoolSize,
+                    Constants.MAXTHREADPOOLSIZETIMES * threadPoolSize,
+                    Constants.MAXTHREADIDLELIFE,
+                    TimeUnit.MINUTES,
+                    new LinkedBlockingQueue<Runnable>());
+            sce.getServletContext().setAttribute("SubmissionThreadPool", tpe);
         }
-
-//        ThreadPoolExecutor tpe = new ThreadPoolExecutor(
-//                threadPoolSize,
-//                Constants.MAXIMUMTHREADPOOLSIZETIMES * threadPoolSize,
-//                Constants.MAXIMUMTHREADIDLELIFE,
-//                TimeUnit.MINUTES,
-//                new LinkedBlockingQueue<Runnable>());
-//        sce.getServletContext().setAttribute("SubmissionThreadPool", tpe);
     }
 
     @Override
     public final void contextDestroyed(final ServletContextEvent sce) {
+        ExecutorService exServ;
+        try {
+            Context ctx = new InitialContext();
+            exServ = (ExecutorService)
+                    ctx.lookup("java:comp/env/threads/Submitter");
+        } catch (NamingException ex) {
+            exServ = (ExecutorService) sce.getServletContext().
+                    getAttribute("SubmissionThreadPool");
+        }
+        exServ.shutdown();
+        try {
+            if (!exServ.awaitTermination(
+                    Constants.MAXTHREADWAIT, TimeUnit.MINUTES)) {
+                log.warn("Failed to shutdown the submission thread pool.");
+            }
+        } catch (InterruptedException ex) {
+            log.error(ex);
+        }
     }
 }

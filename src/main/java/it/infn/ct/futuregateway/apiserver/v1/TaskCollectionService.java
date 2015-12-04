@@ -84,7 +84,7 @@ public class TaskCollectionService extends BaseService {
      */
     @POST
     @Status(Response.Status.CREATED)
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes({MediaType.APPLICATION_JSON, Constants.INDIGOMIMETYPE})
     @Produces(Constants.INDIGOMIMETYPE)
     public final Task createTask(final Task task) {
         Date now = new Date();

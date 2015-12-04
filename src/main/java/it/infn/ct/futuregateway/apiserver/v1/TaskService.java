@@ -25,7 +25,7 @@ package it.infn.ct.futuregateway.apiserver.v1;
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
 import it.infn.ct.futuregateway.apiserver.v1.resources.TaskFile;
-import it.infn.ct.futuregateway.apiserver.v1.resources.TaskFileInput;
+import it.infn.ct.futuregateway.apiserver.v1.resources.observers.TaskObserver;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -43,8 +43,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import org.apache.commons.collections4.IterableUtils;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
@@ -80,7 +78,7 @@ public class TaskService extends BaseService {
         EntityManager em = getEntityManager();
         try {
             task = em.find(Task.class, id);
-            log.error("Associated " + task.getInputFiles().size() + " files");
+            log.debug("Associated " + task.getInputFiles().size() + " files");
         } catch (RuntimeException re) {
             log.error("Impossible to retrieve the task list");
             log.error(re);
@@ -103,7 +101,7 @@ public class TaskService extends BaseService {
      */
     @Path("/input")
     @POST
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Consumes({MediaType.MULTIPART_FORM_DATA, Constants.INDIGOMIMETYPE})
     public final void setInputFile(@PathParam("id") final String id,
             @FormDataParam("file") final List<FormDataBodyPart> lstFiles) {
         if (lstFiles == null || lstFiles.isEmpty()) {
@@ -111,6 +109,7 @@ public class TaskService extends BaseService {
         }
         EntityManager em = getEntityManager();
         Task task = em.find(Task.class, id);
+        task.addObserver(new TaskObserver());
         if (task == null) {
             throw new NotFoundException("Task " + id + " does not exist");
         }
@@ -123,17 +122,9 @@ public class TaskService extends BaseService {
                 EntityTransaction et = em.getTransaction();
                 try {
                     et.begin();
-                    TaskFileInput tfi = IterableUtils.find(task.getInputFiles(),
-                            new Predicate<TaskFileInput>() {
-                        @Override
-                        public boolean evaluate(final TaskFileInput t) {
-                            return t.getName().equals(fName);
-                        }
-                    });
-                    if (tfi != null) {
-                        tfi.setStatus(TaskFile.FILESTATUS.READY);
-                        et.commit();
-                    }
+                    task.updateInputFileStatus(
+                            fName, TaskFile.FILESTATUS.READY);
+                    et.commit();
                 } catch (RuntimeException re) {
                     if (et != null && et.isActive()) {
                         et.rollback();

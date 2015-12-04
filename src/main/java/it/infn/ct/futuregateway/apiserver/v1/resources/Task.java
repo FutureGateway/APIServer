@@ -25,6 +25,7 @@ import it.infn.ct.futuregateway.apiserver.utils.LinkJaxbAdapter;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Observable;
 import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
@@ -48,18 +49,20 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.collections4.Predicate;
 import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
 
 /**
- * The Task represents  any activity a user send to an infrastructure, such as
- * a run a job in a grid computing site or deploy a VM in a cloud.
+ * The Task represents any activity a user send to an infrastructure, such as a
+ * run a job in a grid computing site or deploy a VM in a cloud.
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 @NamedQuery(name = "findTasks",
         query = "Select t.id, t.description, t.status, t.dateCreated"
-                + " from Task t where t.userName = :user")
+        + " from Task t where t.userName = :user")
 @Entity
 @Table(name = "Task")
 
@@ -70,7 +73,7 @@ import org.glassfish.jersey.linking.InjectLinks;
 
 @XmlRootElement(name = "task")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Task implements Serializable {
+public class Task extends Observable implements Serializable {
 
     /**
      * Possible status for the task.
@@ -78,13 +81,17 @@ public class Task implements Serializable {
     public enum STATUS {
 
         /**
-         * Task ready to execute in the selected infrastructure.
-         */
-        SCHEDULED,
-        /**
          * Task created but input still required.
          */
         WAITING,
+        /**
+         * Task ready to be scheduled to the infrastructure.
+         */
+        READY,
+        /**
+         * Task ready to execute in the selected infrastructure.
+         */
+        SCHEDULED,
         /**
          * In execution.
          */
@@ -233,6 +240,7 @@ public class Task implements Serializable {
 
     /**
      * Set a description for the task.
+     *
      * @param aDescription Task description
      */
     public void setDescription(final String aDescription) {
@@ -240,10 +248,10 @@ public class Task implements Serializable {
     }
 
     /**
-     * Retrieve the list of arguments for the application.
-     * This is a list of string the system will use as parameter for the
-     * application. Actually, the list will be converted in a space separated
-     * string maintaining the order of the list.
+     * Retrieve the list of arguments for the application. This is a list of
+     * string the system will use as parameter for the application. Actually,
+     * the list will be converted in a space separated string maintaining the
+     * order of the list.
      * <p>
      * The use of the list will depend on the application. In case of an
      * executable the list will be appended to the command line but for a
@@ -260,10 +268,10 @@ public class Task implements Serializable {
     }
 
     /**
-     * Set a list of arguments for the application.
-     * This is a list of string the system will use as parameter for the
-     * application. Actually, the list will be converted in a space separated
-     * string maintaining the order of the list.
+     * Set a list of arguments for the application. This is a list of string the
+     * system will use as parameter for the application. Actually, the list will
+     * be converted in a space separated string maintaining the order of the
+     * list.
      * <p>
      * The use of the list will depend on the application. In case of an
      * executable the list will be appended to the command line but for a
@@ -276,9 +284,9 @@ public class Task implements Serializable {
     }
 
     /**
-     * Retrieve the list of output files of the application.
-     * This is the list of files the system has to retrieve after the
-     * application or the service has completed its execution.
+     * Retrieve the list of output files of the application. This is the list of
+     * files the system has to retrieve after the application or the service has
+     * completed its execution.
      *
      * @return The output files
      */
@@ -289,9 +297,9 @@ public class Task implements Serializable {
     }
 
     /**
-     * Set the list of output files of the application.
-     * This is the list of files the system has to retrieve after the
-     * application or the service has completed its execution.
+     * Set the list of output files of the application. This is the list of
+     * files the system has to retrieve after the application or the service has
+     * completed its execution.
      *
      * @param someOutputFiles A list with the output files
      */
@@ -301,10 +309,10 @@ public class Task implements Serializable {
     }
 
     /**
-     * Retrieve the input files for the application.
-     * This is a map of files sent to the remote infrastructure for the
-     * execution of the application and/or service. The map key is the file
-     * name and the map value is an URL locating the file.
+     * Retrieve the input files for the application. This is a map of files sent
+     * to the remote infrastructure for the execution of the application and/or
+     * service. The map key is the file name and the map value is an URL
+     * locating the file.
      * <p>
      * The URL can be local or remote to the service.
      *
@@ -317,10 +325,10 @@ public class Task implements Serializable {
     }
 
     /**
-     * Set the input files for the application.
-     * This is a map of files sent to the remote infrastructure for the
-     * execution of the application and/or service. The map key is the file
-     * name and the map value is an URL locating the file.
+     * Set the input files for the application. This is a map of files sent to
+     * the remote infrastructure for the execution of the application and/or
+     * service. The map key is the file name and the map value is an URL
+     * locating the file.
      * <p>
      * The URL can be local or remote to the service.
      *
@@ -348,14 +356,17 @@ public class Task implements Serializable {
      * @see it.infn.ct.futuregateway.apiserver.v1.resources.Task.STATUS
      */
     public void setStatus(final STATUS aStatus) {
+        if (aStatus.equals(this.status)) {
+            setChanged();
+        }
         this.status = aStatus;
+        notifyObservers();
     }
 
     /**
-     * Get the user identifier.
-     * Every task is associated to a user. The identifier is provided by an
-     * external entity (e.g. a Web Application) and can be of any kind but has
-     * to be unique for the user.
+     * Get the user identifier. Every task is associated to a user. The
+     * identifier is provided by an external entity (e.g. a Web Application) and
+     * can be of any kind but has to be unique for the user.
      *
      * @return The user identifier
      */
@@ -364,10 +375,9 @@ public class Task implements Serializable {
     }
 
     /**
-     * Set the user identifier.
-     * Every task is associated to a user. The identifier is provided by an
-     * external entity (e.g. a Web Application) and can be of any kind but has
-     * to be unique for the user.
+     * Set the user identifier. Every task is associated to a user. The
+     * identifier is provided by an external entity (e.g. a Web Application) and
+     * can be of any kind but has to be unique for the user.
      *
      * @param aUser The user identifier
      */
@@ -428,7 +438,35 @@ public class Task implements Serializable {
      *
      * @param someLinks The list of link references
      */
-    public final void setLinks(final List<Link> someLinks) {
+    public void setLinks(final List<Link> someLinks) {
         this.links = someLinks;
+    }
+
+    /**
+     * Update the status of input files.
+     * Change the status value for the input file specified. If the name is not
+     * associated with any input file nothing happen.
+     * <p>
+     * There is not check on the file existence and real status which
+     * is delegated to the caller object.
+     *
+     * @param name File name
+     * @param aStatus New status
+     */
+    public final void updateInputFileStatus(
+            final String name, final TaskFile.FILESTATUS aStatus) {
+
+        TaskFileInput tfi = IterableUtils.find(inputFiles,
+                new Predicate<TaskFileInput>() {
+            @Override
+            public boolean evaluate(final TaskFileInput t) {
+                return t.getName().equals(name);
+            }
+        });
+        if (tfi != null) {
+            tfi.setStatus(aStatus);
+            setChanged();
+            notifyObservers();
+        }
     }
 }

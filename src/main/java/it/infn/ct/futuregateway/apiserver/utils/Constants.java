@@ -36,21 +36,28 @@ public final class Constants {
      * Default thread pool size.
      * The size of thread pool if not differently specified.
      */
-    public static final int DEFAULTTHREADPOOLSIZETIMES = 20;
+    public static final int DEFAULTTHREADPOOLSIZE = 20;
 
     /**
      * Maximum multiple of thread pool size.
-     * The thread pool can increase the size until the number of threads is
-     * MAXIMUMTHREADPOOLSIZETIMES * the base number of threads.
+     * The thread pool can increase the size until the number of threads
+     * is MAXTHREADPOOLSIZETIMES * the base number of threads.
      */
-    public static final int MAXIMUMTHREADPOOLSIZETIMES = 4;
+    public static final int MAXTHREADPOOLSIZETIMES = 4;
 
     /**
      * Maximum lifetime of idle thread.
      * Idle thread exceeding the base capacity of a pool are removed if idle
-     * for more than MAXIMUMTHREADIDLELIFE minutes.
+     * for more than MAXTHREADIDLELIFE milliseconds.
      */
-    public static final int MAXIMUMTHREADIDLELIFE = 2;
+    public static final int MAXTHREADIDLELIFE = 30000;
+
+    /**
+     * Maximum waiting time for thread to stop.
+     * Waiting time in minutes for thread to complete their work during the
+     * shutdown of the thread pool.
+     */
+    public static final int MAXTHREADWAIT = 5;
 
     /**
      * Mime type produced by the server.
