@@ -19,7 +19,6 @@
  * limitations under the License.
  ***********************************************************************
  */
-
 package it.infn.ct.futuregateway.apiserver.v1.resources.observers;
 
 import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
