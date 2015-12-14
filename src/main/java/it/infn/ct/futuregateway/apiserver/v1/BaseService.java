@@ -21,6 +21,8 @@
 
 package it.infn.ct.futuregateway.apiserver.v1;
 
+import it.infn.ct.futuregateway.apiserver.storage.Storage;
+import it.infn.ct.futuregateway.apiserver.storage.Storages;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.servlet.http.HttpServletRequest;
@@ -109,5 +111,16 @@ public abstract class BaseService {
         return (String) getRequest().
                 getServletContext().
                 getAttribute("CacheDir");
+    }
+
+    /**
+     * Retrieve the storage area manager.
+     * The storage area manager allows to store file associated with tasks
+     * and/or applications.
+     *
+     * @return The storage manager
+     */
+    protected final Storage getStorage() {
+        return Storages.getStorage(getCacheDirPath());
     }
 }

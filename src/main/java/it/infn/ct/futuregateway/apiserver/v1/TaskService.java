@@ -23,18 +23,18 @@
 package it.infn.ct.futuregateway.apiserver.v1;
 
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
+import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
 import it.infn.ct.futuregateway.apiserver.v1.resources.TaskFile;
 import it.infn.ct.futuregateway.apiserver.v1.resources.observers.TaskObserver;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
@@ -78,16 +78,68 @@ public class TaskService extends BaseService {
         EntityManager em = getEntityManager();
         try {
             task = em.find(Task.class, id);
-            log.debug("Associated " + task.getInputFiles().size() + " files");
-        } catch (RuntimeException re) {
-            log.error("Impossible to retrieve the task list");
+        } catch (IllegalArgumentException re) {
+            log.error("Impossible to retrieve the task");
             log.error(re);
             throw new RuntimeException("Impossible to access the task list");
         } finally {
             em.close();
         }
-        return task;
+        if (task == null) {
+            throw new NotFoundException();
+        } else {
+            log.debug("Associated " + task.getInputFiles().size() + " files");
+            return task;
+        }
     }
+
+
+    /**
+     * Remove the task. Task are deleted and all the associated activities and
+     * or files removed.
+     *
+     * @param id Id of the task to remove
+     */
+    @DELETE
+    public final void deleteTask(@PathParam("id") final String id) {
+        Task task;
+        EntityManager em = getEntityManager();
+        try {
+            task = em.find(Task.class, id);
+            if (task == null) {
+                throw new NotFoundException();
+            }
+            EntityTransaction et = em.getTransaction();
+            try {
+                et.begin();
+                em.remove(task);
+                et.commit();
+            } catch (RuntimeException re) {
+                if (et != null && et.isActive()) {
+                    et.rollback();
+                }
+                log.error(re);
+                log.error("Impossible to update the task");
+                em.close();
+                throw new InternalServerErrorException("Errore to remove "
+                        + "the task " + id);
+            }
+            try {
+                Storage store = getStorage();
+                store.removeAllFiles(Storage.RESOURCE.TASKS, id);
+            } catch (IOException ex) {
+                log.error("Impossible to remove the directory associated with "
+                        + "the task " + id);
+            }
+        } catch (IllegalArgumentException re) {
+            log.error("Impossible to retrieve the task list");
+            log.error(re);
+            throw new NotFoundException("Task '" + id + "' does not exist!");
+        } finally {
+            em.close();
+        }
+    }
+
 
     /**
      * Upload input files. The method store input files for the specified task.
@@ -117,7 +169,9 @@ public class TaskService extends BaseService {
             final String fName =
                     fdbp.getFormDataContentDisposition().getFileName();
             try {
-                storeFile(id, fdbp.getValueAs(InputStream.class),
+                Storage store = getStorage();
+                store.storeFile(Storage.RESOURCE.TASKS, id,
+                        fdbp.getValueAs(InputStream.class),
                         fName);
                 EntityTransaction et = em.getTransaction();
                 try {
@@ -142,25 +196,5 @@ public class TaskService extends BaseService {
             }
         }
         em.close();
-    }
-
-    /**
-     * Create the directory to store the input. Create a directory inside the
-     * temporary store with path "<taskId>/input". This is used to store the
-     * input file before the submission.
-     *
-     * @param taskId The ID of the task to associate the files
-     * @param input InputStream of the file to store
-     * @param destinationName File destination
-     * @throws IOException In case the file cannot be written
-     */
-    private void storeFile(final String taskId, final InputStream input,
-            final String destinationName) throws IOException {
-        java.nio.file.Path filePath = Paths.get(
-                getCacheDirPath(), taskId, "input", destinationName);
-
-        Files.createDirectories(filePath.getParent());
-        Files.deleteIfExists(filePath);
-        Files.copy(input, filePath);
     }
 }

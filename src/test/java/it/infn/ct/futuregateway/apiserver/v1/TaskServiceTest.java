@@ -23,6 +23,7 @@ package it.infn.ct.futuregateway.apiserver.v1;
 
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
+import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
@@ -35,40 +36,63 @@ import static org.junit.Assert.*;
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-public class TaskCollectionServiceTest extends JerseyTest {
-
+public class TaskServiceTest extends JerseyTest {
+    
     @Override
     protected Application configure() {
-        return new ResourceConfig(TaskCollectionService.class);
+        return new ResourceConfig(TaskService.class);
     }
-
     
 
     /**
-     * Test the status code for empty collection GET.
-     *
-     * The status code has to be 404.
+     * Test id the task details return correctly
      */
     @Test
-    public void emptyListTasks() {
-        Response rs = target("/v1.0/tasks").request(Constants.INDIGOMIMETYPE).
-                get();
-        assertEquals(200, rs.getStatus());
-    }
+    public void taskDetails() {
+        Response rs;
 
-    /**
-     * Test the POST of a new task in the collection.
-     */
-    @Test
-    public void createTask() {
+        rs = target("/v1.0/tasks/" + UUID.randomUUID().toString()).
+                request(Constants.INDIGOMIMETYPE).get();
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), rs.getStatus());
+
         Task ts = new Task();        
         ts.setApplication("test");
         Entity<Task> taskEntity = Entity.entity(ts, Constants.INDIGOMIMETYPE);
-        Response rs = target("/v1.0/tasks").request(Constants.INDIGOMIMETYPE).
+        rs = target("/v1.0/tasks").request(Constants.INDIGOMIMETYPE).
                 post(taskEntity);
-        assertEquals(201, rs.getStatus());
         Task newTask = rs.readEntity(Task.class);
-        assertEquals(ts.getApplication(), newTask.getApplication());
-        assertNotNull(newTask.getId());
-    }    
+
+        rs = target("/v1.0/tasks/" + newTask.getId()).
+                request(Constants.INDIGOMIMETYPE).get();
+        assertEquals(Response.Status.OK.getStatusCode(), rs.getStatus());
+        
+        Task recall = rs.readEntity(Task.class);
+        assertEquals(newTask.getId(), recall.getId());
+        assertEquals(newTask.getApplication(), recall.getApplication());
+    }
+
+
+    /**
+     * Test id the task details return correctly
+     */
+    @Test
+    public void taskDelete() {
+        Response rs;
+
+        Task ts = new Task();        
+        ts.setApplication("test");
+        Entity<Task> taskEntity = Entity.entity(ts, Constants.INDIGOMIMETYPE);
+        rs = target("/v1.0/tasks").request(Constants.INDIGOMIMETYPE).
+                post(taskEntity);
+        Task newTask = rs.readEntity(Task.class);
+
+        rs = target("/v1.0/tasks/" + newTask.getId()).
+                request(Constants.INDIGOMIMETYPE).delete();
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), rs.getStatus());
+        
+        rs = target("/v1.0/tasks/" + newTask.getId()).
+                request(Constants.INDIGOMIMETYPE).delete();
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), rs.getStatus());
+    }
+    
 }
