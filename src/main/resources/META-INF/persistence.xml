@@ -4,7 +4,7 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
         <properties>
-            <property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:file://futuregateway;shutdown=true;hsqldb.lock_file=true"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:file:../data/futuregateway;shutdown=true;hsqldb.lock_file=true"/>
             <property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbc.JDBCDriver"/>
             <property name="javax.persistence.jdbc.user" value="futuregateway"/>
             <property name="javax.persistence.jdbc.password" value="futuregateway"/>

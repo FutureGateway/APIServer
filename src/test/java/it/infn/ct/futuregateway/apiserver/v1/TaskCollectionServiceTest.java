@@ -61,14 +61,14 @@ public class TaskCollectionServiceTest extends JerseyTest {
      */
     @Test
     public void createTask() {
-        Task ts = new Task();        
-        ts.setApplication("test");
+        Task ts = new Task();
+        ts.setApplicationId("test");
         Entity<Task> taskEntity = Entity.entity(ts, Constants.INDIGOMIMETYPE);
         Response rs = target("/v1.0/tasks").request(Constants.INDIGOMIMETYPE).
                 post(taskEntity);
         assertEquals(201, rs.getStatus());
         Task newTask = rs.readEntity(Task.class);
-        assertEquals(ts.getApplication(), newTask.getApplication());
+        assertEquals(ts.getApplicationId(), newTask.getApplicationId());
         assertNotNull(newTask.getId());
     }    
 }

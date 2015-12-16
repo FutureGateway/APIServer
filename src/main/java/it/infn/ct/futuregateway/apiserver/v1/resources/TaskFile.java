@@ -96,7 +96,7 @@ public class TaskFile implements Serializable {
     }
 
     /**
-     * Set the identifier for the file.
+     * Sets the identifier for the file.
      *
      * @param anId The identifier
      */
@@ -105,7 +105,7 @@ public class TaskFile implements Serializable {
     }
 
     /**
-     * Get the value of status.
+     * Returns the value of status.
      *
      * @return the value of status
      */
@@ -114,7 +114,7 @@ public class TaskFile implements Serializable {
     }
 
     /**
-     * Set the value of status.
+     * Sets the value of status.
      *
      * @param aStatus new value of status
      */
@@ -123,7 +123,7 @@ public class TaskFile implements Serializable {
     }
 
     /**
-     * Get the value of name.
+     * Returns the value of name.
      *
      * @return The file name
      */
@@ -132,7 +132,7 @@ public class TaskFile implements Serializable {
     }
 
     /**
-     * Set the value of name.
+     * Sets the value of name.
      *
      * @param aName The name to associate with the file
      */
@@ -141,7 +141,7 @@ public class TaskFile implements Serializable {
     }
 
     /**
-     * Get the value of url.
+     * Returns the value of url.
      *
      * @return The file url
      */
@@ -151,7 +151,7 @@ public class TaskFile implements Serializable {
     }
 
     /**
-     * Set the value of url.
+     * Sets the value of url.
      *
      * @param aUrl New value for the file url
      */

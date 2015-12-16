@@ -5,5 +5,5 @@
     "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
 
 <suppressions>
-    <suppress checks="DesignForExtension" files="Task.java|TaskFile.java"/>
+    <suppress checks="DesignForExtension" files="Task.java|TaskFile.java|Application.java|Params.java"/>
 </suppressions>

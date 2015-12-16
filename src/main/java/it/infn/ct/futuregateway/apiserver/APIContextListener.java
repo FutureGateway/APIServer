@@ -66,8 +66,9 @@ public class APIContextListener implements ServletContextListener {
                     "it.infn.ct.futuregateway.apiserver.container"
             );
         } catch (Exception ex) {
-            log.warn("Resource 'jdbc/FutureGatewayDB' not defined in the "
-                    + "context. The server will use its default DB on file.");
+            log.warn("Resource 'jdbc/FutureGatewayDB' not accessuible or"
+                    + " not properly configured for the application. An"
+                    + " alternative resource is created on the fly.");
             entityManagerFactory = Persistence.createEntityManagerFactory(
                     "it.infn.ct.futuregateway.apiserver.app"
             );

@@ -24,14 +24,11 @@ package it.infn.ct.futuregateway.apiserver.v1;
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.utils.annotations.Status;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Application;
-import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
-import it.infn.ct.futuregateway.apiserver.v1.resources.TaskList;
+import it.infn.ct.futuregateway.apiserver.v1.resources.ApplicationList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -42,127 +39,108 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
 /**
- * The TaskCollectionService provide the REST APIs for the task collection
- * as defined in the documentation.
+ * The ApplicationCollectionService provide the REST APIs for the application
+ * collection as defined in the documentation.
  *
- * @see http://docs.csgfapis.apiary.io/#reference/v1.0/task-collection
+ * @see http://docs.csgfapis.apiary.io/#reference/v1.0/application-collection
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-@Path("/tasks")
-public class TaskCollectionService extends BaseService {
+@Path("/applications")
+public class ApplicationCollectionService extends BaseService {
     /**
      * Logger object.
      * Based on apache commons logging.
      */
-    private final Log log = LogFactory.getLog(TaskCollectionService.class);
+    private final Log log = LogFactory.getLog(
+            ApplicationCollectionService.class);
 
 
     /**
-     * Retrieves the list of tasks.
+     * Retrieves the list of applications.
      *
-     * The list includes only the tasks associated to the user.
-     *
-     * @return The task collection
+     * @return The application collection
      */
     @GET
     @Produces(Constants.INDIGOMIMETYPE)
-    public final TaskList listTasks() {
-        TaskList tasks;
+    public final ApplicationList listApplications() {
+        ApplicationList apps;
         try {
-            tasks = new TaskList(retrieveTaskList());
+            apps = new ApplicationList(retrieveApplicationList());
         } catch (RuntimeException re) {
             getResponse().setStatus(
                     Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
             throw re;
         }
-        return tasks;
+        return apps;
     }
 
+
     /**
-     * Register a new task.
+     * Register a new application.
      *
-     * @param task The task to register
-     * @return The task registered
+     * @param application The application to register
+     * @return The registered application
      */
     @POST
     @Status(Response.Status.CREATED)
     @Consumes({MediaType.APPLICATION_JSON, Constants.INDIGOMIMETYPE})
     @Produces(Constants.INDIGOMIMETYPE)
-    public final Task createTask(final Task task) {
+    public final Application createApplication(final Application application) {
         Date now = new Date();
-        task.setDateCreated(now);
-        task.setLastChange(now);
-        task.setStatus(Task.STATUS.WAITING);
-        task.setUserName(getUser());
+        application.setDateCreated(now);
         EntityManager em = getEntityManager();
         EntityTransaction et = null;
         try {
             et = em.getTransaction();
             et.begin();
-            Application app = em.find(Application.class,
-                    task.getApplicationId());
-            if (app == null) {
-                throw new BadRequestException();
-            }
-            task.setApplicationDetail(app);
-            em.persist(task);
+            em.persist(application);
             et.commit();
         } catch (RuntimeException re) {
             if (et != null && et.isActive()) {
                 et.rollback();
             }
-            log.error("Impossible to create a task");
-            log.debug(re);
-            throw re;
+            log.error("Impossible to create the application");
+            log.error(re);
         } finally {
             em.close();
         }
-        return task;
+        return application;
     }
 
 
     /**
-     * Retrieve a task list for the user.
-     * Tasks are retrieved from the storage for the user performing the request.
-     *
-     * @return A list of tasks
+     * Retrieve the application list.
+     * The fields not requested for the list are cleaned.
+     * @return The list of applications
      */
-    private List<Task> retrieveTaskList() {
-        List<Task> lstTasks = new LinkedList<>();
+    private List<Application> retrieveApplicationList() {
+        List<Application> lstApps;
         EntityManager em = getEntityManager();
         EntityTransaction et = null;
-        List<Object[]> taskList = null;
         try {
             et = em.getTransaction();
             et.begin();
-            taskList = em.createNamedQuery("tasks.userAll").
-                    setParameter("user", getUser()).
+            lstApps = em.createNamedQuery("applications.all",
+                    Application.class).
                     getResultList();
             et.commit();
         } catch (RuntimeException re) {
             if (et != null && et.isActive()) {
                 et.rollback();
             }
-            log.error("Impossible to retrieve the task list");
+            log.error("Impossible to retrieve the Application list");
             log.error(re);
-            throw new RuntimeException("Impossible to access the task list");
+            throw new RuntimeException("Impossible to access the "
+                    + "application list");
         } finally {
             em.close();
         }
-        if (taskList != null && !taskList.isEmpty()) {
-            for (Object[] elem: taskList) {
-                int idElem = 0;
-                Task tmpTask = new Task();
-                tmpTask.setId((String) elem[idElem++]);
-                tmpTask.setDescription((String) elem[idElem++]);
-                tmpTask.setStatus((Task.STATUS) elem[idElem++]);
-                tmpTask.setDateCreated((Date) elem[idElem]);
-                lstTasks.add(tmpTask);
+        if (lstApps != null) {
+            for (Application ap: lstApps) {
+                ap.setDescription(null);
             }
         }
-        return lstTasks;
+        return lstApps;
     }
-
 }

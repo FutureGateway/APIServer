@@ -40,58 +40,64 @@ import org.glassfish.jersey.linking.InjectLinks;
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 @InjectLinks({
-    @InjectLink(value = "tasks", rel = "self")
+    @InjectLink(value = "applications", rel = "self")
 })
-@XmlRootElement(name = "TaskList")
-public class TaskList {
+@XmlRootElement(name = "ApplicationList")
+public class ApplicationList {
 
     /**
      * List of references.
      */
     @InjectLinks({
-        @InjectLink(value = "tasks", rel = "self"),
+        @InjectLink(value = "applications", rel = "self"),
     })
     @XmlElement(name = "_links")
     @XmlJavaTypeAdapter(value = LinkJaxbAdapter.class)
     private List<Link> links;
 
-    /**
-     * List of associated tasks.
-     */
-    private List<Task> tasks;
 
     /**
-     * Create an empty task list.
-     * In this case the tasks cannot be retrieved from the storage but they
-     * have to be provided from the manger object.
+     * List of associated applications.
      */
-    public TaskList() {
+    private List<Application> applications;
+
+
+    /**
+     * Create an empty application list.
+     * In this case the applications cannot be retrieved from the storage but
+     * they have to be provided from the manger object.
+     */
+    public ApplicationList() {
     }
 
-    /**
-     * Create a task list for the user.
-     *
-     * @param someTasks Tasks to insert in the list
-     */
-    public TaskList(final List<Task> someTasks) {
-        this.tasks = someTasks;
-    }
 
     /**
-     * Retrieve the list of tasks.
+     * Create an application list for the user.
      *
-     * @return List of tasks
+     * @param someApplications Applications to insert in the list
      */
-    public final List<Task> getTasks() {
-        return tasks;
+    public ApplicationList(final List<Application> someApplications) {
+        this.applications = someApplications;
     }
 
+
     /**
-     * Set a new task list.
+     * Retrieves the list of applications.
      *
-     * @param someTasks A list of tasks
+     * @return The list of applications
      */
-    public final void setTasks(final List<Task> someTasks) {
-        this.tasks = someTasks;
+    public final List<Application> getApplications() {
+        return applications;
+    }
+
+
+    /**
+     * Set a new application list.
+     *
+     * @param someApplications A list of applications
+     */
+    public final void setApplications(
+            final List<Application> someApplications) {
+        this.applications = someApplications;
     }
 }

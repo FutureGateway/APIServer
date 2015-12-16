@@ -37,6 +37,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
@@ -48,6 +49,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Predicate;
@@ -60,9 +62,9 @@ import org.glassfish.jersey.linking.InjectLinks;
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-@NamedQuery(name = "findTasks",
-        query = "Select t.id, t.description, t.status, t.dateCreated"
-        + " from Task t where t.userName = :user")
+@NamedQuery(name = "tasks.userAll",
+        query = "SELECT t.id, t.description, t.status, t.dateCreated"
+        + " FROM Task t WHERE t.userName = :user")
 @Entity
 @Table(name = "Task")
 
@@ -130,7 +132,14 @@ public class Task extends Observable implements Serializable {
     /**
      * The id of the application associated with the task.
      */
-    private String application;
+    @XmlElement(name = "application")
+    private String applicationId;
+
+    /**
+     * The id of the application associated with the task.
+     */
+    @XmlTransient
+    private Application applicationDetail;
 
     /**
      * A user provided description of the task.
@@ -188,7 +197,7 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Set the task identifier.
+     * Sets the task identifier.
      *
      * @param anId The task identifier
      */
@@ -212,25 +221,50 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Get the id of the associated application.
+     * Returns the id of the associated application.
      *
      * @return The id of the application associated with the task
      */
-    public String getApplication() {
-        return application;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "applicationId", referencedColumnName = "id",
+            nullable = false)
+    public Application getApplicationDetail() {
+        return applicationDetail;
     }
 
     /**
-     * Set the application to associate with the task.
+     * Sets the application to associate with the task.
+     * The application has to be valid in order the task to be valid.
      *
      * @param anApplication The application identifier
      */
-    public void setApplication(final String anApplication) {
-        this.application = anApplication;
+    public void setApplicationDetail(final Application anApplication) {
+        this.applicationDetail = anApplication;
+    }
+
+
+    /**
+     * Returns the id of the associated application.
+     *
+     * @return The id of the application associated with the task
+     */
+    @Column(name = "applicationId", updatable = false, insertable = false)
+    public String getApplicationId() {
+        return applicationId;
     }
 
     /**
-     * Get the user description of the task.
+     * Sets the application to associate with the task.
+     * The application has to be valid in order the task to be valid.
+     *
+     * @param anApplication The application identifier
+     */
+    public void setApplicationId(final String anApplication) {
+        this.applicationId = anApplication;
+    }
+
+    /**
+     * Returns the user description of the task.
      *
      * @return The user description
      */
@@ -239,7 +273,7 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Set a description for the task.
+     * Sets a description for the task.
      *
      * @param aDescription Task description
      */
@@ -268,10 +302,10 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Set a list of arguments for the application. This is a list of string the
-     * system will use as parameter for the application. Actually, the list will
-     * be converted in a space separated string maintaining the order of the
-     * list.
+     * Sets a list of arguments for the application. This is a list of string
+     * the system will use as parameter for the application. Actually, the list
+     * will be converted in a space separated string maintaining the order of
+     * the list.
      * <p>
      * The use of the list will depend on the application. In case of an
      * executable the list will be appended to the command line but for a
@@ -297,7 +331,7 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Set the list of output files of the application. This is the list of
+     * Sets the list of output files of the application. This is the list of
      * files the system has to retrieve after the application or the service has
      * completed its execution.
      *
@@ -325,7 +359,7 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Set the input files for the application. This is a map of files sent to
+     * Sets the input files for the application. This is a map of files sent to
      * the remote infrastructure for the execution of the application and/or
      * service. The map key is the file name and the map value is an URL
      * locating the file.
@@ -339,7 +373,7 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Get the status of the task.
+     * Returns the status of the task.
      *
      * @return The status.
      * @see it.infn.ct.futuregateway.apiserver.v1.resources.Task.STATUS
@@ -350,7 +384,7 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Set the status for the task.
+     * Sets the status for the task.
      *
      * @param aStatus The status to associate with the task
      * @see it.infn.ct.futuregateway.apiserver.v1.resources.Task.STATUS
@@ -364,7 +398,7 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Get the user identifier. Every task is associated to a user. The
+     * Returns the user identifier. Every task is associated to a user. The
      * identifier is provided by an external entity (e.g. a Web Application) and
      * can be of any kind but has to be unique for the user.
      *
@@ -375,7 +409,7 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Set the user identifier. Every task is associated to a user. The
+     * Sets the user identifier. Every task is associated to a user. The
      * identifier is provided by an external entity (e.g. a Web Application) and
      * can be of any kind but has to be unique for the user.
      *
@@ -386,7 +420,7 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Get the creation time of the task.
+     * Returns the creation time of the task.
      *
      * @return Creation time
      */
@@ -396,7 +430,7 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Set the creation time of the task.
+     * Sets the creation time of the task.
      *
      * @param creationDate The creation time
      */
@@ -405,7 +439,7 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Get the time of last status change.
+     * Returns the time of last status change.
      *
      * @return The time of last status change
      */
@@ -415,7 +449,7 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Set the time of last status change.
+     * Sets the time of last status change.
      *
      * @param newChangeDate The time of last status change
      */
@@ -424,7 +458,7 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Get the references for this entity.
+     * Returns the references for this entity.
      *
      * @return The list of Link references
      */
@@ -434,7 +468,7 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Set the references for this entity.
+     * Sets the references for this entity.
      *
      * @param someLinks The list of link references
      */

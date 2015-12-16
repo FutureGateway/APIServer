@@ -56,7 +56,7 @@ public class TaskServiceTest extends JerseyTest {
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), rs.getStatus());
 
         Task ts = new Task();        
-        ts.setApplication("test");
+        ts.setApplicationId("test");
         Entity<Task> taskEntity = Entity.entity(ts, Constants.INDIGOMIMETYPE);
         rs = target("/v1.0/tasks").request(Constants.INDIGOMIMETYPE).
                 post(taskEntity);
@@ -68,7 +68,7 @@ public class TaskServiceTest extends JerseyTest {
         
         Task recall = rs.readEntity(Task.class);
         assertEquals(newTask.getId(), recall.getId());
-        assertEquals(newTask.getApplication(), recall.getApplication());
+        assertEquals(newTask.getApplicationId(), recall.getApplicationId());
     }
 
 
@@ -80,7 +80,7 @@ public class TaskServiceTest extends JerseyTest {
         Response rs;
 
         Task ts = new Task();        
-        ts.setApplication("test");
+        ts.setApplicationId("test");
         Entity<Task> taskEntity = Entity.entity(ts, Constants.INDIGOMIMETYPE);
         rs = target("/v1.0/tasks").request(Constants.INDIGOMIMETYPE).
                 post(taskEntity);
