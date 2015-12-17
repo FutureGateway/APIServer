@@ -96,6 +96,7 @@ public class ApplicationCollectionService extends BaseService {
             et.begin();
             em.persist(application);
             et.commit();
+            log.debug("New application registered: " + application.getId());
         } catch (RuntimeException re) {
             if (et != null && et.isActive()) {
                 et.rollback();

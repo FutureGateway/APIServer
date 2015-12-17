@@ -64,7 +64,7 @@ public class TaskService extends BaseService {
     private final Log log = LogFactory.getLog(TaskService.class);
 
     /**
-     * Retrieve the task details. Task details include all the field a task
+     * Retrieve the task details. Task details include all the fields a task
      * consist of as described in the documentation. This include all the
      * information included in the task collection and many others.
      *
@@ -95,7 +95,7 @@ public class TaskService extends BaseService {
 
 
     /**
-     * Remove the task. Task are deleted and all the associated activities and
+     * Remove the task. Task is deleted and all the associated activities and
      * or files removed.
      *
      * @param id Id of the task to remove
@@ -119,7 +119,7 @@ public class TaskService extends BaseService {
                     et.rollback();
                 }
                 log.error(re);
-                log.error("Impossible to update the task");
+                log.error("Impossible to remove the task");
                 em.close();
                 throw new InternalServerErrorException("Errore to remove "
                         + "the task " + id);
@@ -134,7 +134,7 @@ public class TaskService extends BaseService {
         } catch (IllegalArgumentException re) {
             log.error("Impossible to retrieve the task list");
             log.error(re);
-            throw new NotFoundException("Task '" + id + "' does not exist!");
+            throw new BadRequestException("Task '" + id + "' has a problem!");
         } finally {
             em.close();
         }
