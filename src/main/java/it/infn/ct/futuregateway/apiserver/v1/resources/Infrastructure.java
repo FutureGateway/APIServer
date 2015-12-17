@@ -24,13 +24,7 @@ package it.infn.ct.futuregateway.apiserver.v1.resources;
 import it.infn.ct.futuregateway.apiserver.utils.LinkJaxbAdapter;
 import java.util.List;
 import java.util.UUID;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.NamedQuery;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.ws.rs.core.Link;
@@ -43,42 +37,34 @@ import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
 
 /**
- * The Application represents the operation a user can perform in a remote
- * infrastructure.
- * An application describes the activity a user task will perform in the remote
- * infrastructure associated. An application can execute in multiple
- * infrastructures but only one infrastructure is associated with a task.
+ * The Infrastructure represents the remote infrastructure where application
+ * can execute.
+ * An infrastructure describes all the relevant information to allow the access
+ * and execution of applications and services in a remote infrastructure.
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-@NamedQuery(name = "applications.all",
-        query = "SELECT a FROM Application a")
 
 @Entity
-@Table(name = "Application")
+@Table(name = "Infrastructure")
 
 @InjectLinks({
-    @InjectLink(value = "applications/{id}", rel = "self"),
+    @InjectLink(value = "infrastructures/{id}", rel = "self"),
 })
 
-@XmlRootElement(name = "application")
+@XmlRootElement(name = "infrastructure")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Application extends AccessibleElements {
+public class Infrastructure extends AccessibleElements {
 
     /**
      * List of references.
      */
-    @InjectLinks({
-        @InjectLink(value = "applications/{id}", rel = "self"),
-    })
+    @InjectLinks(value = {
+        @InjectLink(value = "infrastructures/{id}", rel = "self")})
     @XmlElement(name = "_links")
     @XmlJavaTypeAdapter(value = LinkJaxbAdapter.class)
     private List<Link> links;
 
-    /**
-     * Arguments to provide to the application.
-     */
-    private List<String> infrastructures;
 
     /**
      * Initialise the id.
@@ -95,29 +81,4 @@ public class Application extends AccessibleElements {
         }
     }
 
-
-    /**
-     * Returns the infrastructures.
-     *
-     * @return A list of infrastructures
-     */
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "application_infrastructures",
-            joinColumns = @JoinColumn(name = "id"))
-    @Column(name = "infrastructures")
-    public List<String> getInfrastructures() {
-        return infrastructures;
-    }
-
-
-    /**
-     * Sets the infrastructures.
-     * The infrastructures has to be registered before in order to associate
-     * an application.
-     *
-     * @param someInfrastructures A list of infrastructures
-     */
-    public void setInfrastructures(final List<String> someInfrastructures) {
-        this.infrastructures = someInfrastructures;
-    }
 }
