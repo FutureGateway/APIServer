@@ -38,6 +38,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
@@ -62,9 +63,13 @@ import org.glassfish.jersey.linking.InjectLinks;
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-@NamedQuery(name = "tasks.userAll",
-        query = "SELECT t.id, t.description, t.status, t.dateCreated"
-        + " FROM Task t WHERE t.userName = :user")
+@NamedQueries({
+    @NamedQuery(name = "tasks.userAll",
+            query = "SELECT t.id, t.description, t.status, t.dateCreated"
+            + " FROM Task t WHERE t.userName = :user"),
+    @NamedQuery(name = "tasks.forApplication",
+            query = "SELECT t.id FROM Task t WHERE t.applicationId = :appId")
+})
 @Entity
 @Table(name = "Task")
 

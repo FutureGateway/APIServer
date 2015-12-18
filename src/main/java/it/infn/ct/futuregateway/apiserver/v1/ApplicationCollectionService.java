@@ -25,10 +25,13 @@ import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.utils.annotations.Status;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Application;
 import it.infn.ct.futuregateway.apiserver.v1.resources.ApplicationList;
+import it.infn.ct.futuregateway.apiserver.v1.resources.Infrastructure;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -48,6 +51,7 @@ import org.apache.commons.logging.LogFactory;
  */
 @Path("/applications")
 public class ApplicationCollectionService extends BaseService {
+
     /**
      * Logger object.
      * Based on apache commons logging.
@@ -94,9 +98,23 @@ public class ApplicationCollectionService extends BaseService {
         try {
             et = em.getTransaction();
             et.begin();
+            List<Infrastructure> lstInfra = new LinkedList<>();
+            for (String infraId: application.getInfrastructureIds()) {
+                Infrastructure infra = em.find(Infrastructure.class,
+                        infraId);
+                if (infra != null) {
+                    lstInfra.add(infra);
+                }
+            }
+            if (lstInfra.isEmpty()) {
+                throw new BadRequestException();
+            }
+            application.setInfrastructures(lstInfra);
             em.persist(application);
             et.commit();
             log.debug("New application registered: " + application.getId());
+        } catch (BadRequestException bre) {
+            throw bre;
         } catch (RuntimeException re) {
             if (et != null && et.isActive()) {
                 et.rollback();
@@ -140,6 +158,7 @@ public class ApplicationCollectionService extends BaseService {
         if (lstApps != null) {
             for (Application ap: lstApps) {
                 ap.setDescription(null);
+                ap.setParameters(null);
             }
         }
         return lstApps;

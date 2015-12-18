@@ -23,6 +23,7 @@ package it.infn.ct.futuregateway.apiserver.v1;
 
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Application;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.ws.rs.BadRequestException;
@@ -33,11 +34,16 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
+ * The ApplicationService provides the REST APIs for the application as defined
+ * in the documentation.
  *
+ * @see http://docs.csgfapis.apiary.io/#reference/v1.0/task
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 @Path("/applications/{id}")
@@ -50,7 +56,7 @@ public class ApplicationService extends BaseService {
 
 
     /**
-     * Retrieve the application details.
+     * Retrieves the application details.
      * Application details include all the fields an application
      * consist of as described in the documentation. This include all the
      * information included in the task collection and many others.
@@ -83,16 +89,16 @@ public class ApplicationService extends BaseService {
 
 
     /**
-     * Remove the application. Delete the application only if there are not
+     * Removes the application. Delete the application only if there are not
      * tasks associated with it because tasks must be associated with an
      * application.
      * <p>
-     * Applications with associated tasks can only be disable to avoid future
+     * Applications with associated tasks can only be disabled to avoid future
      * execution of new tasks. Nevertheless, a task can be associated with a
      * disabled application and in this case will stay waiting until the
      * application is enabled.
      *
-     * @param id Id of the task to remove
+     * @param id Id of the application to remove
      */
     @DELETE
     public final void deleteApp(@PathParam("id") final String id) {
@@ -106,7 +112,18 @@ public class ApplicationService extends BaseService {
             EntityTransaction et = em.getTransaction();
             try {
                 et.begin();
-                em.remove(app);
+                List<Object[]> taskForApp = em.
+                        createNamedQuery("tasks.forApplication").
+                        setParameter("appId", id).
+                        setMaxResults(1).
+                        getResultList();
+                if (taskForApp == null || taskForApp.isEmpty()) {
+                    em.remove(app);
+                } else {
+                    throw new WebApplicationException("The application cannot "
+                            + "be removed because there are associated tasks",
+                            Response.Status.CONFLICT);
+                }
                 et.commit();
             } catch (RuntimeException re) {
                 if (et != null && et.isActive()) {
@@ -121,7 +138,8 @@ public class ApplicationService extends BaseService {
         } catch (IllegalArgumentException re) {
             log.error("Impossible to retrieve the application list");
             log.error(re);
-            throw new BadRequestException("Task '" + id + "' does not exist!");
+            throw new BadRequestException("Application '" + id + "' "
+                    + "does not exist!");
         } finally {
             em.close();
         }

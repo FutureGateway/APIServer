@@ -110,6 +110,8 @@ public class TaskCollectionService extends BaseService {
             em.persist(task);
             et.commit();
             log.debug("New task registered: " + task.getId());
+        } catch (BadRequestException bre) {
+            throw bre;
         } catch (RuntimeException re) {
             if (et != null && et.isActive()) {
                 et.rollback();

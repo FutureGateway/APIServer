@@ -31,12 +31,12 @@ import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
 
 /**
- * The TaskList represents a collection of tasks.
+ * The ApplicationList represents a collection of applications.
  * This is a utility resource used to represent the collection correctly. The
  * resource annotation does not allow to define the collection representation
  * as defined in the documentation and this class is the workaround.
  *
- * @see http://docs.csgfapis.apiary.io/#reference/v1.0/task-collection
+ * @see http://docs.csgfapis.apiary.io/#reference/v1.0/application-collection
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 @InjectLinks({

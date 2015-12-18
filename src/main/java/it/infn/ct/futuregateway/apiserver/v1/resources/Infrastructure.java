@@ -25,6 +25,7 @@ import it.infn.ct.futuregateway.apiserver.utils.LinkJaxbAdapter;
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.Entity;
+import javax.persistence.NamedQuery;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.ws.rs.core.Link;
@@ -44,6 +45,8 @@ import org.glassfish.jersey.linking.InjectLinks;
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
+@NamedQuery(name = "infrastructures.all",
+        query = "SELECT i FROM Infrastructure i")
 
 @Entity
 @Table(name = "Infrastructure")

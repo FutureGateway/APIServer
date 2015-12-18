@@ -24,12 +24,16 @@ package it.infn.ct.futuregateway.apiserver.v1.resources;
 import it.infn.ct.futuregateway.apiserver.utils.LinkJaxbAdapter;
 import java.util.List;
 import java.util.UUID;
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
@@ -38,6 +42,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
@@ -51,8 +56,13 @@ import org.glassfish.jersey.linking.InjectLinks;
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-@NamedQuery(name = "applications.all",
-        query = "SELECT a FROM Application a")
+@NamedQueries({
+    @NamedQuery(name = "applications.all",
+            query = "SELECT a FROM Application a"),
+    @NamedQuery(name = "applications.forInfrastructure",
+            query = "SELECT a.id FROM Application a INNER JOIN "
+                    + "a.infrastructures i WHERE i.id = :infraId")
+})
 
 @Entity
 @Table(name = "Application")
@@ -76,9 +86,16 @@ public class Application extends AccessibleElements {
     private List<Link> links;
 
     /**
-     * Arguments to provide to the application.
+     * Infrastructures associated with the application.
      */
-    private List<String> infrastructures;
+    @XmlTransient
+    private List<Infrastructure> infrastructures;
+
+    /**
+     * Infrastructures associated with the application.
+     */
+    @XmlElement(name = "infrastructures")
+    private List<String> infrastructureIds;
 
     /**
      * Initialise the id.
@@ -97,15 +114,19 @@ public class Application extends AccessibleElements {
 
 
     /**
-     * Returns the infrastructures.
+     * Retrieves the infrastructures.
      *
      * @return A list of infrastructures
      */
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "application_infrastructures",
-            joinColumns = @JoinColumn(name = "id"))
-    @Column(name = "infrastructures")
-    public List<String> getInfrastructures() {
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "Application_Infrastructures",
+            joinColumns = {@JoinColumn(name = "applicationId",
+                    referencedColumnName = "id",
+                    nullable = false)},
+            inverseJoinColumns = {@JoinColumn(name = "infrastructureId",
+                    referencedColumnName = "id",
+                    nullable = false)})
+    public List<Infrastructure> getInfrastructures() {
         return infrastructures;
     }
 
@@ -117,7 +138,31 @@ public class Application extends AccessibleElements {
      *
      * @param someInfrastructures A list of infrastructures
      */
-    public void setInfrastructures(final List<String> someInfrastructures) {
+    public void setInfrastructures(
+            final List<Infrastructure> someInfrastructures) {
         this.infrastructures = someInfrastructures;
+    }
+
+
+    /**
+     * Retrieves the list of infrastructure identifiers.
+     *
+     * @return List of identifiers
+     */
+    @ElementCollection
+    @CollectionTable(name = "Application_Infrastructures")
+    @Column(name = "infrastructureId", updatable = false, insertable = false)
+    public List<String> getInfrastructureIds() {
+        return infrastructureIds;
+    }
+
+
+    /**
+     * Sets the list of infrastructures.
+     *
+     * @param someInfrastructureIds The list of infrastructure identifiers
+     */
+    public void setInfrastructureIds(final List<String> someInfrastructureIds) {
+        this.infrastructureIds = someInfrastructureIds;
     }
 }

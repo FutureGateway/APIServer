@@ -49,7 +49,7 @@ import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 /**
- * The TaskService provide the REST APIs for the task as defined in the
+ * The TaskService provides the REST APIs for the task as defined in the
  * documentation.
  *
  * @see http://docs.csgfapis.apiary.io/#reference/v1.0/task
@@ -64,7 +64,7 @@ public class TaskService extends BaseService {
     private final Log log = LogFactory.getLog(TaskService.class);
 
     /**
-     * Retrieve the task details. Task details include all the fields a task
+     * Retrieves the task details. Task details include all the fields a task
      * consist of as described in the documentation. This include all the
      * information included in the task collection and many others.
      *
@@ -95,7 +95,7 @@ public class TaskService extends BaseService {
 
 
     /**
-     * Remove the task. Task is deleted and all the associated activities and
+     * Removes the task. Task is deleted and all the associated activities and
      * or files removed.
      *
      * @param id Id of the task to remove
@@ -142,7 +142,7 @@ public class TaskService extends BaseService {
 
 
     /**
-     * Upload input files. The method store input files for the specified task.
+     * Uploads input files. The method store input files for the specified task.
      * Input files are provided as a <i>multipart form data</i> using the field
      * file. This can contains multiple file using the html input attribute
      * <i>multiple="multiple"</i> which allows to associate multiple files with
@@ -153,7 +153,7 @@ public class TaskService extends BaseService {
      */
     @Path("/input")
     @POST
-    @Consumes({MediaType.MULTIPART_FORM_DATA, Constants.INDIGOMIMETYPE})
+    @Consumes({MediaType.MULTIPART_FORM_DATA})
     public final void setInputFile(@PathParam("id") final String id,
             @FormDataParam("file") final List<FormDataBodyPart> lstFiles) {
         if (lstFiles == null || lstFiles.isEmpty()) {
