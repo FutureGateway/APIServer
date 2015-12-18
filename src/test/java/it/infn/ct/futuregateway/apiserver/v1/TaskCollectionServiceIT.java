@@ -22,53 +22,61 @@
 package it.infn.ct.futuregateway.apiserver.v1;
 
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
-import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
+import static junit.framework.Assert.assertEquals;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-public class TaskCollectionServiceTest extends JerseyTest {
-
+public class TaskCollectionServiceIT extends JerseyTest {
+//
     @Override
-    protected Application configure() {
+    protected final Application configure() {
         return new ResourceConfig(TaskCollectionService.class);
     }
-
-    
-
+//
+//
+//
+//    /**
+//     * Test the status code for empty collection GET.
+//     *
+//     * The status code has to be 404.
+//     */
+//    @Test
+//    public void emptyListTasks() {
+//        Response rs = target("/v1.0/tasks").request(Constants.INDIGOMIMETYPE).
+//                get();
+//        assertEquals(200, rs.getStatus());
+//    }
+//
+//    /**
+//     * Test the POST of a new task in the collection.
+//     */
+//    @Test
+//    public void createTask() {
+//        Task ts = new Task();
+//        ts.setApplicationId("test");
+//        Entity<Task> taskEntity = Entity.entity(ts, Constants.INDIGOMIMETYPE);
+//        Response rs = target("/v1.0/tasks").request(Constants.INDIGOMIMETYPE).
+//                post(taskEntity);
+//        assertEquals(201, rs.getStatus());
+//        Task newTask = rs.readEntity(Task.class);
+//        assertEquals(ts.getApplicationId(), newTask.getApplicationId());
+//        assertNotNull(newTask.getId());
+//    }
+//
     /**
-     * Test the status code for empty collection GET.
-     *
-     * The status code has to be 404.
+     * Ciccio.
      */
     @Test
-    public void emptyListTasks() {
+    public final void emptyListTasks() {
         Response rs = target("/v1.0/tasks").request(Constants.INDIGOMIMETYPE).
                 get();
-        assertEquals(200, rs.getStatus());
+        assertEquals(Response.Status.OK, rs.getStatus());
     }
-
-    /**
-     * Test the POST of a new task in the collection.
-     */
-    @Test
-    public void createTask() {
-        Task ts = new Task();
-        ts.setApplicationId("test");
-        Entity<Task> taskEntity = Entity.entity(ts, Constants.INDIGOMIMETYPE);
-        Response rs = target("/v1.0/tasks").request(Constants.INDIGOMIMETYPE).
-                post(taskEntity);
-        assertEquals(201, rs.getStatus());
-        Task newTask = rs.readEntity(Task.class);
-        assertEquals(ts.getApplicationId(), newTask.getApplicationId());
-        assertNotNull(newTask.getId());
-    }    
 }

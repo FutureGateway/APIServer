@@ -133,6 +133,7 @@
                         <id>validate</id>
                         <phase>validate</phase>
                         <configuration>
+                            <includeTestSourceDirectory>true</includeTestSourceDirectory>
                             <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
                             <encoding>UTF-8</encoding>
                             <consoleOutput>true</consoleOutput>
@@ -150,6 +151,27 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19</version>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.19</version>
+                <configuration>
+                    <includes>
+                        <include>**/*IT.java</include>
+                    </includes>
+                    <systemPropertyVariables>
+                        <jersey.config.test.container.factory>${external.container.factory}</jersey.config.test.container.factory>
+                        <jersey.config.test.container.port>${external.container.port}</jersey.config.test.container.port>
+                    </systemPropertyVariables>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <repositories>
@@ -159,30 +181,6 @@
             <url>file:${project.basedir}/lib</url>
         </repository>
     </repositories>
-    <profiles>
-        <profile>
-            <id>run-tests</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <systemPropertyVariables>
-                                <jersey.config.test.container.factory>${external.container.factory}</jersey.config.test.container.factory>
-                                <jersey.config.test.container.port>${external.container.port}</jersey.config.test.container.port>
-                            </systemPropertyVariables>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-            <properties>
-                <external.container.factory>org.glassfish.jersey.test.external.ExternalTestContainerFactory</external.container.factory>
-                <external.container.port>8080</external.container.port>                                
-                <maven.test.skip>false</maven.test.skip>
-            </properties>
-        </profile>
-    </profiles>
     <properties>
         <jersey.version>2.22.1</jersey.version>
         <javax.el>2.2.4</javax.el>
@@ -191,6 +189,7 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.test.skip>true</maven.test.skip>
+        <external.container.factory>org.glassfish.jersey.test.external.ExternalTestContainerFactory</external.container.factory>
+        <external.container.port>8080</external.container.port>                                
     </properties>
 </project>

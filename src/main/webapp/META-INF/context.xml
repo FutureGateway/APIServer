@@ -1,14 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context path="">
-    <Resource auth="Container" driverClassName="org.hsqldb.jdbc.JDBCDriver"
-              maxIdle="30" maxWaitMillis="10000"
-              name="jdbc/FutureGatewayDB" password="futuregateway"
-              type="javax.sql.DataSource"
-              url="jdbc:hsqldb:file:///tmp/futuregatewayTmp;shutdown=true;hsqldb.lock_file=true"
-              username="futuregateway"/>
-
-    <Resource auth="Container" name="threads/Submitter"
-              type="java.util.concurrent.ExecutorService"
-              factory="it.infn.ct.futuregateway.apiserver.utils.ThreadPoolFactory"
-              poolSize="4" maxPoolSize="20" maxThreadIdleTimeMills="30000"/>
+  <Resource auth="Container" driverClassName="org.hsqldb.jdbc.JDBCDriver" maxIdle="30" maxWaitMillis="10000" name="jdbc/FutureGatewayDB" password="futuregateway" type="javax.sql.DataSource" url="jdbc:hsqldb:file:///tmp/futuregatewayTmp;shutdown=true;hsqldb.lock_file=true" username="futuregateway"/>
+  <Resource auth="Container" factory="it.infn.ct.futuregateway.apiserver.utils.ThreadPoolFactory" maxPoolSize="20" maxThreadIdleTimeMills="30000" name="threads/Submitter" poolSize="4" type="java.util.concurrent.ExecutorService"/>
 </Context>
