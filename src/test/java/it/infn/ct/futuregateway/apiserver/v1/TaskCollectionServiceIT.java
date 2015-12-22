@@ -24,9 +24,9 @@ package it.infn.ct.futuregateway.apiserver.v1;
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
-import static junit.framework.Assert.assertEquals;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 /**
@@ -34,7 +34,8 @@ import org.junit.Test;
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 public class TaskCollectionServiceIT extends JerseyTest {
-//
+
+
     @Override
     protected final Application configure() {
         return new ResourceConfig(TaskCollectionService.class);
@@ -71,12 +72,12 @@ public class TaskCollectionServiceIT extends JerseyTest {
 //    }
 //
     /**
-     * Ciccio.
+     * Test .
      */
     @Test
     public final void emptyListTasks() {
         Response rs = target("/v1.0/tasks").request(Constants.INDIGOMIMETYPE).
                 get();
-        assertEquals(Response.Status.OK, rs.getStatus());
+        assertEquals(Response.Status.OK.getStatusCode(), rs.getStatus());
     }
 }

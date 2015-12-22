@@ -140,4 +140,23 @@ public class Params implements Serializable {
         this.id = anId;
     }
 
+
+
+    @Override
+    public final boolean equals(final Object obj) {
+        if (!(obj instanceof Params)) {
+            return false;
+        }
+        Params tmpParam = (Params) obj;
+        return this.name.equals(tmpParam.name)
+                && this.value.equals(tmpParam.value)
+                && this.description.equals(tmpParam.description);
+    }
+
+
+
+    @Override
+    public final int hashCode() {
+        return name.concat(value).concat(description).hashCode();
+    }
 }

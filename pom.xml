@@ -120,6 +120,11 @@
             <artifactId>commons-collections4</artifactId>
             <version>LATEST</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>LATEST</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>APIServer</finalName>
@@ -189,6 +194,7 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <external.container.factory>org.glassfish.jersey.test.external.ExternalTestContainerFactory</external.container.factory>
         <external.container.port>8080</external.container.port>                                
     </properties>
