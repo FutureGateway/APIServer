@@ -150,7 +150,10 @@ public class Application extends AccessibleElements {
      * @return List of identifiers
      */
     @ElementCollection
-    @CollectionTable(name = "Application_Infrastructures")
+    @CollectionTable(name = "Application_Infrastructures",
+            joinColumns = {@JoinColumn(name = "applicationId",
+                    referencedColumnName = "id",
+                    nullable = false)})
     @Column(name = "infrastructureId", updatable = false, insertable = false)
     public List<String> getInfrastructureIds() {
         return infrastructureIds;

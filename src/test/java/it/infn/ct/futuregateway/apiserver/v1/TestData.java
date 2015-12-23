@@ -21,6 +21,7 @@
 
 package it.infn.ct.futuregateway.apiserver.v1;
 
+import it.infn.ct.futuregateway.apiserver.v1.resources.Application;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Infrastructure;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Params;
 import java.util.LinkedList;
@@ -57,6 +58,9 @@ public final class TestData {
      * Random generator for the boolean.
      */
     private static Random rnd = new Random();
+
+
+
     /**
      * Create a random infrastructure.
      * Data are randomly generated.
@@ -85,6 +89,35 @@ public final class TestData {
         return infra;
     }
 
+
+    /**
+     * Create a random infrastructure.
+     * All data are randomly generated but the infrastructure which is not
+     * included.
+     *
+     * @return The infrastructure
+     */
+    public static Application crateApplication() {
+        Application app = new Application();
+        app.setName(RandomStringUtils.randomAlphanumeric(
+                (int) (1 + (Math.random() * MAX_STRING_LENGTH))));
+        app.setDescription(RandomStringUtils.randomAlphanumeric(
+                (int) (1 + (Math.random() * MAX_DESC_LENGTH))));
+        app.setEnabled(rnd.nextBoolean());
+        List<Params> params = new LinkedList();
+        for (int i = 0; i < (int) (Math.random() * MAX_ENTITIES_IN_LIST); i++) {
+            Params p = new Params();
+            p.setDescription(RandomStringUtils.randomAlphanumeric(
+                    (int) (1 + (Math.random() * MAX_DESC_LENGTH))));
+            p.setName(RandomStringUtils.randomAlphanumeric(
+                    (int) (1 + (Math.random() * MAX_STRING_LENGTH))));
+            p.setValue(RandomStringUtils.randomAlphanumeric(
+                    (int) (1 + (Math.random() * MAX_STRING_LENGTH))));
+            params.add(p);
+        }
+        app.setParameters(params);
+        return app;
+    }
 
     /**
      * Utility class cannot be allocated.

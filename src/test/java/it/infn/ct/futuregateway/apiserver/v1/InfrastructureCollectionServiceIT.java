@@ -92,6 +92,7 @@ public class InfrastructureCollectionServiceIT extends JerseyTest {
      */
     @Test
     public final void testAddInfrastructure() {
+        //FIXME: Add test for infrastructures missing some parameters
         Infrastructure infra = TestData.crateInfrastructure();
         Entity<Infrastructure> infraEntity = Entity.entity(infra,
                 Constants.INDIGOMIMETYPE);

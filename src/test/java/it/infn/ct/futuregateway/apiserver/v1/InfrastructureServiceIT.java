@@ -33,6 +33,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
+ * Integration tests for the Infrastructure.
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */

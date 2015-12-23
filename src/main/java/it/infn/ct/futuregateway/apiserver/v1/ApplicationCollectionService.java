@@ -91,6 +91,9 @@ public class ApplicationCollectionService extends BaseService {
     @Consumes({MediaType.APPLICATION_JSON, Constants.INDIGOMIMETYPE})
     @Produces(Constants.INDIGOMIMETYPE)
     public final Application createApplication(final Application application) {
+        if (application.getInfrastructureIds() == null) {
+            throw new BadRequestException();
+        }
         Date now = new Date();
         application.setDateCreated(now);
         EntityManager em = getEntityManager();
@@ -106,23 +109,29 @@ public class ApplicationCollectionService extends BaseService {
                     lstInfra.add(infra);
                 }
             }
-            if (lstInfra.isEmpty()) {
+            if (!lstInfra.isEmpty()) {
+                application.setInfrastructures(lstInfra);
+                em.persist(application);
+            } else {
                 throw new BadRequestException();
             }
-            application.setInfrastructures(lstInfra);
-            em.persist(application);
             et.commit();
             log.debug("New application registered: " + application.getId());
-        } catch (BadRequestException bre) {
-            throw bre;
+        } catch (BadRequestException re) {
+            throw re;
         } catch (RuntimeException re) {
             if (et != null && et.isActive()) {
                 et.rollback();
             }
             log.error("Impossible to create the application");
             log.error(re);
+            throw re;
         } finally {
             em.close();
+        }
+        if (application.getInfrastructures() == null
+                || application.getInfrastructures().isEmpty()) {
+            throw new BadRequestException();
         }
         return application;
     }
