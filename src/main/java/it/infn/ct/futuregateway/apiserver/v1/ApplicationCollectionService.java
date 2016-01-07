@@ -27,7 +27,6 @@ import it.infn.ct.futuregateway.apiserver.v1.resources.Application;
 import it.infn.ct.futuregateway.apiserver.v1.resources.ApplicationList;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Infrastructure;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -91,7 +90,8 @@ public class ApplicationCollectionService extends BaseService {
     @Consumes({MediaType.APPLICATION_JSON, Constants.INDIGOMIMETYPE})
     @Produces(Constants.INDIGOMIMETYPE)
     public final Application createApplication(final Application application) {
-        if (application.getInfrastructureIds() == null) {
+        if (application.getInfrastructureIds() == null
+                || application.getInfrastructureIds().isEmpty()) {
             throw new BadRequestException();
         }
         Date now = new Date();
@@ -101,20 +101,17 @@ public class ApplicationCollectionService extends BaseService {
         try {
             et = em.getTransaction();
             et.begin();
-            List<Infrastructure> lstInfra = new LinkedList<>();
+//            List<Infrastructure> lstInfra = new LinkedList<>();
             for (String infraId: application.getInfrastructureIds()) {
                 Infrastructure infra = em.find(Infrastructure.class,
                         infraId);
-                if (infra != null) {
-                    lstInfra.add(infra);
+                if (infra == null) {
+                    throw new BadRequestException();
                 }
+//                lstInfra.add(infra);
             }
-            if (!lstInfra.isEmpty()) {
-                application.setInfrastructures(lstInfra);
-                em.persist(application);
-            } else {
-                throw new BadRequestException();
-            }
+//            application.setInfrastructures(lstInfra);
+            em.persist(application);
             et.commit();
             log.debug("New application registered: " + application.getId());
         } catch (BadRequestException re) {
@@ -128,10 +125,6 @@ public class ApplicationCollectionService extends BaseService {
             throw re;
         } finally {
             em.close();
-        }
-        if (application.getInfrastructures() == null
-                || application.getInfrastructures().isEmpty()) {
-            throw new BadRequestException();
         }
         return application;
     }

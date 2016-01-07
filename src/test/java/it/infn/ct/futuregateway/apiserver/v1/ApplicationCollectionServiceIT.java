@@ -180,7 +180,7 @@ public class ApplicationCollectionServiceIT extends JerseyTest {
         rs = target("/v1.0/applications").
                 request(Constants.INDIGOMIMETYPE).post(appEntity);
         Application newApp = rs.readEntity(Application.class);
-
+//FIXME: This test should go in the infrastructure
         rs = target("/v1.0/infrastructures/" + infra.get(0)).
                 request(Constants.INDIGOMIMETYPE).delete();
         Assert.assertEquals(Response.Status.CONFLICT.getStatusCode(),

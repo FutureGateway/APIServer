@@ -120,6 +120,8 @@ public class ApplicationService extends BaseService {
                 if (taskForApp == null || taskForApp.isEmpty()) {
                     em.remove(app);
                 } else {
+                    log.info("Application " + id + " has tasks and cannot be"
+                            + " deleted");
                     throw new WebApplicationException("The application cannot "
                             + "be removed because there are associated tasks",
                             Response.Status.CONFLICT);
@@ -131,8 +133,7 @@ public class ApplicationService extends BaseService {
                 }
                 log.error(re);
                 log.error("Impossible to remove the application");
-                em.close();
-                throw new InternalServerErrorException("Errore to remove "
+                throw new InternalServerErrorException("Error to remove "
                         + "the application " + id);
             }
         } catch (IllegalArgumentException re) {

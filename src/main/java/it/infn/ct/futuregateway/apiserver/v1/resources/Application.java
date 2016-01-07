@@ -118,7 +118,7 @@ public class Application extends AccessibleElements {
      *
      * @return A list of infrastructures
      */
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
     @JoinTable(name = "Application_Infrastructures",
             joinColumns = {@JoinColumn(name = "applicationId",
                     referencedColumnName = "id",
@@ -149,7 +149,7 @@ public class Application extends AccessibleElements {
      *
      * @return List of identifiers
      */
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "Application_Infrastructures",
             joinColumns = {@JoinColumn(name = "applicationId",
                     referencedColumnName = "id",

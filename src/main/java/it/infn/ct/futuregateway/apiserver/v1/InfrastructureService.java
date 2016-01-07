@@ -123,13 +123,14 @@ public class InfrastructureService extends BaseService {
                             Response.Status.CONFLICT);
                 }
                 et.commit();
+            } catch (WebApplicationException wex) {
+                throw wex;
             } catch (RuntimeException re) {
                 if (et != null && et.isActive()) {
                     et.rollback();
                 }
                 log.error(re);
                 log.error("Impossible to remove the infrastructure");
-                em.close();
                 throw new InternalServerErrorException("Errore to remove "
                         + "the infrastructure " + id);
             }
