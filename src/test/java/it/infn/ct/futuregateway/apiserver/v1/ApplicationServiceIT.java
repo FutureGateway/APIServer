@@ -21,9 +21,128 @@
  */
 package it.infn.ct.futuregateway.apiserver.v1;
 
+import it.infn.ct.futuregateway.apiserver.utils.Constants;
+import it.infn.ct.futuregateway.apiserver.v1.resources.Application;
+import it.infn.ct.futuregateway.apiserver.v1.resources.Infrastructure;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Response;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.test.JerseyTest;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 /**
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-public class ApplicationServiceIT {
+public class ApplicationServiceIT extends JerseyTest {
+
+    /**
+     * Infrastructure to associate with the applications.
+     */
+    private List<String> infra;
+
+
+
+    @Override
+    protected final javax.ws.rs.core.Application configure() {
+        return new ResourceConfig(ApplicationService.class);
+    }
+
+
+    /**
+     * Create an infrastructure to associate the applications with.
+     */
+    @Before
+    public final void prepareInfrastructure() {
+        infra = new LinkedList<>();
+        for (int i = 0;
+                i < 1 + (int) TestData.MAX_ENTITIES_IN_LIST * Math.random();
+                i++) {
+            Entity<Infrastructure> infraEntity = Entity.entity(
+                    TestData.crateInfrastructure(),
+                    Constants.INDIGOMIMETYPE);
+            Response rs = target("/v1.0/infrastructures").
+                    request(Constants.INDIGOMIMETYPE).post(infraEntity);
+            infra.add(rs.readEntity(Infrastructure.class).getId());
+        }
+    }
+
+
+    /**
+     * Remove the infrastructure after the tests.
+     */
+    @After
+    public final void cleanInfrastructure() {
+        for (String id: infra) {
+            target("/v1.0/infrastructures/" + id).
+                request().delete();
+        }
+    }
+
+
+    /**
+     * Tests the details retrieval.
+     */
+    @Test
+    public final void testApplicationDetails() {
+        Application newApp = TestData.crateApplication();
+        newApp.setInfrastructureIds(infra);
+        Response rs;
+        rs = target("/v1.0/applications").
+                request(Constants.INDIGOMIMETYPE).
+                post(Entity.entity(newApp, Constants.INDIGOMIMETYPE));
+        rs = target("/v1.0/applications/"
+                + rs.readEntity(Application.class).getId()).
+                request(Constants.INDIGOMIMETYPE).get();
+
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), rs.getStatus());
+        Application app = rs.readEntity(Application.class);
+        Assert.assertNotNull(app);
+        Assert.assertNotNull(app.getId());
+        Assert.assertNotNull(app.getDateCreated());
+        Assert.assertNotNull(app.getParameters());
+        Assert.assertEquals(newApp.isEnabled(), app.isEnabled());
+        Assert.assertEquals(newApp.getName(), app.getName());
+        Assert.assertEquals(newApp.getDescription(), app.getDescription());
+        Assert.assertEquals(newApp.getParameters(), app.getParameters());
+        Assert.assertEquals(newApp.getInfrastructureIds(),
+                app.getInfrastructureIds());
+        target("/v1.0/applications/" + app.getId()).
+                request().delete();
+    }
+
+
+
+    /**
+     * Tests the delete.
+     */
+    @Test
+    public final void testApplicationDelete() {
+        Response rs;
+        rs = target("/v1.0/applications/" + UUID.randomUUID()).
+                request().delete();
+        Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(),
+                rs.getStatus());
+
+        Application testApp = TestData.crateApplication();
+        testApp.setInfrastructureIds(infra);
+        rs = target("/v1.0/applications").
+                request(Constants.INDIGOMIMETYPE).
+                post(Entity.entity(testApp, Constants.INDIGOMIMETYPE));
+        String id = rs.readEntity(Application.class).getId();
+        rs = target("/v1.0/applications/" + id).
+                request().delete();
+        Assert.assertEquals(Response.Status.NO_CONTENT.getStatusCode(),
+                rs.getStatus());
+        rs = target("/v1.0/applications/" + id).
+                request().delete();
+        Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(),
+                rs.getStatus());
+    }
 }

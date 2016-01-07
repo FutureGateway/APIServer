@@ -72,6 +72,9 @@ public class ApplicationService extends BaseService {
         EntityManager em = getEntityManager();
         try {
             app = em.find(Application.class, id);
+            log.info("Find the application " + id + " associated with "
+                    + app.getInfrastructureIds().size() + " infrastructures "
+                    + "and " + app.getParameters().size() + " parameters");
         } catch (IllegalArgumentException re) {
             log.error("Impossible to retrieve the application");
             log.error(re);

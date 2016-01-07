@@ -61,14 +61,17 @@ public class ApplicationCollectionServiceIT extends JerseyTest {
      */
     @Before
     public final void prepareInfrastructure() {
-        //FIXME: Number of infrastructure should be variable
         infra = new LinkedList<>();
-        Entity<Infrastructure> infraEntity = Entity.entity(
-                TestData.crateInfrastructure(),
-                Constants.INDIGOMIMETYPE);
-        Response rs = target("/v1.0/infrastructures").
-                request(Constants.INDIGOMIMETYPE).post(infraEntity);
-        infra.add(rs.readEntity(Infrastructure.class).getId());
+        for (int i = 0;
+                i < 1 + (int) TestData.MAX_ENTITIES_IN_LIST * Math.random();
+                i++) {
+            Entity<Infrastructure> infraEntity = Entity.entity(
+                    TestData.crateInfrastructure(),
+                    Constants.INDIGOMIMETYPE);
+            Response rs = target("/v1.0/infrastructures").
+                    request(Constants.INDIGOMIMETYPE).post(infraEntity);
+            infra.add(rs.readEntity(Infrastructure.class).getId());
+        }
     }
 
 
@@ -131,7 +134,7 @@ public class ApplicationCollectionServiceIT extends JerseyTest {
      */
     @Test
     public final void testAddApplication() {
-        //FIXME: Add test for infrastructures missing some parameters
+        //FIXME: Add test for application missing some parameters
         Application app = TestData.crateApplication();
         Entity<Application> appEntity;
         Response rs;
@@ -180,7 +183,6 @@ public class ApplicationCollectionServiceIT extends JerseyTest {
         rs = target("/v1.0/applications").
                 request(Constants.INDIGOMIMETYPE).post(appEntity);
         Application newApp = rs.readEntity(Application.class);
-//FIXME: This test should go in the infrastructure
         rs = target("/v1.0/infrastructures/" + infra.get(0)).
                 request(Constants.INDIGOMIMETYPE).delete();
         Assert.assertEquals(Response.Status.CONFLICT.getStatusCode(),

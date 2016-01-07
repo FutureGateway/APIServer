@@ -33,6 +33,8 @@ import javax.persistence.InheritanceType;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.xml.bind.annotation.XmlElement;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 /**
  * The super class of all the elements accessible by the user.
@@ -143,6 +145,7 @@ public abstract class AccessibleElements implements Serializable {
      * @return A list of parameters
      */
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
     public List<Params> getParameters() {
         return parameters;
     }

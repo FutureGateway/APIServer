@@ -27,6 +27,7 @@ import it.infn.ct.futuregateway.apiserver.v1.resources.Application;
 import it.infn.ct.futuregateway.apiserver.v1.resources.ApplicationList;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Infrastructure;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -101,16 +102,16 @@ public class ApplicationCollectionService extends BaseService {
         try {
             et = em.getTransaction();
             et.begin();
-//            List<Infrastructure> lstInfra = new LinkedList<>();
+            List<Infrastructure> lstInfra = new LinkedList<>();
             for (String infraId: application.getInfrastructureIds()) {
                 Infrastructure infra = em.find(Infrastructure.class,
                         infraId);
                 if (infra == null) {
                     throw new BadRequestException();
                 }
-//                lstInfra.add(infra);
+                lstInfra.add(infra);
             }
-//            application.setInfrastructures(lstInfra);
+            application.setInfrastructures(lstInfra);
             em.persist(application);
             et.commit();
             log.debug("New application registered: " + application.getId());

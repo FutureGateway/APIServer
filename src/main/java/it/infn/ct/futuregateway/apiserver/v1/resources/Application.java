@@ -22,12 +22,10 @@
 package it.infn.ct.futuregateway.apiserver.v1.resources;
 
 import it.infn.ct.futuregateway.apiserver.utils.LinkJaxbAdapter;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -37,6 +35,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.ws.rs.core.Link;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -46,6 +45,8 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 /**
  * The Application represents the operation a user can perform in a remote
@@ -119,6 +120,7 @@ public class Application extends AccessibleElements {
      * @return A list of infrastructures
      */
     @ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
     @JoinTable(name = "Application_Infrastructures",
             joinColumns = {@JoinColumn(name = "applicationId",
                     referencedColumnName = "id",
@@ -149,13 +151,19 @@ public class Application extends AccessibleElements {
      *
      * @return List of identifiers
      */
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "Application_Infrastructures",
-            joinColumns = {@JoinColumn(name = "applicationId",
-                    referencedColumnName = "id",
-                    nullable = false)})
-    @Column(name = "infrastructureId", updatable = false, insertable = false)
+    @Transient
     public List<String> getInfrastructureIds() {
+        if (infrastructureIds != null && !infrastructureIds.isEmpty()) {
+            return infrastructureIds;
+        }
+        if (infrastructures == null) {
+            return null;
+        }
+        infrastructureIds = new LinkedList<>();
+        for (Infrastructure infra: infrastructures) {
+            infrastructureIds.add(infra.getId());
+        }
+
         return infrastructureIds;
     }
 
