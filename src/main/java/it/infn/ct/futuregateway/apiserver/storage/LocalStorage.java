@@ -102,20 +102,26 @@ public class LocalStorage implements Storage {
             throws IOException {
         java.nio.file.Path filePath = Paths.get(
                 path, res.name().toLowerCase(), id);
-        Files.walkFileTree(filePath, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult postVisitDirectory(final Path dir,
-                    final IOException exc) throws IOException {
-                Files.delete(dir);
-                return FileVisitResult.CONTINUE;
-            }
+        if (Files.notExists(filePath)) {
+            return;
+        }
+        if (Files.isDirectory(filePath)) {
+            Files.walkFileTree(filePath, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult postVisitDirectory(final Path dir,
+                        final IOException exc) throws IOException {
+                    Files.delete(dir);
+                    return FileVisitResult.CONTINUE;
+                }
 
-            @Override
-            public FileVisitResult visitFile(final Path file,
-                    final BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
-                return FileVisitResult.CONTINUE;
-            }
-        });
+                @Override
+                public FileVisitResult visitFile(final Path file,
+                        final BasicFileAttributes attrs) throws IOException {
+                    Files.delete(file);
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        }
+        Files.delete(filePath);
     }
 }

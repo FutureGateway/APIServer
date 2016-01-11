@@ -24,6 +24,7 @@ package it.infn.ct.futuregateway.apiserver.v1;
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Application;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Infrastructure;
+import it.infn.ct.futuregateway.apiserver.v1.resources.Params;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -111,7 +112,7 @@ public class ApplicationServiceIT extends JerseyTest {
             Assert.assertNotNull(app.getParameters());
             Assert.assertEquals(newApp.getParameters(), app.getParameters());
         } else {
-            Assert.assertNull(app.getParameters());
+            Assert.assertEquals(new LinkedList<Params>(), app.getParameters());
         }
         Assert.assertEquals(newApp.isEnabled(), app.isEnabled());
         Assert.assertEquals(newApp.getName(), app.getName());
