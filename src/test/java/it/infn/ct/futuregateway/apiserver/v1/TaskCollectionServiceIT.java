@@ -24,13 +24,17 @@ package it.infn.ct.futuregateway.apiserver.v1;
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Application;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Infrastructure;
+import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
+import it.infn.ct.futuregateway.apiserver.v1.resources.TaskList;
 import java.util.LinkedList;
 import java.util.List;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -108,106 +112,111 @@ public class TaskCollectionServiceIT extends JerseyTest {
      */
     @Test
     public final void testListTasks() {
-//        System.out.println("Sono chiamato a fare la lista   ");
-//        Response rs;
-//        rs = target("/v1.0/tasks").
-//                request(Constants.INDIGOMIMETYPE).get();
-//        Assert.assertEquals(Response.Status.OK.getStatusCode(),
-//    rs.getStatus());
-//        Assert.assertNotNull(rs.getLinks());
-//        TaskList lstTaskEmpty =
-//                rs.readEntity(TaskList.class);
-//        Assert.assertNotNull(lstTaskEmpty);
-//        Assert.assertEquals(new LinkedList<Task>(),
-//                lstTaskEmpty.getTasks());
-//
-//        List<Task> lstNewTask = new LinkedList<>();
-//        for (int i = 0;
-//                i < (int) (1 + Math.random() * TestData.MAX_ENTITIES_IN_LIST);
-//                i++) {
-//            Task newTask = TestData.createTask();
-//            newTask.setApplicationId(
-//                    apps.get((int) (Math.random() * apps.size())));
-//            lstNewTask.add(newTask);
-//            target("/v1.0/tasks").request(Constants.INDIGOMIMETYPE).
-//                    post(Entity.entity(newTask, Constants.INDIGOMIMETYPE));
-//        }
-//        rs = target("/v1.0/tasks").
-//                request(Constants.INDIGOMIMETYPE).get();
-//        Assert.assertEquals(Response.Status.OK.getStatusCode(),
-//    rs.getStatus());
-//        Assert.assertNotNull(rs.getLinks());
-//        TaskList lstTask = rs.readEntity(TaskList.class);
-//        Assert.assertNotNull(lstTask);
-//        Assert.assertEquals(lstNewTask.size(),
-//                lstTask.getTasks().size());
-//        for (Task remTask: lstTask.getTasks()) {
-//            target("/v1.0/tasks/" + remTask.getId()).
-//                request().delete();
-//        }
+        Response rs;
+        rs = target("/v1.0/tasks").
+                request(Constants.INDIGOMIMETYPE).get();
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), rs.getStatus());
+        Assert.assertNotNull(rs.getLinks());
+        TaskList lstTaskEmpty =
+                rs.readEntity(TaskList.class);
+        Assert.assertNotNull(lstTaskEmpty);
+        Assert.assertEquals(new LinkedList<Task>(),
+                lstTaskEmpty.getTasks());
+
+        List<Task> lstNewTask = new LinkedList<>();
+        for (int i = 0;
+                i < (int) (1 + Math.random() * TestData.MAX_ENTITIES_IN_LIST);
+                i++) {
+            Task newTask = TestData.createTask();
+            newTask.setApplicationId(
+                    apps.get((int) (Math.random() * apps.size())));
+            lstNewTask.add(newTask);
+            target("/v1.0/tasks").request(Constants.INDIGOMIMETYPE).
+                    post(Entity.entity(newTask, Constants.INDIGOMIMETYPE));
+        }
+        rs = target("/v1.0/tasks").
+                request(Constants.INDIGOMIMETYPE).get();
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), rs.getStatus());
+        Assert.assertNotNull(rs.getLinks());
+        TaskList lstTask = rs.readEntity(TaskList.class);
+        Assert.assertNotNull(lstTask);
+        Assert.assertEquals(lstNewTask.size(),
+                lstTask.getTasks().size());
+        for (Task remTask: lstTask.getTasks()) {
+            target("/v1.0/tasks/" + remTask.getId()).
+                request().delete();
+        }
     }
 
 
-//    /**
-//     * Test to add a task.
-//     */
-//    @Test
-//    public final void testAddTask() {
-//        Task task = TestData.createTask();
-//        Response rs;
-//
-//        rs = target("/v1.0/tasks").
-//                request(Constants.INDIGOMIMETYPE).
-//                post(Entity.entity(task, Constants.INDIGOMIMETYPE));
-//        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(),
-//                rs.getStatus());
-//
-//        task.setApplicationId(RandomStringUtils.randomAlphanumeric(
-//  (int) (1 + (Math.random() * TestData.MAX_STRING_LENGTH))));
-//        rs = target("/v1.0/tasks").
-//                request(Constants.INDIGOMIMETYPE).
-//                post(Entity.entity(task, Constants.INDIGOMIMETYPE));
-//        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(),
-//                rs.getStatus());
-//
-//        task.setApplicationId(apps.get((int) (Math.random() * apps.size())));
-//        rs = target("/v1.0/tasks").
-//                request(Constants.INDIGOMIMETYPE).
-//                post(Entity.entity(task, Constants.INDIGOMIMETYPE));
-//        Assert.assertEquals(Response.Status.CREATED.getStatusCode(),
-//                rs.getStatus());
-//
-//        Task newTask = rs.readEntity(Task.class);
-//        Assert.assertNotNull(newTask);
-//        Assert.assertNotNull(newTask.getId());
-//        Assert.assertNotNull(newTask.getDateCreated());
-//        Assert.assertNotNull(newTask.getInputFiles());
-//        Assert.assertNotNull(newTask.getOutputFiles());
-//        Assert.assertEquals(Task.STATUS.WAITING, newTask.getStatus());
-//        Assert.assertEquals(task.getDescription(), newTask.getDescription());
-//        target("/v1.0/tasks/" + newTask.getId()).
-//                request().delete();
-//    }
-//
-//
-//    /**
-//     * Try to remove the application when one or more tasks exist.
-//     */
-//    @Test
-//    public final void testDeleteAssociatedApplication() {
-//        Task task = TestData.createTask();
-//        Response rs;
-//
-//        task.setApplicationId(apps.get(0));
-//        rs = target("/v1.0/tasks").
-//                request(Constants.INDIGOMIMETYPE).
-//                post(Entity.entity(task, Constants.INDIGOMIMETYPE));
-//        Task newTask = rs.readEntity(Task.class);
-//        rs = target("/v1.0/applications/" + apps.get(0)).
-//                request(Constants.INDIGOMIMETYPE).delete();
-//        Assert.assertEquals(Response.Status.CONFLICT.getStatusCode(),
-//                rs.getStatus());
-//        target("/v1.0/tasks/" + newTask.getId()).
-//                request(Constants.INDIGOMIMETYPE).delete();
-//    }
+    /**
+     * Test to add a task.
+     */
+    @Test
+    public final void testAddTask() {
+        Task task = TestData.createTask();
+        Response rs;
+
+        rs = target("/v1.0/tasks").
+                request(Constants.INDIGOMIMETYPE).
+                post(Entity.entity(task, Constants.INDIGOMIMETYPE));
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(),
+                rs.getStatus());
+
+        task.setApplicationId(RandomStringUtils.randomAlphanumeric(
+                (int) (1 + (Math.random() * TestData.MAX_STRING_LENGTH))));
+        rs = target("/v1.0/tasks").
+                request(Constants.INDIGOMIMETYPE).
+                post(Entity.entity(task, Constants.INDIGOMIMETYPE));
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(),
+                rs.getStatus());
+
+        task.setApplicationId(apps.get((int) (Math.random() * apps.size())));
+        rs = target("/v1.0/tasks").
+                request(Constants.INDIGOMIMETYPE).
+                post(Entity.entity(task, Constants.INDIGOMIMETYPE));
+        Assert.assertEquals(Response.Status.CREATED.getStatusCode(),
+                rs.getStatus());
+
+        Task newTask = rs.readEntity(Task.class);
+        Assert.assertNotNull(newTask);
+        Assert.assertNotNull(newTask.getId());
+        Assert.assertNotNull(newTask.getDateCreated());
+        if (task.getInputFiles() != null) {
+            Assert.assertNotNull(newTask.getInputFiles());
+            Assert.assertEquals(task.getInputFiles().size(),
+                    newTask.getInputFiles().size());
+        }
+        if (task.getOutputFiles() != null) {
+            Assert.assertNotNull(newTask.getOutputFiles());
+            Assert.assertEquals(task.getOutputFiles().size(),
+                    newTask.getOutputFiles().size());
+        }
+        Assert.assertEquals(Task.STATUS.WAITING, newTask.getStatus());
+        Assert.assertEquals(task.getDescription(), newTask.getDescription());
+        target("/v1.0/tasks/" + newTask.getId()).
+                request().delete();
+    }
+
+
+    /**
+     * Try to remove the application when one or more tasks exist.
+     */
+    @Test
+    public final void testDeleteAssociatedApplication() {
+        Task task = TestData.createTask();
+        Response rs;
+
+        task.setApplicationId(apps.get(0));
+        rs = target("/v1.0/tasks").
+                request(Constants.INDIGOMIMETYPE).
+                post(Entity.entity(task, Constants.INDIGOMIMETYPE));
+        Task newTask = rs.readEntity(Task.class);
+        rs = target("/v1.0/applications/" + apps.get(0)).
+                request(Constants.INDIGOMIMETYPE).delete();
+        Assert.assertEquals(Response.Status.CONFLICT.getStatusCode(),
+                rs.getStatus());
+        target("/v1.0/tasks/" + newTask.getId()).
+                request(Constants.INDIGOMIMETYPE).delete();
+    }
 }

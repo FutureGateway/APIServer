@@ -65,12 +65,7 @@ public class InfrastructureServiceIT extends JerseyTest {
         Assert.assertNotNull(infra);
         Assert.assertNotNull(infra.getId());
         Assert.assertNotNull(infra.getDateCreated());
-        if (newInfra.getParameters() != null) {
-            Assert.assertNotNull(infra.getParameters());
-            Assert.assertEquals(
-                    newInfra.getParameters(),
-                    infra.getParameters());
-        }
+        Assert.assertEquals(newInfra.getParameters(), infra.getParameters());
         Assert.assertEquals(newInfra.isEnabled(), infra.isEnabled());
         Assert.assertEquals(newInfra.getName(), infra.getName());
         Assert.assertEquals(newInfra.getDescription(), infra.getDescription());

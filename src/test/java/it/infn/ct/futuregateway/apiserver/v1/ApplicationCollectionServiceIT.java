@@ -154,7 +154,6 @@ public class ApplicationCollectionServiceIT extends JerseyTest {
         Assert.assertNotNull(newApp);
         Assert.assertNotNull(newApp.getId());
         Assert.assertNotNull(newApp.getDateCreated());
-        Assert.assertNotNull(newApp.getParameters());
         Assert.assertEquals(app.isEnabled(), newApp.isEnabled());
         Assert.assertEquals(app.getName(), newApp.getName());
         Assert.assertEquals(app.getDescription(), newApp.getDescription());

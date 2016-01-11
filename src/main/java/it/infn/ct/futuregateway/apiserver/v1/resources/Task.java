@@ -56,6 +56,8 @@ import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Predicate;
 import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 /**
  * The Task represents any activity a user send to an infrastructure, such as a
@@ -231,7 +233,7 @@ public class Task extends Observable implements Serializable {
      *
      * @return The id of the application associated with the task
      */
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "applicationId", referencedColumnName = "id",
             nullable = false)
     public Application getApplicationDetail() {
@@ -246,6 +248,9 @@ public class Task extends Observable implements Serializable {
      */
     public void setApplicationDetail(final Application anApplication) {
         this.applicationDetail = anApplication;
+        if (applicationId == null) {
+            applicationId = applicationDetail.getId();
+        }
     }
 
 
@@ -335,6 +340,7 @@ public class Task extends Observable implements Serializable {
      */
     @OneToMany(cascade = CascadeType.ALL,
             fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
     public List<TaskFileOutput> getOutputFiles() {
         return this.outputFiles;
     }
@@ -363,6 +369,7 @@ public class Task extends Observable implements Serializable {
      */
     @OneToMany(cascade = CascadeType.ALL,
             fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
     public List<TaskFileInput> getInputFiles() {
         return this.inputFiles;
     }
