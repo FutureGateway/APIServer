@@ -51,7 +51,7 @@ public class InfrastructureServiceIT extends JerseyTest {
      */
     @Test
     public final void testInfrastructureDetails() {
-        Infrastructure newInfra = TestData.crateInfrastructure();
+        Infrastructure newInfra = TestData.createInfrastructure();
         Response rs;
         rs = target("/v1.0/infrastructures").
                 request(Constants.INDIGOMIMETYPE).
@@ -65,11 +65,15 @@ public class InfrastructureServiceIT extends JerseyTest {
         Assert.assertNotNull(infra);
         Assert.assertNotNull(infra.getId());
         Assert.assertNotNull(infra.getDateCreated());
-        Assert.assertNotNull(infra.getParameters());
+        if (newInfra.getParameters() != null) {
+            Assert.assertNotNull(infra.getParameters());
+            Assert.assertEquals(
+                    newInfra.getParameters(),
+                    infra.getParameters());
+        }
         Assert.assertEquals(newInfra.isEnabled(), infra.isEnabled());
         Assert.assertEquals(newInfra.getName(), infra.getName());
         Assert.assertEquals(newInfra.getDescription(), infra.getDescription());
-        Assert.assertEquals(newInfra.getParameters(), infra.getParameters());
         target("/v1.0/infrastructures/" + infra.getId()).
                 request().delete();
     }
@@ -89,7 +93,7 @@ public class InfrastructureServiceIT extends JerseyTest {
 
         rs = target("/v1.0/infrastructures").
                 request(Constants.INDIGOMIMETYPE).
-                post(Entity.entity(TestData.crateInfrastructure(),
+                post(Entity.entity(TestData.createInfrastructure(),
                         Constants.INDIGOMIMETYPE));
         String id = rs.readEntity(Infrastructure.class).getId();
         rs = target("/v1.0/infrastructures/" + id).

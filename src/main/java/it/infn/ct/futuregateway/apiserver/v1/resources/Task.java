@@ -68,7 +68,8 @@ import org.glassfish.jersey.linking.InjectLinks;
             query = "SELECT t.id, t.description, t.status, t.dateCreated"
             + " FROM Task t WHERE t.userName = :user"),
     @NamedQuery(name = "tasks.forApplication",
-            query = "SELECT t.id FROM Task t WHERE t.applicationId = :appId")
+            query = "SELECT t.id FROM Task t WHERE "
+                    + "t.applicationDetail.id = :appId")
 })
 @Entity
 @Table(name = "Task")
@@ -253,8 +254,11 @@ public class Task extends Observable implements Serializable {
      *
      * @return The id of the application associated with the task
      */
-    @Column(name = "applicationId", updatable = false, insertable = false)
+    @Transient
     public String getApplicationId() {
+        if (applicationId == null && applicationDetail != null) {
+            applicationId = applicationDetail.getId();
+        }
         return applicationId;
     }
 

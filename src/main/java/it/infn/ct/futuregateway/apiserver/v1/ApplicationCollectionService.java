@@ -118,13 +118,13 @@ public class ApplicationCollectionService extends BaseService {
         } catch (BadRequestException re) {
             throw re;
         } catch (RuntimeException re) {
-            if (et != null && et.isActive()) {
-                et.rollback();
-            }
             log.error("Impossible to create the application");
             log.error(re);
             throw re;
         } finally {
+            if (et != null && et.isActive()) {
+                et.rollback();
+            }
             em.close();
         }
         return application;

@@ -67,7 +67,7 @@ public class InfrastructureCollectionServiceIT extends JerseyTest {
         for (int i = 0;
                 i < (int) (1 + Math.random() * TestData.MAX_ENTITIES_IN_LIST);
                 i++) {
-            Infrastructure newInfra = TestData.crateInfrastructure();
+            Infrastructure newInfra = TestData.createInfrastructure();
             lstNewInfra.add(newInfra);
             target("/v1.0/infrastructures").request(Constants.INDIGOMIMETYPE).
                     post(Entity.entity(newInfra, Constants.INDIGOMIMETYPE));
@@ -93,7 +93,7 @@ public class InfrastructureCollectionServiceIT extends JerseyTest {
     @Test
     public final void testAddInfrastructure() {
         //FIXME: Add test for infrastructures missing some parameters
-        Infrastructure infra = TestData.crateInfrastructure();
+        Infrastructure infra = TestData.createInfrastructure();
         Entity<Infrastructure> infraEntity = Entity.entity(infra,
                 Constants.INDIGOMIMETYPE);
         Response rs = target("/v1.0/infrastructures").

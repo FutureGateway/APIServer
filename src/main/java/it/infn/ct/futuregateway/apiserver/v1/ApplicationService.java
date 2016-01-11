@@ -72,7 +72,7 @@ public class ApplicationService extends BaseService {
         EntityManager em = getEntityManager();
         try {
             app = em.find(Application.class, id);
-            log.info("Find the application " + id + " associated with "
+            log.debug("Find the application " + id + " associated with "
                     + app.getInfrastructureIds().size() + " infrastructures "
                     + "and " + app.getParameters().size() + " parameters");
         } catch (IllegalArgumentException re) {
@@ -130,14 +130,17 @@ public class ApplicationService extends BaseService {
                             Response.Status.CONFLICT);
                 }
                 et.commit();
+            } catch (WebApplicationException wex) {
+                throw wex;
             } catch (RuntimeException re) {
-                if (et != null && et.isActive()) {
-                    et.rollback();
-                }
                 log.error(re);
                 log.error("Impossible to remove the application");
                 throw new InternalServerErrorException("Error to remove "
                         + "the application " + id);
+            } finally {
+                if (et != null && et.isActive()) {
+                    et.rollback();
+                }
             }
         } catch (IllegalArgumentException re) {
             log.error("Impossible to retrieve the application list");

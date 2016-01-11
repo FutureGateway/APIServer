@@ -37,7 +37,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Integration tests for the Infrastructure collection.
+ * Integration tests for the Application collection.
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
@@ -57,7 +57,7 @@ public class ApplicationCollectionServiceIT extends JerseyTest {
 
 
     /**
-     * Create an infrastructure to associate the applications with.
+     * Create infrastructures to associate the applications with.
      */
     @Before
     public final void prepareInfrastructure() {
@@ -66,7 +66,7 @@ public class ApplicationCollectionServiceIT extends JerseyTest {
                 i < 1 + (int) TestData.MAX_ENTITIES_IN_LIST * Math.random();
                 i++) {
             Entity<Infrastructure> infraEntity = Entity.entity(
-                    TestData.crateInfrastructure(),
+                    TestData.createInfrastructure(),
                     Constants.INDIGOMIMETYPE);
             Response rs = target("/v1.0/infrastructures").
                     request(Constants.INDIGOMIMETYPE).post(infraEntity);
@@ -76,7 +76,7 @@ public class ApplicationCollectionServiceIT extends JerseyTest {
 
 
     /**
-     * Remove the infrastructure after the tests.
+     * Remove the infrastructures after the tests.
      */
     @After
     public final void cleanInfrastructure() {
@@ -108,7 +108,7 @@ public class ApplicationCollectionServiceIT extends JerseyTest {
         for (int i = 0;
                 i < (int) (1 + Math.random() * TestData.MAX_ENTITIES_IN_LIST);
                 i++) {
-            Application newApp = TestData.crateApplication();
+            Application newApp = TestData.createApplication();
             newApp.setInfrastructureIds(infra);
             lstNewApp.add(newApp);
             target("/v1.0/applications").request(Constants.INDIGOMIMETYPE).
@@ -130,27 +130,23 @@ public class ApplicationCollectionServiceIT extends JerseyTest {
 
 
     /**
-     * Test to add an infrastructure.
+     * Test to add an application.
      */
     @Test
     public final void testAddApplication() {
-        //FIXME: Add test for application missing some parameters
-        Application app = TestData.crateApplication();
-        Entity<Application> appEntity;
+        Application app = TestData.createApplication();
         Response rs;
 
-        appEntity = Entity.entity(app,
-                Constants.INDIGOMIMETYPE);
         rs = target("/v1.0/applications").
-                request(Constants.INDIGOMIMETYPE).post(appEntity);
+                request(Constants.INDIGOMIMETYPE).
+                post(Entity.entity(app, Constants.INDIGOMIMETYPE));
         Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(),
                 rs.getStatus());
 
         app.setInfrastructureIds(infra);
-        appEntity = Entity.entity(app,
-                Constants.INDIGOMIMETYPE);
         rs = target("/v1.0/applications").
-                request(Constants.INDIGOMIMETYPE).post(appEntity);
+                request(Constants.INDIGOMIMETYPE).
+                post(Entity.entity(app, Constants.INDIGOMIMETYPE));
         Assert.assertEquals(Response.Status.CREATED.getStatusCode(),
                 rs.getStatus());
 
@@ -174,7 +170,7 @@ public class ApplicationCollectionServiceIT extends JerseyTest {
      */
     @Test
     public final void testDeleteAssociatedInfrastructure() {
-        Application app = TestData.crateApplication();
+        Application app = TestData.createApplication();
         Response rs;
 
         app.setInfrastructureIds(infra);

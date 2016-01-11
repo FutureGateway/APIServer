@@ -24,6 +24,9 @@ package it.infn.ct.futuregateway.apiserver.v1;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Application;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Infrastructure;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Params;
+import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
+import it.infn.ct.futuregateway.apiserver.v1.resources.TaskFileInput;
+import it.infn.ct.futuregateway.apiserver.v1.resources.TaskFileOutput;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -67,7 +70,7 @@ public final class TestData {
      *
      * @return The infrastructure
      */
-    public static Infrastructure crateInfrastructure() {
+    public static Infrastructure createInfrastructure() {
         Infrastructure infra = new Infrastructure();
         infra.setName(RandomStringUtils.randomAlphanumeric(
                 (int) (1 + (Math.random() * MAX_STRING_LENGTH))));
@@ -85,7 +88,9 @@ public final class TestData {
                     (int) (1 + (Math.random() * MAX_STRING_LENGTH))));
             params.add(p);
         }
-        infra.setParameters(params);
+        if (!params.isEmpty()) {
+            infra.setParameters(params);
+        }
         return infra;
     }
 
@@ -97,7 +102,7 @@ public final class TestData {
      *
      * @return The infrastructure
      */
-    public static Application crateApplication() {
+    public static Application createApplication() {
         Application app = new Application();
         app.setName(RandomStringUtils.randomAlphanumeric(
                 (int) (1 + (Math.random() * MAX_STRING_LENGTH))));
@@ -115,9 +120,52 @@ public final class TestData {
                     (int) (1 + (Math.random() * MAX_STRING_LENGTH))));
             params.add(p);
         }
-        app.setParameters(params);
+        if (!params.isEmpty()) {
+            app.setParameters(params);
+        }
         return app;
     }
+
+
+    /**
+     * Create a random task.
+     * All data are randomly generated but the application.
+     *
+     * @return The task
+     */
+    public static Task createTask() {
+        Task task = new Task();
+        List<String> someArgs = new LinkedList<>();
+        for (int i = 0; i < (int) (Math.random() * MAX_ENTITIES_IN_LIST); i++) {
+            someArgs.add(RandomStringUtils.randomAlphanumeric(
+                    (int) (1 + (Math.random() * MAX_STRING_LENGTH))));
+        }
+        task.setArguments(someArgs);
+        task.setDescription(RandomStringUtils.randomAlphanumeric(
+                    (int) (1 + (Math.random() * MAX_DESC_LENGTH))));
+        List<TaskFileInput> inputs = new LinkedList<>();
+        for (int i = 0; i < (int) (Math.random() * MAX_ENTITIES_IN_LIST); i++) {
+            TaskFileInput in = new TaskFileInput();
+            in.setName(RandomStringUtils.randomAlphanumeric(
+                    (int) (1 + (Math.random() * MAX_STRING_LENGTH))));
+            inputs.add(in);
+        }
+        if (!inputs.isEmpty()) {
+            task.setInputFiles(inputs);
+        }
+        List<TaskFileOutput> outputs = new LinkedList<>();
+        for (int i = 0; i < (int) (Math.random() * MAX_ENTITIES_IN_LIST); i++) {
+            TaskFileOutput out = new TaskFileOutput();
+            out.setName(RandomStringUtils.randomAlphanumeric(
+                    (int) (1 + (Math.random() * MAX_STRING_LENGTH))));
+            outputs.add(out);
+        }
+        if (!outputs.isEmpty()) {
+            task.setOutputFiles(outputs);
+        }
+        return task;
+    }
+
 
     /**
      * Utility class cannot be allocated.

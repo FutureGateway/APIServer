@@ -37,6 +37,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
+ * Integration tests for the Application.
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
@@ -56,7 +57,7 @@ public class ApplicationServiceIT extends JerseyTest {
 
 
     /**
-     * Create an infrastructure to associate the applications with.
+     * Create infrastructures to associate the applications with.
      */
     @Before
     public final void prepareInfrastructure() {
@@ -65,7 +66,7 @@ public class ApplicationServiceIT extends JerseyTest {
                 i < 1 + (int) TestData.MAX_ENTITIES_IN_LIST * Math.random();
                 i++) {
             Entity<Infrastructure> infraEntity = Entity.entity(
-                    TestData.crateInfrastructure(),
+                    TestData.createInfrastructure(),
                     Constants.INDIGOMIMETYPE);
             Response rs = target("/v1.0/infrastructures").
                     request(Constants.INDIGOMIMETYPE).post(infraEntity);
@@ -75,7 +76,7 @@ public class ApplicationServiceIT extends JerseyTest {
 
 
     /**
-     * Remove the infrastructure after the tests.
+     * Remove the infrastructures after the tests.
      */
     @After
     public final void cleanInfrastructure() {
@@ -91,7 +92,7 @@ public class ApplicationServiceIT extends JerseyTest {
      */
     @Test
     public final void testApplicationDetails() {
-        Application newApp = TestData.crateApplication();
+        Application newApp = TestData.createApplication();
         newApp.setInfrastructureIds(infra);
         Response rs;
         rs = target("/v1.0/applications").
@@ -106,11 +107,15 @@ public class ApplicationServiceIT extends JerseyTest {
         Assert.assertNotNull(app);
         Assert.assertNotNull(app.getId());
         Assert.assertNotNull(app.getDateCreated());
-        Assert.assertNotNull(app.getParameters());
+        if (newApp.getParameters() != null) {
+            Assert.assertNotNull(app.getParameters());
+            Assert.assertEquals(newApp.getParameters(), app.getParameters());
+        } else {
+            Assert.assertNull(app.getParameters());
+        }
         Assert.assertEquals(newApp.isEnabled(), app.isEnabled());
         Assert.assertEquals(newApp.getName(), app.getName());
         Assert.assertEquals(newApp.getDescription(), app.getDescription());
-        Assert.assertEquals(newApp.getParameters(), app.getParameters());
         Assert.assertEquals(newApp.getInfrastructureIds(),
                 app.getInfrastructureIds());
         target("/v1.0/applications/" + app.getId()).
@@ -130,7 +135,7 @@ public class ApplicationServiceIT extends JerseyTest {
         Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(),
                 rs.getStatus());
 
-        Application testApp = TestData.crateApplication();
+        Application testApp = TestData.createApplication();
         testApp.setInfrastructureIds(infra);
         rs = target("/v1.0/applications").
                 request(Constants.INDIGOMIMETYPE).

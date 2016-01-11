@@ -91,6 +91,10 @@ public class TaskCollectionService extends BaseService {
     @Consumes({MediaType.APPLICATION_JSON, Constants.INDIGOMIMETYPE})
     @Produces(Constants.INDIGOMIMETYPE)
     public final Task createTask(final Task task) {
+        if (task.getApplicationId() == null) {
+            throw new BadRequestException("A valid application for the task"
+                    + " must be provided");
+        }
         Date now = new Date();
         task.setDateCreated(now);
         task.setLastChange(now);
@@ -104,7 +108,7 @@ public class TaskCollectionService extends BaseService {
             Application app = em.find(Application.class,
                     task.getApplicationId());
             if (app == null) {
-                throw new BadRequestException();
+                throw new BadRequestException("Application id not valid");
             }
             task.setApplicationDetail(app);
             em.persist(task);
@@ -113,13 +117,13 @@ public class TaskCollectionService extends BaseService {
         } catch (BadRequestException bre) {
             throw bre;
         } catch (RuntimeException re) {
-            if (et != null && et.isActive()) {
-                et.rollback();
-            }
             log.error("Impossible to create a task");
             log.debug(re);
             throw re;
         } finally {
+            if (et != null && et.isActive()) {
+                et.rollback();
+            }
             em.close();
         }
         return task;
