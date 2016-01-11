@@ -211,6 +211,8 @@ public class Task extends Observable implements Serializable {
      */
     public void setId(final String anId) {
         this.id = anId;
+        setChanged();
+        notifyObservers();
     }
 
     /**
@@ -229,7 +231,7 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Returns the id of the associated application.
+     * Returns the associated application.
      *
      * @return The id of the application associated with the task
      */
@@ -251,6 +253,9 @@ public class Task extends Observable implements Serializable {
         if (applicationId == null) {
             applicationId = applicationDetail.getId();
         }
+        lastChange = new Date();
+        setChanged();
+        notifyObservers();
     }
 
 
@@ -275,6 +280,8 @@ public class Task extends Observable implements Serializable {
      */
     public void setApplicationId(final String anApplication) {
         this.applicationId = anApplication;
+        lastChange = new Date();
+        setChanged();
     }
 
     /**
@@ -293,6 +300,8 @@ public class Task extends Observable implements Serializable {
      */
     public void setDescription(final String aDescription) {
         this.description = aDescription;
+        lastChange = new Date();
+        setChanged();
     }
 
     /**
@@ -329,6 +338,8 @@ public class Task extends Observable implements Serializable {
      */
     public void setArguments(final List<String> someArguments) {
         this.arguments = someArguments;
+        lastChange = new Date();
+        setChanged();
     }
 
     /**
@@ -355,6 +366,8 @@ public class Task extends Observable implements Serializable {
     public void setOutputFiles(
             final List<TaskFileOutput> someOutputFiles) {
         this.outputFiles = someOutputFiles;
+        lastChange = new Date();
+        setChanged();
     }
 
     /**
@@ -386,6 +399,8 @@ public class Task extends Observable implements Serializable {
      */
     public void setInputFiles(final List<TaskFileInput> someInputFiles) {
         this.inputFiles = someInputFiles;
+        lastChange = new Date();
+        setChanged();
     }
 
     /**
@@ -406,9 +421,8 @@ public class Task extends Observable implements Serializable {
      * @see it.infn.ct.futuregateway.apiserver.v1.resources.Task.STATUS
      */
     public void setStatus(final STATUS aStatus) {
-        if (aStatus.equals(this.status)) {
-            setChanged();
-        }
+        lastChange = new Date();
+        setChanged();
         this.status = aStatus;
         notifyObservers();
     }
@@ -433,6 +447,8 @@ public class Task extends Observable implements Serializable {
      */
     public void setUserName(final String aUser) {
         this.userName = aUser;
+        lastChange = new Date();
+        setChanged();
     }
 
     /**
@@ -452,6 +468,8 @@ public class Task extends Observable implements Serializable {
      */
     public void setDateCreated(final Date creationDate) {
         this.dateCreated = creationDate;
+        lastChange = new Date();
+        setChanged();
     }
 
     /**
@@ -471,6 +489,8 @@ public class Task extends Observable implements Serializable {
      */
     public void setLastChange(final Date newChangeDate) {
         this.lastChange = newChangeDate;
+        lastChange = new Date();
+        setChanged();
     }
 
     /**
@@ -490,6 +510,8 @@ public class Task extends Observable implements Serializable {
      */
     public void setLinks(final List<Link> someLinks) {
         this.links = someLinks;
+        lastChange = new Date();
+        setChanged();
     }
 
     /**
@@ -515,6 +537,7 @@ public class Task extends Observable implements Serializable {
         });
         if (tfi != null) {
             tfi.setStatus(aStatus);
+            lastChange = new Date();
             setChanged();
             notifyObservers();
         }

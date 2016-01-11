@@ -23,6 +23,8 @@ package it.infn.ct.futuregateway.apiserver.v1;
 
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import it.infn.ct.futuregateway.apiserver.storage.Storages;
+import it.infn.ct.futuregateway.apiserver.utils.Constants;
+import java.util.concurrent.ExecutorService;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.servlet.http.HttpServletRequest;
@@ -63,9 +65,22 @@ public abstract class BaseService {
      * @return The EntityManager
      */
     protected final EntityManager getEntityManager() {
-        EntityManagerFactory emf = (EntityManagerFactory)
-                getRequest().getServletContext().getAttribute("SessionFactory");
+        EntityManagerFactory emf = (EntityManagerFactory) getRequest().
+                getServletContext().getAttribute(Constants.SESSIONFACTORY);
         return emf.createEntityManager();
+    }
+
+
+
+    /**
+     * Return the EntityManagerFactory.
+     * Retrieves the EntityMangerFactory registered for this servlet context
+     *
+     * @return The EntityManagerFactory
+     */
+    protected final EntityManagerFactory getEntityManagerFactory() {
+        return (EntityManagerFactory) getRequest().
+                getServletContext().getAttribute(Constants.SESSIONFACTORY);
     }
 
     /**
@@ -110,7 +125,7 @@ public abstract class BaseService {
     protected final String getCacheDirPath() {
         return (String) getRequest().
                 getServletContext().
-                getAttribute("CacheDir");
+                getAttribute(Constants.CACHEDIR);
     }
 
     /**
@@ -122,5 +137,19 @@ public abstract class BaseService {
      */
     protected final Storage getStorage() {
         return Storages.getStorage(getCacheDirPath());
+    }
+
+
+    /**
+     * Retrieve the submission thread pool.
+     * This thread pool will be used exclusively to manage the submission of
+     * tasks to the remote infrastructures.
+     *
+     * @return The thread pool
+     */
+    protected final ExecutorService getSubmissionThreadPool() {
+        return (ExecutorService) getRequest().
+                getServletContext().
+                getAttribute(Constants.SUBMISSIONPOOL);
     }
 }

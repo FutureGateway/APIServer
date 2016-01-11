@@ -66,6 +66,21 @@ public final class Constants {
             "application/vnd.indigo-datacloud.apiserver+json";
 
     /**
+     * Name of the attribute referring the EntityManagerFactory.
+     */
+    public static final String SESSIONFACTORY = "SessionFactory";
+
+    /**
+     * Name of the attribute referring the CacheDir location.
+     */
+    public static final String CACHEDIR = "CacheDir";
+
+    /**
+     * Name of the attribute referring the thread pool for task submission.
+     */
+    public static final String SUBMISSIONPOOL = "SubmissionThreadPool";
+
+    /**
      * Avoid the class be instantiable.
      */
     private Constants() { }

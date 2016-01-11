@@ -161,7 +161,8 @@ public class TaskService extends BaseService {
         }
         EntityManager em = getEntityManager();
         Task task = em.find(Task.class, id);
-        task.addObserver(new TaskObserver());
+        task.addObserver(new TaskObserver(getEntityManagerFactory(),
+                getSubmissionThreadPool()));
         if (task == null) {
             throw new NotFoundException("Task " + id + " does not exist");
         }

@@ -26,6 +26,7 @@ import it.infn.ct.futuregateway.apiserver.utils.annotations.Status;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Application;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
 import it.infn.ct.futuregateway.apiserver.v1.resources.TaskList;
+import it.infn.ct.futuregateway.apiserver.v1.resources.observers.TaskObserver;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -95,11 +96,11 @@ public class TaskCollectionService extends BaseService {
             throw new BadRequestException("A valid application for the task"
                     + " must be provided");
         }
-        Date now = new Date();
-        task.setDateCreated(now);
-        task.setLastChange(now);
-        task.setStatus(Task.STATUS.WAITING);
+        task.addObserver(new TaskObserver(getEntityManagerFactory(),
+                getSubmissionThreadPool()));
+        task.setDateCreated(new Date());
         task.setUserName(getUser());
+        task.setStatus(Task.STATUS.WAITING);
         EntityManager em = getEntityManager();
         EntityTransaction et = null;
         try {

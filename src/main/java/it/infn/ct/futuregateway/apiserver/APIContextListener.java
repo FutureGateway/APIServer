@@ -74,7 +74,7 @@ public class APIContextListener implements ServletContextListener {
             );
         }
         sce.getServletContext().setAttribute(
-                "SessionFactory", entityManagerFactory
+                Constants.SESSIONFACTORY, entityManagerFactory
         );
         String path = sce.getServletContext().getInitParameter("CacheDir");
         if (path == null || path.isEmpty()) {
@@ -84,7 +84,7 @@ public class APIContextListener implements ServletContextListener {
                     + "FutureGatewayData";
         }
         log.info("Created the cache directory: " + path);
-        sce.getServletContext().setAttribute("CacheDir", path);
+        sce.getServletContext().setAttribute(Constants.CACHEDIR, path);
         try {
             Files.createDirectories(Paths.get(path));
             log.info("Cache dir enabled");
@@ -94,10 +94,11 @@ public class APIContextListener implements ServletContextListener {
         } catch (Exception e) {
             log.error("Impossible to initialise the temporary store");
         }
-
+        ExecutorService tpe;
         try {
             Context ctx = new InitialContext();
-            ctx.lookup("java:comp/env/threads/Submitter");
+            tpe = (ExecutorService)
+                    ctx.lookup("java:comp/env/threads/Submitter");
         } catch (NamingException ex) {
             log.warn("Submitter thread not defined in the container. A thread "
                     + "pool is created using provided configuration parameters "
@@ -111,12 +112,12 @@ public class APIContextListener implements ServletContextListener {
                         + " value or it is not present. Default value "
                         + "10 is used");
             }
-            ExecutorService tpe = ThreadPoolFactory.getThreadPool(
+            tpe = ThreadPoolFactory.getThreadPool(
                     threadPoolSize,
                     Constants.MAXTHREADPOOLSIZETIMES * threadPoolSize,
                     Constants.MAXTHREADIDLELIFE);
-            sce.getServletContext().setAttribute("SubmissionThreadPool", tpe);
         }
+        sce.getServletContext().setAttribute(Constants.SUBMISSIONPOOL, tpe);
     }
 
     @Override
