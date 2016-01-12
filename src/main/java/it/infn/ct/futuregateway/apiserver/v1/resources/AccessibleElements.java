@@ -32,6 +32,8 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlElement;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -163,6 +165,7 @@ public abstract class AccessibleElements implements Serializable {
      *
      * @return Creation time
      */
+    @Temporal(TemporalType.TIMESTAMP)
     public Date getDateCreated() {
         return dateCreated;
     }

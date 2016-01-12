@@ -456,7 +456,7 @@ public class Task extends Observable implements Serializable {
      *
      * @return Creation time
      */
-    @Temporal(javax.persistence.TemporalType.DATE)
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     public Date getDateCreated() {
         return dateCreated;
     }
@@ -477,7 +477,7 @@ public class Task extends Observable implements Serializable {
      *
      * @return The time of last status change
      */
-    @Temporal(javax.persistence.TemporalType.DATE)
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     public Date getLastChange() {
         return lastChange;
     }

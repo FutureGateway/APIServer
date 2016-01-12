@@ -186,9 +186,10 @@ public class TaskService extends BaseService {
                     }
                     log.error(re);
                     log.error("Impossible to update the task");
-                    em.close();
                     throw new InternalServerErrorException("Errore to update "
                             + "the task");
+                } finally {
+                    em.close();
                 }
             } catch (IOException ex) {
                 log.error(ex);

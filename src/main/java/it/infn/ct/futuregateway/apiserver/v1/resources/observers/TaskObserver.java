@@ -21,12 +21,15 @@
  */
 package it.infn.ct.futuregateway.apiserver.v1.resources.observers;
 
+import it.infn.ct.futuregateway.apiserver.taskmanager.Submitter;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
 import it.infn.ct.futuregateway.apiserver.v1.resources.TaskFile;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutorService;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -66,8 +69,8 @@ public class TaskObserver implements Observer {
      * @param anExecutorService An ExecutorService to retrieve threads managing
      * the task submission
      */
-    public TaskObserver(EntityManagerFactory anEntityManagerFactory,
-            ExecutorService anExecutorService) {
+    public TaskObserver(final EntityManagerFactory anEntityManagerFactory,
+            final ExecutorService anExecutorService) {
         this.emf = anEntityManagerFactory;
         this.es = anExecutorService;
     }
@@ -79,10 +82,11 @@ public class TaskObserver implements Observer {
             log.error("Wrong abject associated with the oserver");
         }
         Task t = (Task) obs;
-        if (t.getId() == null) {
+        if (t.getId() == null || t.getStatus() == null) {
             return;
         }
-        if (t.getStatus() != null && t.getStatus().equals(Task.STATUS.WAITING)
+        log.debug("Task " + t.getId() + " updated");
+        if (t.getStatus().equals(Task.STATUS.WAITING)
                 && t.getApplicationDetail() != null) {
             if (t.getInputFiles() != null) {
                 for (TaskFile tf: t.getInputFiles()) {
@@ -94,6 +98,23 @@ public class TaskObserver implements Observer {
             t.setStatus(Task.STATUS.READY);
             submit(t);
         }
+        if (t.getStatus().equals(Task.STATUS.DONE)) {
+            EntityManager em = emf.createEntityManager();
+            EntityTransaction et = em.getTransaction();
+            try {
+                et.begin();
+                em.merge(t);
+                et.commit();
+            } catch (RuntimeException re) {
+                log.error("Impossible to update the task status");
+                log.error(re);
+                if (et != null && et.isActive()) {
+                    et.rollback();
+                }
+            } finally {
+                em.close();
+            }
+        }
     }
 
     /**
@@ -104,6 +125,7 @@ public class TaskObserver implements Observer {
      * @param t The task to submit
      */
     private void submit(final Task t) {
-        log.info("Submitted the task: " + t.getId());
+        es.execute(new Submitter(t));
+        log.debug("Submitted the task: " + t.getId());
     }
 }
