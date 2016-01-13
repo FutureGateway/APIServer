@@ -177,6 +177,12 @@ public class Task extends Observable implements Serializable {
     private STATUS status;
 
     /**
+     * The date when the task was created.
+     */
+    @XmlElement(name = "runtime_data")
+    private List<Params> runtime;
+
+    /**
      * The user name submitting the task.
      */
     @XmlElement(name = "user")
@@ -424,6 +430,39 @@ public class Task extends Observable implements Serializable {
         lastChange = new Date();
         setChanged();
         this.status = aStatus;
+        notifyObservers();
+    }
+
+
+    /**
+     * Returns the runtime information.
+     * Runtime information are retrieved by the system during the submission and
+     * or execution of the task and can be relevant to the user. E.g. in case of
+     * task running a VM the relevant information could be the IP and the
+     * credentials of the machine.
+     *
+     * @return List of runtime
+     */
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
+    public List<Params> getRuntime() {
+        return runtime;
+    }
+
+
+    /**
+     * Sets the runtime information.
+     * Runtime information are retrieved by the system during the submission and
+     * or execution of the task and can be relevant to the user. E.g. in case of
+     * task running a VM the relevant information could be the IP and the
+     * credentials of the machine.
+     *
+     * @param someRuntime A list of runtime parameters
+     */
+    public void setRuntime(final List<Params> someRuntime) {
+        lastChange = new Date();
+        setChanged();
+        this.runtime = someRuntime;
         notifyObservers();
     }
 
