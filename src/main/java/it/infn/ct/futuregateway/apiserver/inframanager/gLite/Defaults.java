@@ -19,48 +19,52 @@
  * limitations under the License.
  ***********************************************************************/
 
-package it.infn.ct.futuregateway.apiserver.taskmanager;
+package it.infn.ct.futuregateway.apiserver.inframanager.gLite;
 
-import it.infn.ct.futuregateway.apiserver.utils.Constants;
-import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.io.File;
 
 /**
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-public class Submitter implements Runnable {
+public final class Defaults {
 
     /**
-     * Logger object. Based on apache commons logging.
+     * Number of time the WMS has to re-try the execution.
      */
-    private final Log log = LogFactory.getLog(Submitter.class);
+    public static final int RETRYCOUNT = 3;
 
     /**
-     * Task managed by this thread.
+     * Default path for ssh public key.
      */
-    private final Task task;
+    public static final String SSHPUBLICKEY = System.getProperty("user.home")
+            + File.separator + "sshkeys"
+            + File.separator + "id_rsa.pub";
 
     /**
-     * The thread managing the submission of a task.
-     * The submission is performed with jSAGA and run in a separate thread.
-     *
-     * @param aTask The task managed by the thread
+     * Default path for ssh private key.
      */
-    public Submitter(final Task aTask) {
-        this.task = aTask;
-    }
+    public static final String SSHPRIVATEKEY = System.getProperty("user.home")
+            + File.separator + "sshkeys"
+            + File.separator + "id_rsa";
 
+    /**
+     * Proxy renewal option.
+     */
+    public static final String PROXYRENEWAL = "false";
 
-    @Override
-    public final void run() {
-        try {
-            Thread.sleep(Constants.MAXTHREADIDLELIFE);
-        } catch (InterruptedException ex) {
-            log.error(ex);
-        }
-        task.setStatus(Task.STATUS.DONE);
-    }
+    /**
+     * VOMS proxy option.
+     */
+    public static final String DISABLEVOMSPROXY = "false";
 
+    /**
+     * RFC proxy option.
+     */
+    public static final String RFCPROXY = "true";
+
+    /**
+     * Avoid the class be instantiable.
+     */
+    private Defaults() { }
 }

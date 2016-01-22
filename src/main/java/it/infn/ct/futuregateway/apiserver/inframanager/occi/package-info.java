@@ -24,4 +24,4 @@
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-package it.infn.ct.futuregateway.apiserver.taskmanager;
+package it.infn.ct.futuregateway.apiserver.inframanager.occi;

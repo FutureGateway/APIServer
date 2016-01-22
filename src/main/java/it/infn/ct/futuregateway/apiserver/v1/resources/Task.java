@@ -26,6 +26,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Observable;
+import java.util.Random;
 import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
@@ -53,6 +54,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.Predicate;
 import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
@@ -180,7 +182,7 @@ public class Task extends Observable implements Serializable {
      * The date when the task was created.
      */
     @XmlElement(name = "runtime_data")
-    private List<Params> runtime;
+    private List<RuntimeParams> runtime;
 
     /**
      * The user name submitting the task.
@@ -197,7 +199,17 @@ public class Task extends Observable implements Serializable {
     /**
      * The date of last task status update.
      */
+    @XmlElement(name = "last_change")
     private Date lastChange;
+
+    /**
+     * Infrastructure executing the task.
+     * An application can be associated with multiple infrastructure, this is
+     * the Id of one selected to execute the task.
+     */
+    @XmlTransient
+    private String associatedInfrastructureId;
+
 
     /**
      * Retrieve the task identifier.
@@ -445,7 +457,7 @@ public class Task extends Observable implements Serializable {
      */
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Fetch(FetchMode.SELECT)
-    public List<Params> getRuntime() {
+    public List<RuntimeParams> getRuntime() {
         return runtime;
     }
 
@@ -459,7 +471,7 @@ public class Task extends Observable implements Serializable {
      *
      * @param someRuntime A list of runtime parameters
      */
-    public void setRuntime(final List<Params> someRuntime) {
+    public void setRuntime(final List<RuntimeParams> someRuntime) {
         lastChange = new Date();
         setChanged();
         this.runtime = someRuntime;
@@ -549,6 +561,74 @@ public class Task extends Observable implements Serializable {
      */
     public void setLinks(final List<Link> someLinks) {
         this.links = someLinks;
+        lastChange = new Date();
+        setChanged();
+    }
+
+    /**
+     * Retrieves the associated infrastructure Id.
+     * This is the infrastructure selected to execute the task among
+     * the many the application can run on.
+     *
+     * @return The infrastructure
+     */
+    @Transient
+    public Infrastructure getAssociatedInfrastructure() {
+        if (applicationDetail == null) {
+            return null;
+        }
+        return IterableUtils.find(
+                applicationDetail.getInfrastructures(),
+                new Predicate<Infrastructure>() {
+            @Override
+            public boolean evaluate(final Infrastructure t) {
+                return t.getId().equals(getAssociatedInfrastructureId());
+            }
+        });
+    }
+    /**
+     * Retrieves the associated infrastructure Id.
+     * This is the Id of the infrastructure selected to execute the task among
+     * the many the application can run on.
+     *
+     * @return The infrastructure Id
+     */
+    public String getAssociatedInfrastructureId() {
+        if ((associatedInfrastructureId == null
+                || associatedInfrastructureId.isEmpty())
+                && applicationDetail != null) {
+            List<Infrastructure> infras =
+                    ListUtils.select(applicationDetail.getInfrastructures(),
+                            new Predicate<Infrastructure>() {
+                                @Override
+                                public boolean evaluate(
+                                        final Infrastructure t) {
+                                    return t.isEnabled();
+                                }
+                            }
+                    );
+            Random rand = new Random((new Date()).getTime());
+
+            while (!infras.isEmpty()) {
+                Infrastructure i = infras.remove(rand.nextInt(infras.size()));
+                if (i.isEnabled()) {
+                    setAssociatedInfrastructureId(i.getId());
+                    return associatedInfrastructureId;
+                }
+            }
+        }
+        return associatedInfrastructureId;
+    }
+
+    /**
+     * Sets the infrastructure for the execution.
+     * It has to be one of the infrastructure the application is enabled to
+     * execute.
+     *
+     * @param anInfrastructure The infrastructure Id
+     */
+    public void setAssociatedInfrastructureId(final String anInfrastructure) {
+        this.associatedInfrastructureId = anInfrastructure;
         lastChange = new Date();
         setChanged();
     }

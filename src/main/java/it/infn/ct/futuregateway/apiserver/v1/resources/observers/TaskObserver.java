@@ -21,7 +21,7 @@
  */
 package it.infn.ct.futuregateway.apiserver.v1.resources.observers;
 
-import it.infn.ct.futuregateway.apiserver.taskmanager.Submitter;
+import it.infn.ct.futuregateway.apiserver.inframanager.Submitter;
 import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
 import it.infn.ct.futuregateway.apiserver.v1.resources.TaskFile;
 import java.util.Observable;
@@ -98,22 +98,21 @@ public class TaskObserver implements Observer {
             t.setStatus(Task.STATUS.READY);
             submit(t);
         }
-        if (t.getStatus().equals(Task.STATUS.DONE)) {
-            EntityManager em = emf.createEntityManager();
-            EntityTransaction et = em.getTransaction();
-            try {
-                et.begin();
-                em.merge(t);
-                et.commit();
-            } catch (RuntimeException re) {
-                log.error("Impossible to update the task status");
-                log.error(re);
-                if (et != null && et.isActive()) {
-                    et.rollback();
-                }
-            } finally {
-                em.close();
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction et = em.getTransaction();
+        try {
+            et.begin();
+            em.merge(t);
+            et.commit();
+        } catch (RuntimeException re) {
+            log.error("Impossible to update the task!");
+            log.error(re);
+            if (et != null && et.isActive()) {
+                et.rollback();
             }
+        } finally {
+            //FIXME: The session should be close when the observer is disposed
+            em.close();
         }
     }
 

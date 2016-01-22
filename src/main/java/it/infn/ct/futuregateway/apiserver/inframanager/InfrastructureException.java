@@ -19,9 +19,31 @@
  * limitations under the License.
  ***********************************************************************/
 
+package it.infn.ct.futuregateway.apiserver.inframanager;
+
 /**
- * This Package ......
+ * Problem with the defined infrastructure.
+ * This exception group all possible errors connected with the infrastructure
+ * access and management.
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-package it.infn.ct.futuregateway.apiserver.taskmanager.gLite;
+public class InfrastructureException extends Exception {
+
+    /**
+     * Creates a new instance of <code>InfrastrucureException</code> without
+     * detail message.
+     */
+    public InfrastructureException() {
+    }
+
+    /**
+     * Constructs an instance of <code>InfrastrucureException</code> with the
+     * specified detail message.
+     *
+     * @param msg the detail message.
+     */
+    public InfrastructureException(final String msg) {
+        super(msg);
+    }
+}

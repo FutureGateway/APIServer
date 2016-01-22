@@ -42,6 +42,146 @@ import org.glassfish.jersey.linking.InjectLinks;
  * can execute.
  * An infrastructure describes all the relevant information to allow the access
  * and execution of applications and services in a remote infrastructure.
+ * <p>
+ * Infrastructures are identified by a set of parameters which provide all the
+ * information needed to allow the system execute application or call service
+ * on behalf of the user. Parameter differs for different applications and these
+ * are as follow.
+ * <p>
+ * Infrastructures are differentiate using the attribute <b><i>type</i></b>.
+ * This can have one of the following values: <i>wsgram</i>, <i>gatekeeper</i>,
+ * <i>wms</i>, <i>occi</i>, <i>unicore</i>, <i>ourgrid</i>,
+ * <i>bes-genesis2</i>, <i>gos</i>, <i>ssh</i> and <i>tosca</i>. If omitted, it
+ * will be evaluated from the parameter <b><i>jobservice</i></b>.
+ * <p>
+ * <dl>
+ *  <dt><span class="strong">Common to all infrastructures</span></dt>
+ *  <dd>
+ *      <ul>
+ *          <li>
+ *              <b>type</b>: the type of infrastructure. This can have one of
+ *              the following values: <i>wsgram</i>, <i>gatekeeper</i>,
+ *              <i>wms</i>, <i>rocci</i>, <i>unicore</i>, <i>ourgrid</i>,
+ *              <i>bes-genesis2</i>, <i>gos</i>, <i>ssh</i> and <i>tosca</i>.
+ *              If omitted, it will be evaluated from the parameter
+ *              <b><i>jobservice</i></b>.
+ *          </li>
+ *          <li><b>jobservice</b>: URI of the entity accepting jobs on the
+ *          remote infrastructure. Generally, the protocol in the URI is not
+ *          the communication protocol but identify the adaptor to use. E.g. to
+ *          create a VM using rocci adaptor the URI will be like
+ *          <i>rocci://&ltremote_server&gt:&ltremote_port&gt</i>
+ *          </li>
+ *      </ul>
+ *  </dd>
+ *
+ *  <dt><span class="strong">gLite</span></dt>
+ *  <dd>
+ *      <ul>
+ *          <li>
+ *              <b>retrycount</b>: Number of re-submissions in case of failure.
+ *              Default value is 3. Applicable only for type <i>wms</i>.
+ *          </li>
+ *          <li>
+ *              <b>myproxyserver</b>: Hostname of a myproxyserver. Applicable
+ *              only for type <i>wms</i>.
+ *          </li>
+ *          <li>
+ *              <b>proxyurl</b>: URL of a valid proxy. It can be a local file
+ *              to the server of remote file accessed using http(s) or other
+ *              java enabled protocols. This has precedence to other parameters
+ *              like the etokenserverurl with the related parameters for the
+ *              query.
+ *          </li>
+ *
+ *          <li>
+ *              <b>etokenserverurl</b>: URL of the eToken Server. The URL can
+ *              include everything but the query string specifying the proxy
+ *              parameters (protocol, hostname, path, etc...). If some
+ *              parameters in the query string do not change then can also be
+ *              included in the url and the system will append the others.
+ *          </li>
+ *          <li>
+ *              <b>etokenid</b>: The id of the token to retrieve from the eToken
+ *              server.
+ *          </li>
+ *          <li><b>vo</b>: Name of the VO the proxy is binded to.</li>
+ *          <li><b>voroles</b>: FQAN of the roles to integrate in the proxy</li>
+ *          <li>
+ *              <b>proxyrenewal</b>: A flag to indicate if the proxy renewal has
+ *              to be enabled. Default is <i>false</i>.
+ *          </li>
+ *          <li>
+ *              <b>disablevomsproxy</b>: A flag to indicate if the voms proxy
+ *              has to be disabled. Dafault is <i>false</i>.
+ *          </li>
+ *          <li>
+ *              <b>rfcproxy</b>: A flag indicating if the proxy has to be RFC
+ *              compliant.
+ *          </li>
+ *      </ul>
+ *  </dd>
+ *
+ *  <dt><span class="strong">OCCI</span></dt>
+ *  <dd>
+ *      <ul>
+ *          <li>
+ *              <b>sshpublickey</b>: Path to the public key to use for the ssh
+ *              connection after the VM start. Default to
+ *              <i>$HOME/sshkeys/id_rsa.pub</i>
+ *          </li>
+ *          <li>
+ *              <b>sshprivatekey</b>: Path to the private key to use for the ssh
+ *              connection after the VM start. Default to
+ *              <i>$HOME/sshkeys/id_rsa</i>
+ *          </li>
+ *          <li>
+ *              <b>proxyurl</b>: URL of a valid proxy. It can be a local file
+ *              to the server of remote file accessed using http(s) or other
+ *              java enabled protocols. This has precedence to other parameters
+ *              like the etokenserverurl with the related parameters for the
+ *              query.
+ *          </li>
+ *
+ *          <li>
+ *              <b>etokenserverurl</b>: URL of the eToken Server. The URL can
+ *              include everything but the query string specifying the proxy
+ *              parameters (protocol, hostname, path, etc...). If some
+ *              parameters in the query string do not change then can also be
+ *              included in the url and the system will append the others.
+ *          </li>
+ *          <li>
+ *              <b>etokenid</b>: The id of the token to retrieve from the eToken
+ *              server.
+ *          </li>
+ *          <li><b>vo</b>: Name of the VO the proxy is binded to.</li>
+ *          <li><b>voroles</b>: FQAN of the roles to integrate in the proxy</li>
+ *          <li>
+ *              <b>proxyrenewal</b>: A flag to indicate if the proxy renewal has
+ *              to be enabled. Default is <i>false</i>.
+ *          </li>
+ *          <li>
+ *              <b>disablevomsproxy</b>: A flag to indicate if the voms proxy
+ *              has to be disabled. Dafault is <i>false</i>.
+ *          </li>
+ *          <li>
+ *              <b>rfcproxy</b>: A flag indicating if the proxy has to be RFC
+ *              compliant.
+ *          </li>
+ *      </ul>
+ *  </dd>
+ *
+ *  <dt><span class="strong">SSH</span></dt>
+ *  <dd>
+ *      <ul>
+ *          <li><b>username</b>: Username for the ssh connection.</li>
+ *          <li>
+ *              <b>password</b>: Password for the associated username (in case
+ *              the authentication is made with username/password).
+ *          </li>
+ *      </ul>
+ *  </dd>
+ * </dl>
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
