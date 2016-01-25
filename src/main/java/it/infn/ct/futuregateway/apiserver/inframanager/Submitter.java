@@ -22,7 +22,7 @@
 package it.infn.ct.futuregateway.apiserver.inframanager;
 
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
-import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
+import it.infn.ct.futuregateway.apiserver.resources.Task;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ogf.saga.session.Session;

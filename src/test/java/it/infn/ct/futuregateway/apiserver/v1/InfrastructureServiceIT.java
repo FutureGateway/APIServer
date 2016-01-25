@@ -22,7 +22,7 @@
 package it.infn.ct.futuregateway.apiserver.v1;
 
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
-import it.infn.ct.futuregateway.apiserver.v1.resources.Infrastructure;
+import it.infn.ct.futuregateway.apiserver.resources.Infrastructure;
 import java.util.UUID;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;

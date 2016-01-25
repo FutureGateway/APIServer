@@ -22,7 +22,7 @@
 package it.infn.ct.futuregateway.apiserver.v1;
 
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
-import it.infn.ct.futuregateway.apiserver.v1.resources.Application;
+import it.infn.ct.futuregateway.apiserver.resources.Application;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;

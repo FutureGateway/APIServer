@@ -22,8 +22,8 @@
 package it.infn.ct.futuregateway.apiserver.inframanager;
 
 import it.infn.ct.futuregateway.apiserver.inframanager.gLite.Defaults;
-import it.infn.ct.futuregateway.apiserver.v1.resources.Infrastructure;
-import it.infn.ct.futuregateway.apiserver.v1.resources.Params;
+import it.infn.ct.futuregateway.apiserver.resources.Infrastructure;
+import it.infn.ct.futuregateway.apiserver.resources.Params;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

@@ -19,7 +19,7 @@
  * limitations under the License.
  ***********************************************************************/
 
-package it.infn.ct.futuregateway.apiserver.v1.resources;
+package it.infn.ct.futuregateway.apiserver.resources;
 
 import java.io.Serializable;
 import java.util.Date;

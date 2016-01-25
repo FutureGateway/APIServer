@@ -21,12 +21,12 @@
 
 package it.infn.ct.futuregateway.apiserver.v1;
 
-import it.infn.ct.futuregateway.apiserver.v1.resources.Application;
-import it.infn.ct.futuregateway.apiserver.v1.resources.Infrastructure;
-import it.infn.ct.futuregateway.apiserver.v1.resources.Params;
-import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
-import it.infn.ct.futuregateway.apiserver.v1.resources.TaskFileInput;
-import it.infn.ct.futuregateway.apiserver.v1.resources.TaskFileOutput;
+import it.infn.ct.futuregateway.apiserver.resources.Application;
+import it.infn.ct.futuregateway.apiserver.resources.Infrastructure;
+import it.infn.ct.futuregateway.apiserver.resources.Params;
+import it.infn.ct.futuregateway.apiserver.resources.Task;
+import it.infn.ct.futuregateway.apiserver.resources.TaskFileInput;
+import it.infn.ct.futuregateway.apiserver.resources.TaskFileOutput;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;

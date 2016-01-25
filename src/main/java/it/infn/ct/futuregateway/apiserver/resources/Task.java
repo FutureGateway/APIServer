@@ -19,7 +19,7 @@
  * the License.
  **********************************************************************
  */
-package it.infn.ct.futuregateway.apiserver.v1.resources;
+package it.infn.ct.futuregateway.apiserver.resources;
 
 import it.infn.ct.futuregateway.apiserver.utils.LinkJaxbAdapter;
 import java.io.Serializable;

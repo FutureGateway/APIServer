@@ -23,10 +23,10 @@ package it.infn.ct.futuregateway.apiserver.v1;
 
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.utils.annotations.Status;
-import it.infn.ct.futuregateway.apiserver.v1.resources.Application;
-import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
-import it.infn.ct.futuregateway.apiserver.v1.resources.TaskList;
-import it.infn.ct.futuregateway.apiserver.v1.resources.observers.TaskObserver;
+import it.infn.ct.futuregateway.apiserver.resources.Application;
+import it.infn.ct.futuregateway.apiserver.resources.Task;
+import it.infn.ct.futuregateway.apiserver.resources.TaskList;
+import it.infn.ct.futuregateway.apiserver.resources.observers.TaskObserver;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;

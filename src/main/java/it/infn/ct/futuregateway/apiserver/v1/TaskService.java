@@ -24,9 +24,9 @@ package it.infn.ct.futuregateway.apiserver.v1;
 
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
-import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
-import it.infn.ct.futuregateway.apiserver.v1.resources.TaskFile;
-import it.infn.ct.futuregateway.apiserver.v1.resources.observers.TaskObserver;
+import it.infn.ct.futuregateway.apiserver.resources.Task;
+import it.infn.ct.futuregateway.apiserver.resources.TaskFile;
+import it.infn.ct.futuregateway.apiserver.resources.observers.TaskObserver;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;

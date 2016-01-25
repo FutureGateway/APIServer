@@ -19,11 +19,11 @@
  * limitations under the License.
  ***********************************************************************
  */
-package it.infn.ct.futuregateway.apiserver.v1.resources.observers;
+package it.infn.ct.futuregateway.apiserver.resources.observers;
 
 import it.infn.ct.futuregateway.apiserver.inframanager.Submitter;
-import it.infn.ct.futuregateway.apiserver.v1.resources.Task;
-import it.infn.ct.futuregateway.apiserver.v1.resources.TaskFile;
+import it.infn.ct.futuregateway.apiserver.resources.Task;
+import it.infn.ct.futuregateway.apiserver.resources.TaskFile;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutorService;

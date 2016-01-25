@@ -37,7 +37,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-public abstract class BaseService {
+abstract class BaseService {
 
     /**
      * Logger object.
