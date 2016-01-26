@@ -19,7 +19,7 @@
  * limitations under the License.
  ***********************************************************************/
 
-package it.infn.ct.futuregateway.apiserver.inframanager.gLite;
+package it.infn.ct.futuregateway.apiserver.inframanager.occi;
 
 import java.io.File;
 
@@ -30,24 +30,18 @@ import java.io.File;
 public final class Defaults {
 
     /**
-     * Number of time the WMS has to re-try the execution.
+     * Default path for ssh public key.
      */
-    public static final int RETRYCOUNT = 3;
+    public static final String SSHPUBLICKEY = System.getProperty("user.home")
+            + File.separator + "sshkeys"
+            + File.separator + "id_rsa.pub";
 
     /**
-     * Proxy renewal option.
+     * Default path for ssh private key.
      */
-    public static final String PROXYRENEWAL = "false";
-
-    /**
-     * VOMS proxy option.
-     */
-    public static final String DISABLEVOMSPROXY = "false";
-
-    /**
-     * RFC proxy option.
-     */
-    public static final String RFCPROXY = "true";
+    public static final String SSHPRIVATEKEY = System.getProperty("user.home")
+            + File.separator + "sshkeys"
+            + File.separator + "id_rsa";
 
     /**
      * Avoid the class be instantiable.

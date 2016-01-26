@@ -19,38 +19,19 @@
  * limitations under the License.
  ***********************************************************************/
 
-package it.infn.ct.futuregateway.apiserver.inframanager.gLite;
+package it.infn.ct.futuregateway.apiserver.inframanager;
 
-import java.io.File;
+import it.infn.ct.futuregateway.apiserver.resources.Task;
+import org.ogf.saga.job.JobService;
 
 /**
+ * Utility class to build a JobService.
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-public final class Defaults {
-
-    /**
-     * Number of time the WMS has to re-try the execution.
-     */
-    public static final int RETRYCOUNT = 3;
-
-    /**
-     * Proxy renewal option.
-     */
-    public static final String PROXYRENEWAL = "false";
-
-    /**
-     * VOMS proxy option.
-     */
-    public static final String DISABLEVOMSPROXY = "false";
-
-    /**
-     * RFC proxy option.
-     */
-    public static final String RFCPROXY = "true";
-
-    /**
-     * Avoid the class be instantiable.
-     */
-    private Defaults() { }
+public final class JobServiceFactory {
+    public static JobService createJobService(Task aTask)
+            throws InfrastructureException{
+        return null;
+    }
 }

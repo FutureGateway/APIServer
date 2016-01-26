@@ -66,11 +66,12 @@ import org.glassfish.jersey.linking.InjectLinks;
  *              If omitted, it will be evaluated from the parameter
  *              <b><i>jobservice</i></b>.
  *          </li>
- *          <li><b>jobservice</b>: URI of the entity accepting jobs on the
- *          remote infrastructure. Generally, the protocol in the URI is not
- *          the communication protocol but identify the adaptor to use. E.g. to
- *          create a VM using rocci adaptor the URI will be like
- *          <i>rocci://&ltremote_server&gt:&ltremote_port&gt</i>
+ *          <li>
+ *              <b>jobservice</b>: URI of the entity accepting jobs on the
+ *              remote infrastructure. Generally, the protocol in the URI is not
+ *              the communication protocol but identify the adaptor to use. E.g.
+ *              to create a VM using rocci adaptor the URI will be like
+ *              <i>rocci://&ltremote_server&gt:&ltremote_port&gt</i>
  *          </li>
  *      </ul>
  *  </dd>

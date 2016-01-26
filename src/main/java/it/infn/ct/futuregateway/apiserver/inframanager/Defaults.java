@@ -19,20 +19,13 @@
  * limitations under the License.
  ***********************************************************************/
 
-package it.infn.ct.futuregateway.apiserver.inframanager.gLite;
-
-import java.io.File;
+package it.infn.ct.futuregateway.apiserver.inframanager;
 
 /**
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 public final class Defaults {
-
-    /**
-     * Number of time the WMS has to re-try the execution.
-     */
-    public static final int RETRYCOUNT = 3;
 
     /**
      * Proxy renewal option.

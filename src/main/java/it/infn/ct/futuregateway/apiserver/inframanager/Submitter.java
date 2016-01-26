@@ -25,7 +25,7 @@ import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ogf.saga.session.Session;
+import org.ogf.saga.job.JobService;
 
 /**
  *
@@ -57,13 +57,12 @@ public class Submitter implements Runnable {
     @Override
     public final void run() {
         try {
-            SessionBuilder sb = new SessionBuilder(
-                    task.getAssociatedInfrastructure(),
-                    task.getUserName());
             try {
-                Session session = sb.createSession();
+                JobService js = JobServiceFactory.createJobService(task);
+                
             } catch (InfrastructureException ex) {
-                log.error("Session not valid. Task " + task.getId() + "failed");
+                log.error("Session not valid. Task " + task.getId() + "failed: "
+                        + ex);
                 task.setStatus(Task.STATUS.ABORTED);
             }
             Thread.sleep(Constants.MAXTHREADIDLELIFE);

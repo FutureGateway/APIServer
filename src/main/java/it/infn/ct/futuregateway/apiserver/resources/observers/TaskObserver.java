@@ -111,7 +111,6 @@ public class TaskObserver implements Observer {
                 et.rollback();
             }
         } finally {
-            //FIXME: The session should be close when the observer is disposed
             em.close();
         }
     }
