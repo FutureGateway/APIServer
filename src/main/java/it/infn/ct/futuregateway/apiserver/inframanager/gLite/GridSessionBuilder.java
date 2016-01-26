@@ -81,7 +81,8 @@ public final class GridSessionBuilder extends GenericSessionBuilder {
      * @param anInfra The infrastructure associated with the configured session
      * @param aUser The user requesting the session
      */
-    public GridSessionBuilder(final Infrastructure anInfra, final String aUser) {
+    public GridSessionBuilder(final Infrastructure anInfra,
+            final String aUser) {
         super(anInfra, aUser);
     }
 
@@ -105,7 +106,6 @@ public final class GridSessionBuilder extends GenericSessionBuilder {
     public GridSessionBuilder(final Map<String, Params> someParams,
             final String aUser) {
         super(someParams, aUser);
-        
     }
 
 
@@ -150,7 +150,6 @@ public final class GridSessionBuilder extends GenericSessionBuilder {
                     "wms.rank=other.GlueCEStateFreeCPUs",
                     "wms.MyProxyServer=" + getParamterValue("myproxyserver",
                             "") });
-                
             }
             newSession.addContext(context);
         } catch (BadParameterException | IncorrectStateException

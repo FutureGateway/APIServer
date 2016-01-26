@@ -105,7 +105,6 @@ public final class SSHSessionBuilder extends GenericSessionBuilder {
     public SSHSessionBuilder(final Map<String, Params> someParams,
             final String aUser) {
         super(someParams, aUser);
-        
     }
 
 

@@ -19,36 +19,9 @@
  * limitations under the License.
  ***********************************************************************/
 
-package it.infn.ct.futuregateway.apiserver.inframanager.gLite;
-
 /**
+ * This Package ......
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-public final class Defaults {
-
-    /**
-     * Number of time the WMS has to re-try the execution.
-     */
-    public static final int RETRYCOUNT = 3;
-
-    /**
-     * Proxy renewal option.
-     */
-    public static final String PROXYRENEWAL = "false";
-
-    /**
-     * VOMS proxy option.
-     */
-    public static final String DISABLEVOMSPROXY = "false";
-
-    /**
-     * RFC proxy option.
-     */
-    public static final String RFCPROXY = "true";
-
-    /**
-     * Avoid the class be instantiable.
-     */
-    private Defaults() { }
-}
+package it.infn.ct.futuregateway.apiserver.inframanager.ssh;

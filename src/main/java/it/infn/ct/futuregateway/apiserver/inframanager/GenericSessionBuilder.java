@@ -91,7 +91,8 @@ public abstract class GenericSessionBuilder {
      * @param anInfra The infrastructure associated with the configured session
      * @param aUser The user requesting the session
      */
-    public GenericSessionBuilder(final Infrastructure anInfra, final String aUser) {
+    public GenericSessionBuilder(final Infrastructure anInfra,
+            final String aUser) {
         this.infrastructure = anInfra;
         for (Params par: anInfra.getParameters()) {
             params.put(par.getName(), par);
@@ -132,7 +133,7 @@ public abstract class GenericSessionBuilder {
         this(aTask.getAssociatedInfrastructure(), aTask.getUserName());
     }
 
-    
+
     /**
      * Create a new session.
      * The session is create with the context derived from the infrastructure
@@ -153,20 +154,25 @@ public abstract class GenericSessionBuilder {
      * @throws InfrastructureException If the proxy for the infrastructure
      * cannot be retrieved for problems with the parameters
      */
-    protected String readRemoteProxy() throws InfrastructureException {
+    protected final String readRemoteProxy() throws InfrastructureException {
         URL proxy;
-        if (getParamterValue("proxyurl", null) == null && getParamterValue("etokenserverurl", null) == null) {
-            throw new InfrastructureException("No proxy location in " + "configuration parameters for " + infrastructure.getId());
+        if (getParamterValue("proxyurl", null) == null
+                && getParamterValue("etokenserverurl", null) == null) {
+            throw new InfrastructureException("No proxy location in "
+                    + "configuration parameters for " + infrastructure.getId());
         }
         if (getParamterValue("proxyurl", null) != null) {
             try {
                 proxy = new URL(getParamterValue("proxyurl", null));
             } catch (MalformedURLException mue) {
-                throw new InfrastructureException("URL for the proxy is not " + "valid, infrastructure " + infrastructure.getId() + " is not accessible");
+                throw new InfrastructureException("URL for the proxy is not "
+                        + "valid, infrastructure " + infrastructure.getId()
+                        + " is not accessible");
             }
         } else {
             try {
-                URI etokenurl = new URI(getParamterValue("etokenserverurl", null));
+                URI etokenurl = new URI(
+                        getParamterValue("etokenserverurl", null));
                 StringBuilder queryURI = new StringBuilder();
                 StringBuilder pathURI = new StringBuilder();
                 String oldPath = etokenurl.getPath();
@@ -177,37 +183,62 @@ public abstract class GenericSessionBuilder {
                     }
                     pathURI.append(getParamterValue("etokenid", ""));
                 } else {
-                    pathURI.append('/').append(getParamterValue("etokenid", ""));
+                    pathURI.append('/')
+                            .append(getParamterValue("etokenid", ""));
                 }
                 String oldQuery = etokenurl.getQuery();
                 if (oldQuery != null) {
                     queryURI.append(oldQuery).append('&');
                 }
-                queryURI.append("voms=").append(getParamterValue("vo", "")).append(':').append(getParamterValue("voroles", "")).append('&');
-                queryURI.append("proxy-renewal=").append(getParamterValue("proxyrenewal", Defaults.PROXYRENEWAL)).append('&');
-                queryURI.append("disable-voms-proxy=").append(getParamterValue("disablevomsproxy", Defaults.DISABLEVOMSPROXY)).append('&');
-                queryURI.append("rfc-proxy=").append(getParamterValue("rfcproxy", Defaults.RFCPROXY)).append('&');
+                queryURI.append("voms=")
+                        .append(getParamterValue("vo", ""))
+                        .append(':')
+                        .append(getParamterValue("voroles", ""))
+                        .append('&');
+                queryURI.append("proxy-renewal=")
+                        .append(getParamterValue("proxyrenewal",
+                                Defaults.PROXYRENEWAL))
+                        .append('&');
+                queryURI.append("disable-voms-proxy=")
+                        .append(getParamterValue("disablevomsproxy",
+                                Defaults.DISABLEVOMSPROXY))
+                        .append('&');
+                queryURI.append("rfc-proxy=")
+                        .append(getParamterValue("rfcproxy",
+                                Defaults.RFCPROXY))
+                        .append('&');
                 queryURI.append("cn-label=");
                 if (user != null) {
                     queryURI.append("eToken:").append(user);
                 }
-                etokenurl = new URI(etokenurl.getScheme(), etokenurl.getUserInfo(), etokenurl.getHost(), etokenurl.getPort(), pathURI.toString(), queryURI.toString(), etokenurl.getFragment());
+                etokenurl = new URI(
+                        etokenurl.getScheme(),
+                        etokenurl.getUserInfo(),
+                        etokenurl.getHost(),
+                        etokenurl.getPort(),
+                        pathURI.toString(),
+                        queryURI.toString(),
+                        etokenurl.getFragment());
                 proxy = etokenurl.toURL();
             } catch (MalformedURLException | URISyntaxException use) {
-                throw new InfrastructureException("etokenserverurl not " + "properly configured");
+                throw new InfrastructureException("etokenserverurl not "
+                        + "properly configured for infrastructure "
+                        + getInfrastructure().getId());
             }
         }
         StringBuilder strProxy = new StringBuilder();
         log.debug("Accessing the proxy " + proxy.toString());
         try {
             String lnProxy;
-            BufferedReader fileProxy = new BufferedReader(new InputStreamReader(proxy.openStream()));
+            BufferedReader fileProxy = new BufferedReader(
+                    new InputStreamReader(proxy.openStream()));
             while ((lnProxy = fileProxy.readLine()) != null) {
                 strProxy.append(lnProxy);
                 strProxy.append("\n");
             }
         } catch (IOException ioer) {
-            log.error("Impossible to retrieve the remote proxy certificate from" + ": " + proxy.toString());
+            log.error("Impossible to retrieve the remote proxy certificate from"
+                    + ": " + proxy.toString());
         }
         log.debug("Proxy:\n\n" + strProxy.toString() + "\n\n");
         return strProxy.toString();
@@ -219,7 +250,8 @@ public abstract class GenericSessionBuilder {
      * @param defaultValue Default value if the parameter is not defined
      * @return Parameter value
      */
-    protected String getParamterValue(final String name, final String defaultValue) {
+    protected final String getParamterValue(final String name,
+            final String defaultValue) {
         if (params.containsKey(name)) {
             return params.get(name).getValue();
         }
@@ -231,7 +263,7 @@ public abstract class GenericSessionBuilder {
      *
      * @param aParam The new parameter
      */
-    public void addParameter(final Params aParam) {
+    public final void addParameter(final Params aParam) {
         this.params.put(aParam.getName(), aParam);
     }
 
@@ -240,17 +272,17 @@ public abstract class GenericSessionBuilder {
      *
      * @return The user identifier
      */
-    public String getUser() {
+    public final String getUser() {
         return user;
     }
 
     /**
      * Sets the user for the session.
      *
-     * @param user The user identifier
+     * @param aUser The user identifier
      */
-    public void setUser(String user) {
-        this.user = user;
+    public final void setUser(final String aUser) {
+        this.user = aUser;
     }
 
     /**
@@ -258,7 +290,7 @@ public abstract class GenericSessionBuilder {
      *
      * @return The infrastructure
      */
-    public Infrastructure getInfrastructure() {
+    public final Infrastructure getInfrastructure() {
         if (infrastructure == null) {
             return new Infrastructure();
         }
@@ -270,7 +302,7 @@ public abstract class GenericSessionBuilder {
      *
      * @param anInfrastructure The infrastructure
      */
-    public void setInfrastructure(Infrastructure anInfrastructure) {
+    public final void setInfrastructure(final Infrastructure anInfrastructure) {
         this.infrastructure = anInfrastructure;
         for (Params par: anInfrastructure.getParameters()) {
             params.put(par.getName(), par);

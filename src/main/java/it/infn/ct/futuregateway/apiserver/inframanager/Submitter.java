@@ -59,7 +59,6 @@ public class Submitter implements Runnable {
         try {
             try {
                 JobService js = JobServiceFactory.createJobService(task);
-                
             } catch (InfrastructureException ex) {
                 log.error("Session not valid. Task " + task.getId() + "failed: "
                         + ex);

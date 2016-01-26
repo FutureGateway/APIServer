@@ -30,8 +30,20 @@ import org.ogf.saga.job.JobService;
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 public final class JobServiceFactory {
-    public static JobService createJobService(Task aTask)
-            throws InfrastructureException{
+    /**
+     * Avoid the class be instantiable.
+     */
+    private JobServiceFactory() { }
+    /**
+     * Create the JobService for the infrastructure.
+     *
+     * @param aTask The task requesting the JobService
+     * @return The JobService
+     * @throws InfrastructureException If the infrastructure cannot be used for
+     * some problem in the configuration or in the infrastructure
+     */
+    public static JobService createJobService(final Task aTask)
+            throws InfrastructureException {
         return null;
     }
 }

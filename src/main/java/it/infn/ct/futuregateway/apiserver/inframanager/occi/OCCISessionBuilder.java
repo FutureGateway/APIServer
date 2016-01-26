@@ -81,7 +81,8 @@ public final class OCCISessionBuilder extends GenericSessionBuilder {
      * @param anInfra The infrastructure associated with the configured session
      * @param aUser The user requesting the session
      */
-    public OCCISessionBuilder(final Infrastructure anInfra, final String aUser) {
+    public OCCISessionBuilder(final Infrastructure anInfra,
+            final String aUser) {
         super(anInfra, aUser);
     }
 
@@ -105,7 +106,6 @@ public final class OCCISessionBuilder extends GenericSessionBuilder {
     public OCCISessionBuilder(final Map<String, Params> someParams,
             final String aUser) {
         super(someParams, aUser);
-        
     }
 
 
