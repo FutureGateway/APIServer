@@ -631,6 +631,7 @@ public class Task extends Observable implements Serializable {
         this.associatedInfrastructureId = anInfrastructure;
         lastChange = new Date();
         setChanged();
+        notifyObservers();
     }
 
     /**

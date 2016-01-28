@@ -61,8 +61,10 @@ import org.glassfish.jersey.linking.InjectLinks;
  *          <li>
  *              <b>type</b>: the type of infrastructure. This can have one of
  *              the following values: <i>wsgram</i>, <i>gatekeeper</i>,
- *              <i>wms</i>, <i>rocci</i>, <i>unicore</i>, <i>ourgrid</i>,
- *              <i>bes-genesis2</i>, <i>gos</i>, <i>ssh</i> and <i>tosca</i>.
+ *              <i>wms</i>, <i>rocci</i>, <i>rocci</i>, <i>unicore</i>,
+ *              <i>ourgrid</i>, <i>bes-genesis2</i>, <i>gos</i>, <i>ssh</i> and
+ *              <i>tosca</i>.
+ *              <p>
  *              If omitted, it will be evaluated from the parameter
  *              <b><i>jobservice</i></b>.
  *          </li>

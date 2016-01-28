@@ -21,7 +21,7 @@
 
 package it.infn.ct.futuregateway.apiserver.inframanager.gLite;
 
-import it.infn.ct.futuregateway.apiserver.inframanager.GenericSessionBuilder;
+import it.infn.ct.futuregateway.apiserver.inframanager.SessionBuilder;
 import it.infn.ct.futuregateway.apiserver.inframanager.InfrastructureException;
 import it.infn.ct.futuregateway.apiserver.resources.Infrastructure;
 import it.infn.ct.futuregateway.apiserver.resources.Params;
@@ -47,7 +47,7 @@ import org.ogf.saga.session.SessionFactory;
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-public final class GridSessionBuilder extends GenericSessionBuilder {
+public final class GridSessionBuilder extends SessionBuilder {
     /**
      * Logger object.
      * Based on apache commons logging.

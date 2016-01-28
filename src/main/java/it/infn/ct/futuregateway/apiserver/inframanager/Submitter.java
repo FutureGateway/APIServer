@@ -21,11 +21,10 @@
 
 package it.infn.ct.futuregateway.apiserver.inframanager;
 
-import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ogf.saga.job.JobService;
+import org.ogf.saga.job.Job;
 
 /**
  *
@@ -56,18 +55,13 @@ public class Submitter implements Runnable {
 
     @Override
     public final void run() {
+        Job job;
         try {
-            try {
-                JobService js = JobServiceFactory.createJobService(task);
-            } catch (InfrastructureException ex) {
-                log.error("Session not valid. Task " + task.getId() + "failed: "
-                        + ex);
-                task.setStatus(Task.STATUS.ABORTED);
-            }
-            Thread.sleep(Constants.MAXTHREADIDLELIFE);
-        } catch (InterruptedException ex) {
+            job = CustomJobFactory.createJob(task);
+        } catch (InfrastructureException ex) {
+            log.error("JobFactory does not work");
             log.error(ex);
+            task.setStatus(Task.STATUS.ABORTED);
         }
     }
-
 }

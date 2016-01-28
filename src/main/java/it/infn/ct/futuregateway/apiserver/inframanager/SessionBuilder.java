@@ -21,7 +21,6 @@
 
 package it.infn.ct.futuregateway.apiserver.inframanager;
 
-import it.infn.ct.futuregateway.apiserver.inframanager.gLite.GridSessionBuilder;
 import it.infn.ct.futuregateway.apiserver.resources.Infrastructure;
 import it.infn.ct.futuregateway.apiserver.resources.Params;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
@@ -42,12 +41,12 @@ import org.ogf.saga.session.Session;
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-public abstract class GenericSessionBuilder {
+public abstract class SessionBuilder {
     /**
      * Logger object.
      * Based on apache commons logging.
      */
-    private final Log log = LogFactory.getLog(GridSessionBuilder.class);
+    private final Log log = LogFactory.getLog(SessionBuilder.class);
 
     /**
      * Parameters to use for the session.
@@ -68,7 +67,7 @@ public abstract class GenericSessionBuilder {
      * Empty builder.
      * Parameters must be provided before the session is created.
      */
-    public GenericSessionBuilder() {
+    public SessionBuilder() {
     }
 
 
@@ -80,7 +79,7 @@ public abstract class GenericSessionBuilder {
      *
      * @param anInfra The infrastructure associated with the configured session
      */
-    public GenericSessionBuilder(final Infrastructure anInfra) {
+    public SessionBuilder(final Infrastructure anInfra) {
         this(anInfra, null);
     }
 
@@ -91,7 +90,7 @@ public abstract class GenericSessionBuilder {
      * @param anInfra The infrastructure associated with the configured session
      * @param aUser The user requesting the session
      */
-    public GenericSessionBuilder(final Infrastructure anInfra,
+    public SessionBuilder(final Infrastructure anInfra,
             final String aUser) {
         this.infrastructure = anInfra;
         for (Params par: anInfra.getParameters()) {
@@ -106,7 +105,7 @@ public abstract class GenericSessionBuilder {
      *
      * @param someParams Parameters to use for the new session
      */
-    public GenericSessionBuilder(final Map<String, Params> someParams) {
+    public SessionBuilder(final Map<String, Params> someParams) {
         this(someParams, null);
     }
 
@@ -117,7 +116,7 @@ public abstract class GenericSessionBuilder {
      * @param someParams Parameters to use for the new session
      * @param aUser The user requesting the session
      */
-    public GenericSessionBuilder(final Map<String, Params> someParams,
+    public SessionBuilder(final Map<String, Params> someParams,
             final String aUser) {
         this.params = someParams;
         this.user = aUser;
@@ -129,7 +128,7 @@ public abstract class GenericSessionBuilder {
      *
      * @param aTask The task requesting the creation of the session
      */
-    public GenericSessionBuilder(final Task aTask) {
+    public SessionBuilder(final Task aTask) {
         this(aTask.getAssociatedInfrastructure(), aTask.getUserName());
     }
 
