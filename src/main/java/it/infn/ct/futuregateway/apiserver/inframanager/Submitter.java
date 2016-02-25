@@ -24,6 +24,7 @@ package it.infn.ct.futuregateway.apiserver.inframanager;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.job.Job;
 
 /**
@@ -60,6 +61,13 @@ public class Submitter implements Runnable {
             job = CustomJobFactory.createJob(task);
         } catch (InfrastructureException ex) {
             log.error("JobFactory does not work");
+            log.error(ex);
+            task.setStatus(Task.STATUS.ABORTED);
+        } catch (BadParameterException ex) {
+            log.error("Paramaters not correct for the task "
+                    + task.getId()
+                    + " using the infrastructure "
+                    + task.getAssociatedInfrastructureId());
             log.error(ex);
             task.setStatus(Task.STATUS.ABORTED);
         }

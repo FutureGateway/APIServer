@@ -23,6 +23,7 @@ package it.infn.ct.futuregateway.apiserver.inframanager;
 
 import it.infn.ct.futuregateway.apiserver.resources.Params;
 import java.util.List;
+import java.util.Properties;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Predicate;
 
@@ -82,5 +83,38 @@ public final class Utilities {
             return tmpParam.getValue();
         }
         return defaultValue;
+    }
+
+
+    /**
+     * Convert a Params list in a properties object.
+     * Similar to {@code onvertParamsToProperties(params, new Properties())}.
+     *
+     * @param params The Params to convert
+     * @return A new Properties containing the parameters
+     */
+    public static Properties convertParamsToProperties(
+            final List<Params> params) {
+        return convertParamsToProperties(params, new Properties());
+    }
+
+
+    /**
+     * Convert a Params list in a properties object.
+     *
+     * @param params The Params to convert
+     * @param properties The Properties where the parameters will be added
+     * @return The Properties containing the parameters
+     */
+    public static Properties convertParamsToProperties(
+            final List<Params> params, final Properties properties) {
+        Properties pr = properties;
+        for (Params par: params) {
+            Object previous = pr.setProperty(par.getName(), par.getValue());
+            if (previous != null) {
+                pr.setProperty(par.getName(), previous + "," + par.getValue());
+            }
+        }
+        return pr;
     }
 }

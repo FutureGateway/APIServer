@@ -22,6 +22,7 @@
 package it.infn.ct.futuregateway.apiserver.inframanager;
 
 import it.infn.ct.futuregateway.apiserver.inframanager.gLite.GridSessionBuilder;
+import it.infn.ct.futuregateway.apiserver.inframanager.gLite.ResourceDiscovery;
 import it.infn.ct.futuregateway.apiserver.inframanager.occi.OCCISessionBuilder;
 import it.infn.ct.futuregateway.apiserver.inframanager.ssh.SSHSessionBuilder;
 import it.infn.ct.futuregateway.apiserver.resources.Params;
@@ -29,7 +30,19 @@ import it.infn.ct.futuregateway.apiserver.resources.Task;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.IncorrectURLException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.PermissionDeniedException;
+import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.job.Job;
+import org.ogf.saga.job.JobDescription;
+import org.ogf.saga.job.JobFactory;
+import org.ogf.saga.job.JobService;
+import org.ogf.saga.url.URLFactory;
 
 /**
  * Utility class to build a JobService.
@@ -55,9 +68,11 @@ public final class CustomJobFactory {
      * @return The JobService
      * @throws InfrastructureException If the infrastructure cannot be used for
      * some problem in the configuration or in the infrastructure
+     * @throws BadParameterException The task cannot be submitted because some
+     * parameters are missed or not correct
      */
     public static Job createJob(final Task task)
-            throws InfrastructureException {
+            throws InfrastructureException, BadParameterException {
         List<Params> infraParams = task.getAssociatedInfrastructure()
                 .getParameters();
         String infraType = Utilities.getParamterValue(infraParams, "type");
@@ -79,12 +94,34 @@ public final class CustomJobFactory {
         }
 
         SessionBuilder sb;
+        JobDescription jd;
+        String resource = Utilities.getParamterValue(infraParams, "jobservice");
+        try {
+            jd = JobDescriptionFactory.createJobDescription(task);
+        } catch (NotImplementedException | NoSuccessException ne) {
+            throw new InfrastructureException("Impossible to create a job"
+                    + "description ");
+        }
+
         switch (infraType) {
             case "wsgram":
             case "gatekeeper":
             case "wms:":
                 sb = new GridSessionBuilder(
                         task.getAssociatedInfrastructure(), task.getUserName());
+                if (resource == null || resource.contains(",")
+                        || resource.contains(";")) {
+                    ResourceDiscovery rd = new ResourceDiscovery(infraParams,
+                            sb.getVO());
+                    try {
+                        resource = rd.getJobResource(
+                                ResourceDiscovery.ResourceType.WMS);
+                    } catch (NoResorucesAvailable nra) {
+                        throw new InfrastructureException("No service resources"
+                                + " available for the infrastructure "
+                                + task.getAssociatedInfrastructureId());
+                    }
+                }
                 break;
             case "rocci":
             case "occi":
@@ -114,8 +151,19 @@ public final class CustomJobFactory {
                 throw new InfrastructureException("Infrastructure type '"
                         + infraType + "' not supported");
         }
-
-        return null;
+        try {
+            JobService js = JobFactory.createJobService(sb.getSession(),
+                    URLFactory.createURL(resource));
+            return js.createJob(jd);
+        } catch (AuthenticationFailedException | AuthorizationFailedException
+                | IncorrectURLException | NoSuccessException
+                | NotImplementedException | PermissionDeniedException
+                | TimeoutException ex) {
+            LOG.error(ex);
+            throw new InfrastructureException("Impossibile to generate a job"
+                    + "for the infrastructure "
+                    + task.getAssociatedInfrastructureId());
+        }
     }
 
 }

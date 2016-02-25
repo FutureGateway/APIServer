@@ -24,8 +24,7 @@ package it.infn.ct.futuregateway.apiserver.inframanager.ssh;
 import it.infn.ct.futuregateway.apiserver.inframanager.SessionBuilder;
 import it.infn.ct.futuregateway.apiserver.inframanager.InfrastructureException;
 import it.infn.ct.futuregateway.apiserver.resources.Infrastructure;
-import it.infn.ct.futuregateway.apiserver.resources.Params;
-import java.util.Map;
+import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ogf.saga.context.Context;
@@ -91,7 +90,7 @@ public final class SSHSessionBuilder extends SessionBuilder {
      *
      * @param someParams Parameters to use for the new session
      */
-    public SSHSessionBuilder(final Map<String, Params> someParams) {
+    public SSHSessionBuilder(final Properties someParams) {
         this(someParams, null);
     }
 
@@ -102,7 +101,7 @@ public final class SSHSessionBuilder extends SessionBuilder {
      * @param someParams Parameters to use for the new session
      * @param aUser The user requesting the session
      */
-    public SSHSessionBuilder(final Map<String, Params> someParams,
+    public SSHSessionBuilder(final Properties someParams,
             final String aUser) {
         super(someParams, aUser);
     }
@@ -113,13 +112,12 @@ public final class SSHSessionBuilder extends SessionBuilder {
      * The session is create with the context derived from the infrastructure
      * parameters.
      *
-     * @return The new session
      * @throws InfrastructureException In case there is a problem with the
      * infrastructure or the parameter are not correct for the context (bad or
      * missed values)
      */
     @Override
-    public Session createSession()
+    public void createNewSession()
             throws InfrastructureException {
         Session newSession;
         try {
@@ -132,13 +130,13 @@ public final class SSHSessionBuilder extends SessionBuilder {
         log.debug("Create a new SSH session");
         try {
             Context context = ContextFactory.createContext("UserPass");
-            if (getParamterValue("username", null) != null) {
+            if (getParams().getProperty("username", null) != null) {
                 context.setAttribute("UserID",
-                        getParamterValue("username", null));
+                        getParams().getProperty("username", null));
             }
-            if (getParamterValue("password", null) != null) {
+            if (getParams().getProperty("password", null) != null) {
                 context.setAttribute("UserPass",
-                        getParamterValue("password", null));
+                        getParams().getProperty("password", null));
             }
             // This is a misterious setting coming from the
             // legacy Grid Engine
@@ -160,6 +158,13 @@ public final class SSHSessionBuilder extends SessionBuilder {
             throw new InfrastructureException("Impossible to open a session in"
                     + " the infratructure");
         }
-        return newSession;
+        setSession(newSession);
+    }
+
+
+    @Override
+    public String getVO() {
+        throw new UnsupportedOperationException("Not supported in SSH based "
+                + "infrastructures");
     }
 }

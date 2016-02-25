@@ -31,8 +31,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ogf.saga.session.Session;
@@ -51,7 +50,7 @@ public abstract class SessionBuilder {
     /**
      * Parameters to use for the session.
      */
-    private Map<String, Params> params = new HashMap<>();
+    private Properties params = new Properties();
 
     /**
      * Infrastructure requiring the session.
@@ -62,6 +61,11 @@ public abstract class SessionBuilder {
      * User requiring the session.
      */
     private String user;
+
+    /**
+     * Last created session.
+     */
+    private Session session;
 
     /**
      * Empty builder.
@@ -93,9 +97,7 @@ public abstract class SessionBuilder {
     public SessionBuilder(final Infrastructure anInfra,
             final String aUser) {
         this.infrastructure = anInfra;
-        for (Params par: anInfra.getParameters()) {
-            params.put(par.getName(), par);
-        }
+        params = Utilities.convertParamsToProperties(anInfra.getParameters());
         this.user = aUser;
     }
 
@@ -105,7 +107,7 @@ public abstract class SessionBuilder {
      *
      * @param someParams Parameters to use for the new session
      */
-    public SessionBuilder(final Map<String, Params> someParams) {
+    public SessionBuilder(final Properties someParams) {
         this(someParams, null);
     }
 
@@ -116,7 +118,7 @@ public abstract class SessionBuilder {
      * @param someParams Parameters to use for the new session
      * @param aUser The user requesting the session
      */
-    public SessionBuilder(final Map<String, Params> someParams,
+    public SessionBuilder(final Properties someParams,
             final String aUser) {
         this.params = someParams;
         this.user = aUser;
@@ -135,15 +137,42 @@ public abstract class SessionBuilder {
 
     /**
      * Create a new session.
-     * The session is create with the context derived from the infrastructure
-     * parameters.
+     * The session is created with the context derived from the infrastructure
+     * parameters and stored inside the builder. A new session is created
+     * on call so multiple call will return different sessions.
      *
-     * @return The new session
      * @throws InfrastructureException In case there is a problem with the
      * infrastructure or the parameter are not correct for the context (bad or
      * missed values)
      */
-    public abstract Session createSession() throws InfrastructureException;
+    public abstract void createNewSession() throws InfrastructureException;
+
+    /**
+     * Retrieves the last created session.
+     * If the session has not been created a new session is generated with the
+     * method <code>createNewSession</code>. Multiple call will return the same
+     * method unless a new session is explicitely requested.
+     *
+     * @return The session.
+     * @throws InfrastructureException If a new session cannot be generated
+     */
+    public final Session getSession() throws InfrastructureException {
+        if (session == null) {
+            createNewSession();
+        }
+        return session;
+    }
+
+    /**
+     * Set the session.
+     *
+     * @param aSession The new session
+     * @return The SessionBuilder
+     */
+    protected final SessionBuilder setSession(final Session aSession) {
+        this.session = aSession;
+        return this;
+    }
 
     /**
      * Read the proxy certificate from a remote location.
@@ -155,14 +184,14 @@ public abstract class SessionBuilder {
      */
     protected final String readRemoteProxy() throws InfrastructureException {
         URL proxy;
-        if (getParamterValue("proxyurl", null) == null
-                && getParamterValue("etokenserverurl", null) == null) {
+        if (params.getProperty("proxyurl") == null
+                && params.getProperty("etokenserverurl") == null) {
             throw new InfrastructureException("No proxy location in "
                     + "configuration parameters for " + infrastructure.getId());
         }
-        if (getParamterValue("proxyurl", null) != null) {
+        if (params.getProperty("proxyurl") != null) {
             try {
-                proxy = new URL(getParamterValue("proxyurl", null));
+                proxy = new URL(params.getProperty("proxyurl"));
             } catch (MalformedURLException mue) {
                 throw new InfrastructureException("URL for the proxy is not "
                         + "valid, infrastructure " + infrastructure.getId()
@@ -170,8 +199,7 @@ public abstract class SessionBuilder {
             }
         } else {
             try {
-                URI etokenurl = new URI(
-                        getParamterValue("etokenserverurl", null));
+                URI etokenurl = new URI(params.getProperty("etokenserverurl"));
                 StringBuilder queryURI = new StringBuilder();
                 StringBuilder pathURI = new StringBuilder();
                 String oldPath = etokenurl.getPath();
@@ -180,30 +208,30 @@ public abstract class SessionBuilder {
                     if (!oldPath.endsWith("/")) {
                         pathURI.append('/');
                     }
-                    pathURI.append(getParamterValue("etokenid", ""));
+                    pathURI.append(params.getProperty("etokenid", ""));
                 } else {
                     pathURI.append('/')
-                            .append(getParamterValue("etokenid", ""));
+                            .append(params.getProperty("etokenid", ""));
                 }
                 String oldQuery = etokenurl.getQuery();
                 if (oldQuery != null) {
                     queryURI.append(oldQuery).append('&');
                 }
                 queryURI.append("voms=")
-                        .append(getParamterValue("vo", ""))
+                        .append(params.getProperty("vo", ""))
                         .append(':')
-                        .append(getParamterValue("voroles", ""))
+                        .append(params.getProperty("voroles", ""))
                         .append('&');
                 queryURI.append("proxy-renewal=")
-                        .append(getParamterValue("proxyrenewal",
+                        .append(params.getProperty("proxyrenewal",
                                 Defaults.PROXYRENEWAL))
                         .append('&');
                 queryURI.append("disable-voms-proxy=")
-                        .append(getParamterValue("disablevomsproxy",
+                        .append(params.getProperty("disablevomsproxy",
                                 Defaults.DISABLEVOMSPROXY))
                         .append('&');
                 queryURI.append("rfc-proxy=")
-                        .append(getParamterValue("rfcproxy",
+                        .append(params.getProperty("rfcproxy",
                                 Defaults.RFCPROXY))
                         .append('&');
                 queryURI.append("cn-label=");
@@ -243,27 +271,51 @@ public abstract class SessionBuilder {
         return strProxy.toString();
     }
 
+
+    /**
+     * Retrieves the session parameters.
+     *
+     * @return The parameters
+     */
+    public final Properties getParams() {
+        return params;
+    }
+
     /**
      * Retrieves parameter from the infrastructure.
      * @param name Parameter name
      * @param defaultValue Default value if the parameter is not defined
      * @return Parameter value
      */
-    protected final String getParamterValue(final String name,
-            final String defaultValue) {
-        if (params.containsKey(name)) {
-            return params.get(name).getValue();
-        }
-        return defaultValue;
+//    protected final String getParamterValue(final String name,
+//            final String defaultValue) {
+//        if (params.containsKey(name)) {
+//            return params.get(name).getValue();
+//        }
+//        return defaultValue;
+//    }
+
+
+    /**
+     * Sets the parameter for the session.
+     *
+     * @param somePrams The parameters
+     * @return The SessionBuilder
+     */
+    public final SessionBuilder setParams(final Properties somePrams) {
+        this.params = somePrams;
+        return this;
     }
 
     /**
      * Add additional parameters.
      *
      * @param aParam The new parameter
+     * @return The SessionBuilder
      */
-    public final void addParameter(final Params aParam) {
-        this.params.put(aParam.getName(), aParam);
+    public final SessionBuilder addParameter(final Params aParam) {
+        this.params.setProperty(aParam.getName(), aParam.getValue());
+        return this;
     }
 
     /**
@@ -279,9 +331,11 @@ public abstract class SessionBuilder {
      * Sets the user for the session.
      *
      * @param aUser The user identifier
+     * @return The SessionBuilder
      */
-    public final void setUser(final String aUser) {
+    public final SessionBuilder setUser(final String aUser) {
         this.user = aUser;
+        return this;
     }
 
     /**
@@ -300,13 +354,24 @@ public abstract class SessionBuilder {
      * Sets the infrastructure for the session.
      *
      * @param anInfrastructure The infrastructure
+     * @return The SessionBuilder
      */
-    public final void setInfrastructure(final Infrastructure anInfrastructure) {
+    public final SessionBuilder setInfrastructure(
+            final Infrastructure anInfrastructure) {
         this.infrastructure = anInfrastructure;
         for (Params par: anInfrastructure.getParameters()) {
-            params.put(par.getName(), par);
+            params.setProperty(par.getName(), par.getValue());
         }
-
+        return this;
     }
 
+
+    /**
+     * Retrieves the Virtual Organisation (VO).
+     * The method analyse the parameters and if not present will check the
+     * credentials (i.e. the proxy certificate) to retrieve the VO name.
+     *
+     * @return The VO name
+     */
+    public abstract String getVO();
 }

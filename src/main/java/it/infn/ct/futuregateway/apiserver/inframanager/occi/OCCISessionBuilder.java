@@ -24,8 +24,7 @@ package it.infn.ct.futuregateway.apiserver.inframanager.occi;
 import it.infn.ct.futuregateway.apiserver.inframanager.SessionBuilder;
 import it.infn.ct.futuregateway.apiserver.inframanager.InfrastructureException;
 import it.infn.ct.futuregateway.apiserver.resources.Infrastructure;
-import it.infn.ct.futuregateway.apiserver.resources.Params;
-import java.util.Map;
+import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ogf.saga.context.Context;
@@ -92,7 +91,7 @@ public final class OCCISessionBuilder extends SessionBuilder {
      *
      * @param someParams Parameters to use for the new session
      */
-    public OCCISessionBuilder(final Map<String, Params> someParams) {
+    public OCCISessionBuilder(final Properties someParams) {
         this(someParams, null);
     }
 
@@ -103,7 +102,7 @@ public final class OCCISessionBuilder extends SessionBuilder {
      * @param someParams Parameters to use for the new session
      * @param aUser The user requesting the session
      */
-    public OCCISessionBuilder(final Map<String, Params> someParams,
+    public OCCISessionBuilder(final Properties someParams,
             final String aUser) {
         super(someParams, aUser);
     }
@@ -114,13 +113,12 @@ public final class OCCISessionBuilder extends SessionBuilder {
      * The session is create with the context derived from the infrastructure
      * parameters.
      *
-     * @return The new session
      * @throws InfrastructureException In case there is a problem with the
      * infrastructure or the parameter are not correct for the context (bad or
      * missed values)
      */
     @Override
-    public Session createSession()
+    public void createNewSession()
             throws InfrastructureException {
         Session newSession;
         try {
@@ -137,10 +135,10 @@ public final class OCCISessionBuilder extends SessionBuilder {
                     readRemoteProxy());
             context.setAttribute(Context.USERID, "root");
             context.setAttribute(Context.USERCERT,
-                    getParamterValue("sshpublickey",
+                    getParams().getProperty("sshpublickey",
                             Defaults.SSHPUBLICKEY));
             context.setAttribute(Context.USERKEY,
-                    getParamterValue("sshprivatekey",
+                    getParams().getProperty("sshprivatekey",
                             Defaults.SSHPRIVATEKEY));
 
             newSession.addContext(context);
@@ -159,6 +157,13 @@ public final class OCCISessionBuilder extends SessionBuilder {
             throw new InfrastructureException("Impossible to open a session in"
                     + " the infratructure");
         }
-        return newSession;
+        setSession(newSession);
+    }
+
+
+    @Override
+    public String getVO() {
+        throw new UnsupportedOperationException("Not supported in OCCI based "
+                + "infrastructures");
     }
 }

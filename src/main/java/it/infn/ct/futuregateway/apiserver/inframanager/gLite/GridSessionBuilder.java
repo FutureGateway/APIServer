@@ -24,8 +24,7 @@ package it.infn.ct.futuregateway.apiserver.inframanager.gLite;
 import it.infn.ct.futuregateway.apiserver.inframanager.SessionBuilder;
 import it.infn.ct.futuregateway.apiserver.inframanager.InfrastructureException;
 import it.infn.ct.futuregateway.apiserver.resources.Infrastructure;
-import it.infn.ct.futuregateway.apiserver.resources.Params;
-import java.util.Map;
+import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ogf.saga.context.Context;
@@ -66,7 +65,7 @@ public final class GridSessionBuilder extends SessionBuilder {
      * Build a new session.
      * The session is specifically created for the infrastructure provided.
      * <p>
-     * This is aquivalent to {@code SessionBuilder(anInfra, null)}
+     * This is equivalent to {@code SessionBuilder(anInfra, null)}
      *
      * @param anInfra The infrastructure associated with the configured session
      */
@@ -92,7 +91,7 @@ public final class GridSessionBuilder extends SessionBuilder {
      *
      * @param someParams Parameters to use for the new session
      */
-    public GridSessionBuilder(final Map<String, Params> someParams) {
+    public GridSessionBuilder(final Properties someParams) {
         this(someParams, null);
     }
 
@@ -103,7 +102,7 @@ public final class GridSessionBuilder extends SessionBuilder {
      * @param someParams Parameters to use for the new session
      * @param aUser The user requesting the session
      */
-    public GridSessionBuilder(final Map<String, Params> someParams,
+    public GridSessionBuilder(final Properties someParams,
             final String aUser) {
         super(someParams, aUser);
     }
@@ -114,13 +113,12 @@ public final class GridSessionBuilder extends SessionBuilder {
      * The session is create with the context derived from the infrastructure
      * parameters.
      *
-     * @return The new session
      * @throws InfrastructureException In case there is a problem with the
      * infrastructure or the parameter are not correct for the context (bad or
      * missed values)
      */
     @Override
-    public Session createSession()
+    public void createNewSession()
             throws InfrastructureException {
         Session newSession;
         try {
@@ -131,10 +129,10 @@ public final class GridSessionBuilder extends SessionBuilder {
             throw new InfrastructureException("New sessions cannot be created");
         }
         String  infratype;
-        if (getParamterValue("type", null) != null) {
-            infratype = getParamterValue("type", null);
+        if (getParams().getProperty("type", null) != null) {
+            infratype = getParams().getProperty("type", null);
         } else {
-            infratype = getParamterValue("jobservice", "");
+            infratype = getParams().getProperty("jobservice", "");
             infratype = infratype.substring(0, infratype.indexOf(":"));
         }
         log.debug("Create a new Grid session for the type");
@@ -145,10 +143,11 @@ public final class GridSessionBuilder extends SessionBuilder {
             if (infratype.equals("wms")) {
                 context.setVectorAttribute("JobServiceAttributes",
                 new String[] {
-                    "wms.RetryCount=" + getParamterValue("retrycount",
+                    "wms.RetryCount=" + getParams().getProperty("retrycount",
                             Integer.toString(Defaults.RETRYCOUNT)),
                     "wms.rank=other.GlueCEStateFreeCPUs",
-                    "wms.MyProxyServer=" + getParamterValue("myproxyserver",
+                    "wms.MyProxyServer="
+                            + getParams().getProperty("myproxyserver",
                             "") });
             }
             newSession.addContext(context);
@@ -167,8 +166,15 @@ public final class GridSessionBuilder extends SessionBuilder {
             throw new InfrastructureException("Impossible to open a session in"
                     + " the infratructure");
         }
-        return newSession;
+        setSession(newSession);
     }
 
+    @Override
+    public String getVO() {
+        if (getParams().getProperty("vo", null) != null) {
+            return getParams().getProperty("vo", null);
+        }
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 
 }
