@@ -41,6 +41,8 @@ public final class Utilities {
 
     /**
      * Retrieves the parameter value from a list.
+     * If the parameter has multiple definition, and so multiple values, the
+     * first occurrence is returned.
      *
      * @param params The parameter list
      * @param name Parameter name
@@ -64,6 +66,8 @@ public final class Utilities {
 
     /**
      * Retrieves the parameter value from a list.
+     * If the parameter has multiple definition, and so multiple values, the
+     * first occurrence is returned.
      *
      * @param params The parameter list
      * @param name Parameter name

@@ -45,14 +45,13 @@ import org.glassfish.jersey.linking.InjectLinks;
  * <p>
  * Infrastructures are identified by a set of parameters which provide all the
  * information needed to allow the system execute application or call service
- * on behalf of the user. Parameter differs for different applications and these
- * are as follow.
+ * on behalf of the user. Each parameter can be repeated multiple times and if
+ * multiple values are accepted then repeated parameters are considered as a
+ * single parameter with a comma separated values. If only a value is accepted
+ * than the first selected value at run-time is used but this could result in a
+ * non deterministic selection.
  * <p>
- * Infrastructures are differentiate using the attribute <b><i>type</i></b>.
- * This can have one of the following values: <i>wsgram</i>, <i>gatekeeper</i>,
- * <i>wms</i>, <i>occi</i>, <i>unicore</i>, <i>ourgrid</i>,
- * <i>bes-genesis2</i>, <i>gos</i>, <i>ssh</i> and <i>tosca</i>. If omitted, it
- * will be evaluated from the parameter <b><i>jobservice</i></b>.
+ * Parameters differ for different applications and these are as follow.
  * <p>
  * <dl>
  *  <dt><span class="strong">Common to all infrastructures</span></dt>
@@ -61,9 +60,9 @@ import org.glassfish.jersey.linking.InjectLinks;
  *          <li>
  *              <b>type</b>: the type of infrastructure. This can have one of
  *              the following values: <i>wsgram</i>, <i>gatekeeper</i>,
- *              <i>wms</i>, <i>rocci</i>, <i>rocci</i>, <i>unicore</i>,
- *              <i>ourgrid</i>, <i>bes-genesis2</i>, <i>gos</i>, <i>ssh</i> and
- *              <i>tosca</i>.
+ *              <i>gLite</i>, <i>wms</i>, <i>rocci</i>, <i>rocci</i>,
+ *              <i>unicore</i>, <i>ourgrid</i>, <i>bes-genesis2</i>, <i>gos</i>,
+ *              <i>ssh</i>, <i>openstack</i> and <i>tosca</i>.
  *              <p>
  *              If omitted, it will be evaluated from the parameter
  *              <b><i>jobservice</i></b>.
@@ -75,12 +74,24 @@ import org.glassfish.jersey.linking.InjectLinks;
  *              to create a VM using rocci adaptor the URI will be like
  *              <i>rocci://&ltremote_server&gt:&ltremote_port&gt</i>
  *          </li>
+ *          <li>
+ *              <b>selectpolicy</b>: In case of multiple endpoint for the
+ *              submission they are selected using the specified policy. This
+ *              can have the values: <i>RANDOM</i> and <i>ORDERED</i>. With the
+ *              former the endpoints are selected in random order while with the
+ *              latter they are selected following the specified order.
+ *          </li>
  *      </ul>
  *  </dd>
  *
  *  <dt><span class="strong">gLite</span></dt>
  *  <dd>
  *      <ul>
+ *          <li>
+ *              <b>ce</b>: A CE where the job has to be submitted. If the
+ *              jobservice is omitted the job will be sent directly to the one
+ *              of the selected CE.
+ *          </li>
  *          <li>
  *              <b>retrycount</b>: Number of re-submissions in case of failure.
  *              Default value is 3. Applicable only for type <i>wms</i>.
@@ -108,7 +119,12 @@ import org.glassfish.jersey.linking.InjectLinks;
  *              <b>etokenid</b>: The id of the token to retrieve from the eToken
  *              server.
  *          </li>
- *          <li><b>vo</b>: Name of the VO the proxy is binded to.</li>
+ *          <li>
+ *              <b>vo</b>: Name of the VO the proxy is binded to. If no end
+ *              points are provided for the submission the GOCDB is called to
+ *              retrieve information for the specified vo. This is performed
+ *              only if no other options available.
+ *             </li>
  *          <li><b>voroles</b>: FQAN of the roles to integrate in the proxy</li>
  *          <li>
  *              <b>proxyrenewal</b>: A flag to indicate if the proxy renewal has
@@ -121,6 +137,11 @@ import org.glassfish.jersey.linking.InjectLinks;
  *          <li>
  *              <b>rfcproxy</b>: A flag indicating if the proxy has to be RFC
  *              compliant.
+ *          </li>
+ *          <li>
+ *              <b>bdii</b>: A BDII service from where gather information of the
+ *              infrastructure. If no jobservice specified a list of valid
+ *              end point can be retrieved from the bdii.
  *          </li>
  *      </ul>
  *  </dd>
