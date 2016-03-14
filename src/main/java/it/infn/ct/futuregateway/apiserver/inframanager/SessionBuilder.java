@@ -281,19 +281,6 @@ public abstract class SessionBuilder {
         return params;
     }
 
-    /**
-     * Retrieves parameter from the infrastructure.
-     * @param name Parameter name
-     * @param defaultValue Default value if the parameter is not defined
-     * @return Parameter value
-     */
-//    protected final String getParamterValue(final String name,
-//            final String defaultValue) {
-//        if (params.containsKey(name)) {
-//            return params.get(name).getValue();
-//        }
-//        return defaultValue;
-//    }
 
 
     /**

@@ -106,21 +106,19 @@ public final class CustomJobFactory {
         switch (infraType) {
             case "wsgram":
             case "gatekeeper":
+            case "gLite:":
             case "wms:":
                 sb = new GridSessionBuilder(
                         task.getAssociatedInfrastructure(), task.getUserName());
-                if (resource == null || resource.contains(",")
-                        || resource.contains(";")) {
-                    ResourceDiscovery rd = new ResourceDiscovery(infraParams,
-                            sb.getVO());
-                    try {
-                        resource = rd.getJobResource(
-                                ResourceDiscovery.ResourceType.WMS);
-                    } catch (NoResorucesAvailable nra) {
-                        throw new InfrastructureException("No service resources"
-                                + " available for the infrastructure "
-                                + task.getAssociatedInfrastructureId());
-                    }
+                ResourceDiscovery rd = new ResourceDiscovery(infraParams,
+                        sb.getVO());
+                try {
+                    resource = rd.getJobResource(
+                            ResourceDiscovery.ResourceType.WMS);
+                } catch (NoResorucesAvailable nra) {
+                    throw new InfrastructureException("No service resources"
+                            + " available for the infrastructure "
+                            + task.getAssociatedInfrastructureId());
                 }
                 break;
             case "rocci":
@@ -144,6 +142,9 @@ public final class CustomJobFactory {
                 sb = new SSHSessionBuilder(
                         task.getAssociatedInfrastructure(), task.getUserName());
                 break;
+            case "openstack":
+                throw new UnsupportedOperationException("Infrastructures "
+                        + infraType + " not yet supported");
             case "tosca":
                 throw new UnsupportedOperationException("Infrastructures "
                         + infraType + " not yet supported");

@@ -210,6 +210,14 @@ public class Task extends Observable implements Serializable {
     @XmlTransient
     private String associatedInfrastructureId;
 
+    /**
+     * Native id.
+     * The id associated with the task by the infrastructure. This is the
+     * identifier used to communicate with the remote infrastructure to monitor
+     * the task and/or retrieve the output.
+     */
+    @XmlTransient
+    private String nativeId;
 
     /**
      * Retrieve the task identifier.
@@ -630,6 +638,25 @@ public class Task extends Observable implements Serializable {
     public void setAssociatedInfrastructureId(final String anInfrastructure) {
         this.associatedInfrastructureId = anInfrastructure;
         lastChange = new Date();
+        setChanged();
+        notifyObservers();
+    }
+
+    /**
+     * Retrieves the Identifier generated in the remote infrastructure.
+     * @return The Id
+     */
+    public String getNativeId() {
+        return nativeId;
+    }
+
+    /**
+     * Sets the Identifier generated in the remote infrastructure.
+     *
+     * @param aNativeId The Id
+     */
+    public void setNativeId(final String aNativeId) {
+        this.nativeId = aNativeId;
         setChanged();
         notifyObservers();
     }
