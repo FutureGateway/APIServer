@@ -77,7 +77,7 @@ public final class TestData {
         infra.setDescription(RandomStringUtils.randomAlphanumeric(
                 (int) (1 + (Math.random() * MAX_DESC_LENGTH))));
         infra.setEnabled(rnd.nextBoolean());
-        List<Params> params = new LinkedList();
+        List<Params> params = (List<Params>) new LinkedList<Params>();
         for (int i = 0; i < (int) (Math.random() * MAX_ENTITIES_IN_LIST); i++) {
             Params p = new Params();
             p.setDescription(RandomStringUtils.randomAlphanumeric(
@@ -109,7 +109,7 @@ public final class TestData {
         app.setDescription(RandomStringUtils.randomAlphanumeric(
                 (int) (1 + (Math.random() * MAX_DESC_LENGTH))));
         app.setEnabled(rnd.nextBoolean());
-        List<Params> params = new LinkedList();
+        List<Params> params = (List<Params>) new LinkedList<Params>();
         for (int i = 0; i < (int) (Math.random() * MAX_ENTITIES_IN_LIST); i++) {
             Params p = new Params();
             p.setDescription(RandomStringUtils.randomAlphanumeric(

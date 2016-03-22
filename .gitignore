@@ -14,3 +14,8 @@ hs_err_pid*
 /lib/
 /nbproject/
 nb-configuration.xml
+nbactions.xml
+.project
+.settings/
+.checkstyle
+.classpath
