@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -77,6 +79,22 @@ import org.hibernate.annotations.FetchMode;
 public class Application extends AccessibleElements {
 
     /**
+     * The type of computation associated with the application.
+     */
+    public enum TYPE {
+        /**
+         * The application will execute something on the
+         * associated infrastructure.
+         */
+        JOB,
+        /**
+         * The application will instantiate some resources in the associated
+         * infrastructure.
+         */
+        RESOURCE
+    }
+
+    /**
      * List of references.
      */
     @InjectLinks({
@@ -97,6 +115,11 @@ public class Application extends AccessibleElements {
      */
     @XmlElement(name = "infrastructures")
     private List<String> infrastructureIds;
+
+    /**
+     * The type of the application.
+     */
+    private TYPE type = TYPE.JOB;
 
     /**
      * Initialise the id.
@@ -175,5 +198,25 @@ public class Application extends AccessibleElements {
      */
     public void setInfrastructureIds(final List<String> someInfrastructureIds) {
         this.infrastructureIds = someInfrastructureIds;
+    }
+
+    /**
+     * Retrieves the type of application.
+     *
+     * @return The application type
+     * @see it.infn.ct.futuregateway.apiserver.resources.Application.TYPE
+     */
+    @Enumerated(EnumType.STRING)
+    public TYPE getType() {
+        return type;
+    }
+
+    /**
+     * Sets the type of the application.
+     *
+     * @param aType The application type
+     */
+    public void setType(final TYPE aType) {
+        this.type = aType;
     }
 }

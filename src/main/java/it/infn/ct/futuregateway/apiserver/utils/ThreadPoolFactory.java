@@ -37,8 +37,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
+ * Custom creation of an ExecutorService using the parameters
+ * provided in the context.
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
+ * @see java.util.concurrent.ExecutorService
  */
 public class ThreadPoolFactory implements ObjectFactory {
 
@@ -52,7 +55,7 @@ public class ThreadPoolFactory implements ObjectFactory {
             final Context ctx, final Hashtable<?, ?> env) throws Exception {
 
         Reference ref = (Reference) obj;
-        Enumeration addrs = ref.getAll();
+        Enumeration<RefAddr> addrs = ref.getAll();
         int threadPoolSize = Constants.DEFAULTTHREADPOOLSIZE;
         int maxThreadPoolSize = Constants.MAXTHREADPOOLSIZETIMES
                 * threadPoolSize;

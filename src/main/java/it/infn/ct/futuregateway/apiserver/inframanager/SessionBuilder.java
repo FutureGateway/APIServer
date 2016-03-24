@@ -37,7 +37,7 @@ import org.apache.commons.logging.LogFactory;
 import org.ogf.saga.session.Session;
 
 /**
- *
+ * Create sessions compatible with JSAGA.
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 public abstract class SessionBuilder {

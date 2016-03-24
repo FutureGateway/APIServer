@@ -224,6 +224,11 @@ import org.glassfish.jersey.linking.InjectLinks;
 public class Infrastructure extends AccessibleElements {
 
     /**
+     * Defines if the infrastructure is virtual.
+     */
+    private boolean virtual = false;
+
+    /**
      * List of references.
      */
     @InjectLinks(value = {
@@ -248,4 +253,22 @@ public class Infrastructure extends AccessibleElements {
         }
     }
 
+    /**
+     * Checks if the infrastructure is virtual.
+     *
+     * @return true if virtual, false otherwise
+     */
+    public boolean isVirtual() {
+        return virtual;
+    }
+
+    /**
+     * Sets if the infrastructure has to be virtual.
+     *
+     * @param isVirtual true if the infrastructure has to be virtual,
+     * false otherwise
+     */
+    public void setVirtual(final boolean isVirtual) {
+        this.virtual = virtual;
+    }
 }

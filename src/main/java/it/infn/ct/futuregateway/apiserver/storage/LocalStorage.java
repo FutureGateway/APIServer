@@ -94,6 +94,7 @@ public class LocalStorage implements Storage {
         Files.createDirectories(filePath.getParent());
         Files.deleteIfExists(filePath);
         Files.copy(input, filePath);
+        log.debug("File " + destinationName + " written at '" + filePath + "'");
     }
 
 

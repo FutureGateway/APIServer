@@ -28,6 +28,8 @@ import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.job.Job;
 
 /**
+ * The Submitter implements the thread responsible for the
+ * submission of a task to the remote infrastructure.
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
