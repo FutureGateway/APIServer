@@ -122,7 +122,11 @@ public final class OCCISessionBuilder extends SessionBuilder {
             throws InfrastructureException {
         Session newSession;
         try {
-            newSession = SessionFactory.createSession(false);
+            newSession = SessionFactory.createSession(
+                    System.getProperty("saga.factory",
+                            it.infn.ct.futuregateway.apiserver.
+                                    inframanager.Defaults.SAGAFACTORY),
+                    false);
         } catch (NoSuccessException nse) {
             log.error("Impossible to generate a new session.");
             log.error(nse);
@@ -130,7 +134,11 @@ public final class OCCISessionBuilder extends SessionBuilder {
         }
         log.debug("Create a new OCCI session");
         try {
-            Context context = ContextFactory.createContext("rocci");
+            Context context = ContextFactory.createContext(
+                    System.getProperty("saga.factory",
+                            it.infn.ct.futuregateway.apiserver.
+                                    inframanager.Defaults.SAGAFACTORY),
+                    "rocci");
             context.setAttribute(Context.USERPROXY,
                     readRemoteProxy());
             context.setAttribute(Context.USERID, "root");

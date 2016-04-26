@@ -43,6 +43,12 @@ public final class Defaults {
     public static final String RFCPROXY = "true";
 
     /**
+     * Default SAGA factory to use.
+     */
+    public static final String SAGAFACTORY =
+            "fr.in2p3.jsaga.impl.SagaFactoryImpl";
+
+    /**
      * Avoid the class be instantiable.
      */
     private Defaults() { }

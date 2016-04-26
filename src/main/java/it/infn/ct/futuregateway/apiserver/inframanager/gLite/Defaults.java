@@ -32,20 +32,6 @@ public final class Defaults {
      */
     public static final int RETRYCOUNT = 3;
 
-    /**
-     * Proxy renewal option.
-     */
-    public static final String PROXYRENEWAL = "false";
-
-    /**
-     * VOMS proxy option.
-     */
-    public static final String DISABLEVOMSPROXY = "false";
-
-    /**
-     * RFC proxy option.
-     */
-    public static final String RFCPROXY = "true";
 
     /**
      * Avoid the class be instantiable.

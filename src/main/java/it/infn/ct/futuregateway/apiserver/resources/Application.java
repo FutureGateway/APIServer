@@ -42,8 +42,10 @@ import javax.ws.rs.core.Link;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
@@ -79,8 +81,10 @@ import org.hibernate.annotations.FetchMode;
 public class Application extends AccessibleElements {
 
     /**
-     * The type of computation associated with the application.
+     * The outcome of computation associated with the application.
      */
+    @XmlType
+    @XmlEnum(String.class)
     public enum TYPE {
         /**
          * The application will execute something on the
@@ -117,9 +121,9 @@ public class Application extends AccessibleElements {
     private List<String> infrastructureIds;
 
     /**
-     * The type of the application.
+     * The outcome of the application.
      */
-    private TYPE type = TYPE.JOB;
+    private TYPE outcome = TYPE.JOB;
 
     /**
      * Initialise the id.
@@ -201,22 +205,22 @@ public class Application extends AccessibleElements {
     }
 
     /**
-     * Retrieves the type of application.
+     * Retrieves the outcome of application.
      *
-     * @return The application type
+     * @return The application outcome
      * @see it.infn.ct.futuregateway.apiserver.resources.Application.TYPE
      */
     @Enumerated(EnumType.STRING)
-    public TYPE getType() {
-        return type;
+    public TYPE getOutcome() {
+        return outcome;
     }
 
     /**
-     * Sets the type of the application.
+     * Sets the outcome of the application.
      *
-     * @param aType The application type
+     * @param aType The application outcome
      */
-    public void setType(final TYPE aType) {
-        this.type = aType;
+    public void setOutcome(final TYPE aType) {
+        this.outcome = aType;
     }
 }

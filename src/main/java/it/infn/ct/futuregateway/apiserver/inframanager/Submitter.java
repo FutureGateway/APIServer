@@ -21,10 +21,19 @@
 
 package it.infn.ct.futuregateway.apiserver.inframanager;
 
+import it.infn.ct.futuregateway.apiserver.resources.Application;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
 import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.PermissionDeniedException;
+import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.job.Job;
 
 /**
@@ -58,20 +67,37 @@ public class Submitter implements Runnable {
 
     @Override
     public final void run() {
-        Job job;
-        try {
-            job = CustomJobFactory.createJob(task);
-        } catch (InfrastructureException ex) {
-            log.error("JobFactory does not work");
-            log.error(ex);
-            task.setStatus(Task.STATUS.ABORTED);
-        } catch (BadParameterException ex) {
-            log.error("Paramaters not correct for the task "
-                    + task.getId()
-                    + " using the infrastructure "
-                    + task.getAssociatedInfrastructureId());
-            log.error(ex);
-            task.setStatus(Task.STATUS.ABORTED);
+        if (task.getApplicationDetail().getOutcome().equals(
+                Application.TYPE.JOB)) {
+            Job job;
+            try {
+                job = CustomJobFactory.createJob(task);
+                job.run();
+                task.setNativeId(job.getAttribute(Job.JOBID));
+                task.setStatus(Task.STATUS.RUNNING);
+            } catch (InfrastructureException ex) {
+                log.error("JobFactory does not work");
+                log.error(ex);
+                task.setStatus(Task.STATUS.ABORTED);
+            } catch (BadParameterException ex) {
+                log.error("Paramaters not correct for the task "
+                        + task.getId()
+                        + " using the infrastructure "
+                        + task.getAssociatedInfrastructureId());
+                log.error(ex);
+                task.setStatus(Task.STATUS.ABORTED);
+            } catch (NotImplementedException | AuthenticationFailedException
+                    | AuthorizationFailedException | PermissionDeniedException
+                    | IncorrectStateException | DoesNotExistException
+                    | TimeoutException | NoSuccessException ex) {
+                log.error("Impossible to submit the task: " + task.getId());
+                log.error(ex);
+                task.setStatus(Task.STATUS.ABORTED);
+            }
+        }
+        if (task.getApplicationDetail().getOutcome().equals(
+                Application.TYPE.RESOURCE)) {
+            throw new UnsupportedOperationException("Resources not managed");
         }
     }
 }

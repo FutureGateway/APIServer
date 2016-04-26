@@ -152,14 +152,13 @@ public class Params implements Serializable {
         }
         Params tmpParam = (Params) obj;
         return this.name.equals(tmpParam.name)
-                && this.value.equals(tmpParam.value)
-                && this.description.equals(tmpParam.description);
+                && this.value.equals(tmpParam.value);
     }
 
 
 
     @Override
     public final int hashCode() {
-        return name.concat(value).concat(description).hashCode();
+        return name.concat(value).hashCode();
     }
 }

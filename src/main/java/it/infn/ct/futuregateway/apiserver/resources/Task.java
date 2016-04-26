@@ -93,6 +93,10 @@ public class Task extends Observable implements Serializable {
     public enum STATUS {
 
         /**
+         * Task received by the user but not yet made persistent.
+         */
+        PENDING,
+        /**
          * Task created but input still required.
          */
         WAITING,

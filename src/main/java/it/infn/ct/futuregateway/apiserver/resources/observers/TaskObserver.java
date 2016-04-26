@@ -24,6 +24,7 @@ package it.infn.ct.futuregateway.apiserver.resources.observers;
 import it.infn.ct.futuregateway.apiserver.inframanager.Submitter;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.resources.TaskFile;
+import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutorService;
@@ -58,6 +59,11 @@ public class TaskObserver implements Observer {
      */
     private final ExecutorService es;
 
+    /**
+     * 
+     */
+    private final Storage store;
+
 
     /**
      * Generate the observer of the task.
@@ -68,35 +74,28 @@ public class TaskObserver implements Observer {
      * persistence context
      * @param anExecutorService An ExecutorService to retrieve threads managing
      * the task submission
+     * @param aStorage A storage object to move files to/from the server after
+     * or before the execution
      */
-    public TaskObserver(final EntityManagerFactory anEntityManagerFactory,
-            final ExecutorService anExecutorService) {
+    public TaskObserver(
+            final EntityManagerFactory anEntityManagerFactory,
+            final ExecutorService anExecutorService,
+            final Storage aStorage) {
         this.emf = anEntityManagerFactory;
         this.es = anExecutorService;
+        this.store = aStorage;
     }
 
 
     @Override
     public final void update(final Observable obs, final Object arg) {
-        if (!(obs instanceof Task)) {
-            log.error("Wrong abject associated with the oserver");
-        }
-        Task t = (Task) obs;
-        if (t.getId() == null || t.getStatus() == null) {
+        Task t;
+        try {
+            t = (Task) obs;
+        } catch (ClassCastException cce) {
+            log.error("Wrong abject associated with the task oserver");
+            log.error(cce);
             return;
-        }
-        log.debug("Task " + t.getId() + " updated");
-        if (t.getStatus().equals(Task.STATUS.WAITING)
-                && t.getApplicationDetail() != null) {
-            if (t.getInputFiles() != null) {
-                for (TaskFile tf: t.getInputFiles()) {
-                    if (tf.getStatus().equals(TaskFile.FILESTATUS.NEEDED)) {
-                        return;
-                    }
-                }
-            }
-            t.setStatus(Task.STATUS.READY);
-            submit(t);
         }
         EntityManager em = emf.createEntityManager();
         EntityTransaction et = em.getTransaction();
@@ -112,6 +111,23 @@ public class TaskObserver implements Observer {
             }
         } finally {
             em.close();
+        }
+        log.debug("Task " + t.getId() + " updated");
+        switch (t.getStatus()) {
+            case READY:
+                submit(t);
+                break;
+            case WAITING:
+                if (t.getInputFiles() != null) {
+                    for (TaskFile tf: t.getInputFiles()) {
+                        if (tf.getStatus().equals(TaskFile.FILESTATUS.NEEDED)) {
+                            return;
+                        }
+                    }
+                }
+                t.setStatus(Task.STATUS.READY);
+                break;
+            default:
         }
     }
 

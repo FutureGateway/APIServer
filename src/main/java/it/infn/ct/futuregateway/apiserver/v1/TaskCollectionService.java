@@ -96,11 +96,9 @@ public class TaskCollectionService extends BaseService {
             throw new BadRequestException("A valid application for the task"
                     + " must be provided");
         }
-        task.addObserver(new TaskObserver(getEntityManagerFactory(),
-                getSubmissionThreadPool()));
         task.setDateCreated(new Date());
         task.setUserName(getUser());
-        task.setStatus(Task.STATUS.WAITING);
+        task.setStatus(Task.STATUS.PENDING);
         EntityManager em = getEntityManager();
         EntityTransaction et = null;
         try {
@@ -127,6 +125,11 @@ public class TaskCollectionService extends BaseService {
             }
             em.close();
         }
+        log.debug("Adding the observer");
+        task.addObserver(new TaskObserver(getEntityManagerFactory(),
+                getSubmissionThreadPool()));
+        log.debug("Task in waiting for the next step");
+        task.setStatus(Task.STATUS.WAITING);
         return task;
     }
 

@@ -94,14 +94,7 @@ public final class CustomJobFactory {
         }
 
         SessionBuilder sb;
-        JobDescription jd;
         String resource = Utilities.getParamterValue(infraParams, "jobservice");
-        try {
-            jd = JobDescriptionFactory.createJobDescription(task);
-        } catch (NotImplementedException | NoSuccessException ne) {
-            throw new InfrastructureException("Impossible to create a job"
-                    + "description ");
-        }
 
         switch (infraType) {
             case "wsgram":
@@ -153,15 +146,22 @@ public final class CustomJobFactory {
                         + infraType + "' not supported");
         }
         try {
-            JobService js = JobFactory.createJobService(sb.getSession(),
-                    URLFactory.createURL(resource));
+            JobService js = JobFactory.createJobService(
+                    System.getProperty("saga.factory", Defaults.SAGAFACTORY),
+                    sb.getSession(),
+                    URLFactory.createURL(
+                            System.getProperty("saga.factory",
+                                    Defaults.SAGAFACTORY),
+                            resource));
+            JobDescription jd = JobDescriptionFactory.createJobDescription(
+                    task);
             return js.createJob(jd);
         } catch (AuthenticationFailedException | AuthorizationFailedException
                 | IncorrectURLException | NoSuccessException
                 | NotImplementedException | PermissionDeniedException
                 | TimeoutException ex) {
             LOG.error(ex);
-            throw new InfrastructureException("Impossibile to generate a job"
+            throw new InfrastructureException("Impossibile to generate a job "
                     + "for the infrastructure "
                     + task.getAssociatedInfrastructureId());
         }

@@ -122,7 +122,11 @@ public final class GridSessionBuilder extends SessionBuilder {
             throws InfrastructureException {
         Session newSession;
         try {
-            newSession = SessionFactory.createSession(false);
+            newSession = SessionFactory.createSession(
+                    System.getProperty("saga.factory",
+                            it.infn.ct.futuregateway.apiserver.
+                                    inframanager.Defaults.SAGAFACTORY),
+                    false);
         } catch (NoSuccessException nse) {
             log.error("Impossible to generate a new session.");
             log.error(nse);
@@ -137,7 +141,11 @@ public final class GridSessionBuilder extends SessionBuilder {
         }
         log.debug("Create a new Grid session for the type");
         try {
-            Context context = ContextFactory.createContext("VOMS");
+            Context context = ContextFactory.createContext(
+                    System.getProperty("saga.factory",
+                            it.infn.ct.futuregateway.apiserver.
+                                    inframanager.Defaults.SAGAFACTORY),
+                    "VOMS");
             context.setAttribute(Context.USERPROXY,
                     readRemoteProxy());
             if (infratype.equals("wms")) {

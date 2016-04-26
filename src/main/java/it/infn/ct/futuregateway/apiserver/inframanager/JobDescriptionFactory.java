@@ -22,7 +22,10 @@
 package it.infn.ct.futuregateway.apiserver.inframanager;
 
 import it.infn.ct.futuregateway.apiserver.resources.Task;
+import java.util.Collection;
 import java.util.Properties;
+import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.collections4.Transformer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ogf.saga.error.AuthenticationFailedException;
@@ -71,14 +74,29 @@ public final class JobDescriptionFactory {
     public static JobDescription createJobDescription(final Task task)
             throws NoSuccessException, NotImplementedException,
             BadParameterException {
-        JobDescription jd = JobFactory.createJobDescription();
+        JobDescription jd = JobFactory.createJobDescription(
+                System.getProperty("saga.factory", Defaults.SAGAFACTORY));
         Properties prTask = Utilities.convertParamsToProperties(
                 task.getAssociatedInfrastructure().getParameters());
         prTask = Utilities.convertParamsToProperties(
                 task.getApplicationDetail().getParameters(), prTask);
 
+        String arguments = IterableUtils.toString(task.getArguments(),
+                new Transformer<String, String>() {
+                    @Override
+                    public String transform(String s) {
+                        return s;
+                    }
+                },
+                ";", "", "");        
+        prTask.setProperty(JobDescription.ARGUMENTS, arguments);
+        if (!prTask.containsKey(JobDescription.FILETRANSFER)) {
+            StringBuilder fileTr = new StringBuilder();
+//            for (task.getInputFiles())
+        }
         try {
             setRequiredParam(jd, prTask, JobDescription.EXECUTABLE);
+            setRequiredParam(jd, prTask, JobDescription.FILETRANSFER, true);
         } catch (AuthenticationFailedException | AuthorizationFailedException
                 | BadParameterException | DoesNotExistException
                 | IncorrectStateException | NoSuccessException
@@ -101,7 +119,6 @@ public final class JobDescriptionFactory {
         setOptionalParam(jd, prTask, JobDescription.INPUT);
         setOptionalParam(jd, prTask, JobDescription.OUTPUT);
         setOptionalParam(jd, prTask, JobDescription.ERROR);
-        setOptionalParam(jd, prTask, JobDescription.FILETRANSFER, true);
         setOptionalParam(jd, prTask, JobDescription.CLEANUP);
         setOptionalParam(jd, prTask, JobDescription.JOBSTARTTIME);
         setOptionalParam(jd, prTask, JobDescription.WALLTIMELIMIT);

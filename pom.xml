@@ -137,6 +137,12 @@
             <version>${jsaga.version}</version>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-ssh3</artifactId>
+            <version>${jsaga.version}</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
     <build>
         <finalName>APIServer</finalName>

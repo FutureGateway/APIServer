@@ -21,6 +21,7 @@
 
 package it.infn.ct.futuregateway.apiserver.inframanager.ssh;
 
+import it.infn.ct.futuregateway.apiserver.inframanager.Defaults;
 import it.infn.ct.futuregateway.apiserver.inframanager.SessionBuilder;
 import it.infn.ct.futuregateway.apiserver.inframanager.InfrastructureException;
 import it.infn.ct.futuregateway.apiserver.resources.Infrastructure;
@@ -121,7 +122,9 @@ public final class SSHSessionBuilder extends SessionBuilder {
             throws InfrastructureException {
         Session newSession;
         try {
-            newSession = SessionFactory.createSession(false);
+            newSession = SessionFactory.createSession(
+                    System.getProperty("saga.factory", Defaults.SAGAFACTORY),
+                    false);
         } catch (NoSuccessException nse) {
             log.error("Impossible to generate a new session.");
             log.error(nse);
@@ -129,17 +132,29 @@ public final class SSHSessionBuilder extends SessionBuilder {
         }
         log.debug("Create a new SSH session");
         try {
-            Context context = ContextFactory.createContext("UserPass");
+            String contextType = "SSH";
+            if (getParams().getProperty("privatekey", null) == null) {
+                contextType = "UserPass";
+            }
+            Context context = ContextFactory.createContext(
+                    System.getProperty("saga.factory", Defaults.SAGAFACTORY),
+                    contextType);
             if (getParams().getProperty("username", null) != null) {
-                context.setAttribute("UserID",
+                context.setAttribute(Context.USERID,
                         getParams().getProperty("username", null));
             }
             if (getParams().getProperty("password", null) != null) {
-                context.setAttribute("UserPass",
+                context.setAttribute(Context.USERPASS,
                         getParams().getProperty("password", null));
             }
-            // This is a misterious setting coming from the
-            // legacy Grid Engine
+            if (getParams().getProperty("privatekey", null) != null) {
+                context.setAttribute("UserPrivateKey",
+                        getParams().getProperty("privatekey", null));
+            }
+            // SSH Adaptor is not able to perform the host key verification in
+            // many cases. The lines below disable the check
+            context.setVectorAttribute("JobServiceAttributes",
+                    new String[]{"ssh.KnownHosts="});
             context.setVectorAttribute("DataServiceAttributes",
                     new String[]{"sftp.KnownHosts="});
             newSession.addContext(context);
