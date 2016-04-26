@@ -127,7 +127,7 @@ public class TaskCollectionService extends BaseService {
         }
         log.debug("Adding the observer");
         task.addObserver(new TaskObserver(getEntityManagerFactory(),
-                getSubmissionThreadPool()));
+                getSubmissionThreadPool(), getStorage()));
         log.debug("Task in waiting for the next step");
         task.setStatus(Task.STATUS.WAITING);
         return task;

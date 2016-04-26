@@ -22,7 +22,6 @@
 package it.infn.ct.futuregateway.apiserver.inframanager;
 
 import it.infn.ct.futuregateway.apiserver.resources.Task;
-import java.util.Collection;
 import java.util.Properties;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Transformer;
@@ -84,11 +83,11 @@ public final class JobDescriptionFactory {
         String arguments = IterableUtils.toString(task.getArguments(),
                 new Transformer<String, String>() {
                     @Override
-                    public String transform(String s) {
+                    public String transform(final String s) {
                         return s;
                     }
                 },
-                ";", "", "");        
+                ";", "", "");
         prTask.setProperty(JobDescription.ARGUMENTS, arguments);
         if (!prTask.containsKey(JobDescription.FILETRANSFER)) {
             StringBuilder fileTr = new StringBuilder();

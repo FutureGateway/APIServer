@@ -60,7 +60,7 @@ public class TaskObserver implements Observer {
     private final ExecutorService es;
 
     /**
-     * 
+     * The storage responsible for managing files.
      */
     private final Storage store;
 
