@@ -104,7 +104,7 @@ public final class JobDescriptionFactory {
         try {
             setRequiredParam(jd, prTask, JobDescription.EXECUTABLE);
             if (prTask.containsKey(JobDescription.FILETRANSFER)) {
-                setRequiredParam(jd, prTask, JobDescription.FILETRANSFER, true);
+                setOptionalParam(jd, prTask, JobDescription.FILETRANSFER, true);
             } else {
                 List<String> fTransf = new ArrayList<>();
                 if (task.getInputFiles() != null) {
@@ -117,23 +117,20 @@ public final class JobDescriptionFactory {
                                 + tf.getName() + ">" + tf.getName());
                     }
                 }
+                String path = store.getCachePath(
+                        Storage.RESOURCE.TASKS, task.getId(),
+                        Constants.OUTPUTFOLDER).toString();
                 if (task.getOutputFiles() != null) {
-                    String path = store.getCachePath(
-                            Storage.RESOURCE.TASKS, task.getId(),
-                            Constants.OUTPUTFOLDER).toString();
                     for (TaskFile tf: task.getOutputFiles()) {
                         fTransf.add(tf.getName() + "<" + path
                                 + FileSystems.getDefault().getSeparator()
                                 + tf.getName());
                     }
                 }
-                if (fTransf.isEmpty()) {
-                    String path = store.getCachePath(
-                            Storage.RESOURCE.TASKS, task.getId(),
-                            Constants.OUTPUTFOLDER).toString();
-                    fTransf.add(path + FileSystems.getDefault().getSeparator()
-                            + Defaults.OUTPUT + "<" + Defaults.OUTPUT);
-                }
+                fTransf.add(path + FileSystems.getDefault().getSeparator()
+                        + Defaults.OUTPUT + "<" + Defaults.OUTPUT);
+                fTransf.add(path + FileSystems.getDefault().getSeparator()
+                        + Defaults.ERROR + "<" + Defaults.ERROR);
                 jd.setVectorAttribute(JobDescription.FILETRANSFER,
                         fTransf.toArray(new String[fTransf.size()]));
             }
