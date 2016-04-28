@@ -115,6 +115,7 @@ public class TaskObserver implements Observer {
         log.debug("Task " + t.getId() + " updated");
         switch (t.getStatus()) {
             case READY:
+                store.createCache(Storage.RESOURCE.TASKS, t.getId());
                 submit(t);
                 break;
             case WAITING:
@@ -127,6 +128,8 @@ public class TaskObserver implements Observer {
                 }
                 t.setStatus(Task.STATUS.READY);
                 break;
+            case DONE:
+                store.storeCache(Storage.RESOURCE.TASKS, t.getId());
             default:
         }
     }
