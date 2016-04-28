@@ -105,7 +105,7 @@ public interface Storage {
      * @param subfolder Sub folder inside the the area. If the sub folder does
      * not exist it will be created. If it is null the path will be to the
      * top folder for the resource
-     * @return Path to the folder 
+     * @return Path to the folder
      */
     Path getCachePath(final RESOURCE res, final String id,
             final String subfolder);
@@ -118,4 +118,13 @@ public interface Storage {
      * @param id The ID of the resource associated
      */
     void storeCache(final RESOURCE res, final String id);
+
+    /**
+     * Moves the files in a cache folder from the storage for manipulation.
+     *
+     * @param res The resource type
+     * @param id The ID of the resource associated
+     */
+    void createCache(final RESOURCE res, final String id);
+
 }

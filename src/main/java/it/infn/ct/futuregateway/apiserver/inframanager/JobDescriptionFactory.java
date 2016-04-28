@@ -22,6 +22,12 @@
 package it.infn.ct.futuregateway.apiserver.inframanager;
 
 import it.infn.ct.futuregateway.apiserver.resources.Task;
+import it.infn.ct.futuregateway.apiserver.resources.TaskFile;
+import it.infn.ct.futuregateway.apiserver.storage.Storage;
+import it.infn.ct.futuregateway.apiserver.utils.Constants;
+import java.nio.file.FileSystems;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Transformer;
@@ -65,12 +71,14 @@ public final class JobDescriptionFactory {
      * will be created in any case (a LOG will notify the problem).
      *
      * @param task The task requiring the job description
+     * @param store The storage managing the temporary files
      * @return The job description
      * @throws NoSuccessException Impossible to generate the description
      * @throws NotImplementedException Not implemented for this kind of task
      * @throws BadParameterException A mandatory parameter is wrong or missed
      */
-    public static JobDescription createJobDescription(final Task task)
+    public static JobDescription createJobDescription(
+            final Task task, final Storage store)
             throws NoSuccessException, NotImplementedException,
             BadParameterException {
         JobDescription jd = JobFactory.createJobDescription(
@@ -89,13 +97,43 @@ public final class JobDescriptionFactory {
                 },
                 ";", "", "");
         prTask.setProperty(JobDescription.ARGUMENTS, arguments);
-        if (!prTask.containsKey(JobDescription.FILETRANSFER)) {
-            StringBuilder fileTr = new StringBuilder();
-//            for (task.getInputFiles())
-        }
         try {
             setRequiredParam(jd, prTask, JobDescription.EXECUTABLE);
-            setRequiredParam(jd, prTask, JobDescription.FILETRANSFER, true);
+            if (prTask.containsKey(JobDescription.FILETRANSFER)) {
+                setRequiredParam(jd, prTask, JobDescription.FILETRANSFER, true);
+            } else {
+                List<String> fTransf = new ArrayList<>();
+                if (task.getInputFiles() != null) {
+                    String path = store.getCachePath(
+                            Storage.RESOURCE.TASKS, task.getId(),
+                            Constants.INPUTFOLDER).toString();
+                    for (TaskFile tf: task.getInputFiles()) {
+                        fTransf.add(path
+                                + FileSystems.getDefault().getSeparator()
+                                + tf.getName() + ">" + tf.getName());
+                    }
+                }
+                if (task.getOutputFiles() != null) {
+                    String path = store.getCachePath(
+                            Storage.RESOURCE.TASKS, task.getId(),
+                            Constants.OUTPUTFOLDER).toString();
+                    for (TaskFile tf: task.getOutputFiles()) {
+                        fTransf.add(tf.getName() + "<" + path
+                                + FileSystems.getDefault().getSeparator()
+                                + tf.getName());
+                    }
+                }
+                if (fTransf.isEmpty()) {
+                    String path = store.getCachePath(
+                            Storage.RESOURCE.TASKS, task.getId(),
+                            Constants.OUTPUTFOLDER).toString();
+                    fTransf.add(Defaults.OUTPUT + "<" + path
+                                + FileSystems.getDefault().getSeparator()
+                            + Defaults.OUTPUT);
+                }
+                jd.setVectorAttribute(JobDescription.FILETRANSFER,
+                        fTransf.toArray(new String[fTransf.size()]));
+            }
         } catch (AuthenticationFailedException | AuthorizationFailedException
                 | BadParameterException | DoesNotExistException
                 | IncorrectStateException | NoSuccessException

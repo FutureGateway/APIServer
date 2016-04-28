@@ -39,7 +39,7 @@ public final class Storages {
      * Create a storage access object.
      * The files are stored in a folder inside the local file system.
      *
-     * @see Storages#getStorage(java.lang.String, java.lang.String) 
+     * @see Storages#getStorage(java.lang.String, java.lang.String)
      * @param path Path to a folder for caching the files
      * @return A storage access object
      */

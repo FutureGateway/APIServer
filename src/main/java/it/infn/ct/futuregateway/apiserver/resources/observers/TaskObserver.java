@@ -139,7 +139,7 @@ public class TaskObserver implements Observer {
      * @param t The task to submit
      */
     private void submit(final Task t) {
-        es.execute(new Submitter(t));
+        es.execute(new Submitter(t, store));
         log.debug("Submitted the task: " + t.getId());
     }
 }

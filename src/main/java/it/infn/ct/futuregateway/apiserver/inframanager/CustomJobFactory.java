@@ -27,6 +27,7 @@ import it.infn.ct.futuregateway.apiserver.inframanager.occi.OCCISessionBuilder;
 import it.infn.ct.futuregateway.apiserver.inframanager.ssh.SSHSessionBuilder;
 import it.infn.ct.futuregateway.apiserver.resources.Params;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
+import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -65,13 +66,14 @@ public final class CustomJobFactory {
      * Create the JobService for the infrastructure.
      *
      * @param task The task requesting the JobService
+     * @param store The storage managing the cache file
      * @return The JobService
      * @throws InfrastructureException If the infrastructure cannot be used for
      * some problem in the configuration or in the infrastructure
      * @throws BadParameterException The task cannot be submitted because some
      * parameters are missed or not correct
      */
-    public static Job createJob(final Task task)
+    public static Job createJob(final Task task, final Storage store)
             throws InfrastructureException, BadParameterException {
         List<Params> infraParams = task.getAssociatedInfrastructure()
                 .getParameters();
@@ -154,7 +156,7 @@ public final class CustomJobFactory {
                                     Defaults.SAGAFACTORY),
                             resource));
             JobDescription jd = JobDescriptionFactory.createJobDescription(
-                    task);
+                    task, store);
             return js.createJob(jd);
         } catch (AuthenticationFailedException | AuthorizationFailedException
                 | IncorrectURLException | NoSuccessException

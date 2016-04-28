@@ -23,6 +23,7 @@ package it.infn.ct.futuregateway.apiserver.inframanager;
 
 import it.infn.ct.futuregateway.apiserver.resources.Application;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
+import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ogf.saga.error.AuthenticationFailedException;
@@ -55,13 +56,20 @@ public class Submitter implements Runnable {
     private final Task task;
 
     /**
+     * Storage managing the files for the task.
+     */
+    private final Storage store;
+
+    /**
      * The thread managing the submission of a task.
      * The submission is performed with jSAGA and run in a separate thread.
      *
      * @param aTask The task managed by the thread
+     * @param aStore The storage managing the task files
      */
-    public Submitter(final Task aTask) {
+    public Submitter(final Task aTask, final Storage aStore) {
         this.task = aTask;
+        this.store = aStore;
     }
 
 
@@ -71,7 +79,7 @@ public class Submitter implements Runnable {
                 Application.TYPE.JOB)) {
             Job job;
             try {
-                job = CustomJobFactory.createJob(task);
+                job = CustomJobFactory.createJob(task, store);
                 job.run();
                 task.setNativeId(job.getAttribute(Job.JOBID));
                 task.setStatus(Task.STATUS.RUNNING);

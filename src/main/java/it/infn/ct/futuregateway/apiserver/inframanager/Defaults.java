@@ -64,5 +64,5 @@ public class Defaults {
     protected Defaults() {
         throw new UnsupportedOperationException("Static utility class should "
                 + "not be allocated!");
-    } 
+    }
 }

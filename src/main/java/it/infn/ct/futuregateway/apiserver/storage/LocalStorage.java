@@ -66,7 +66,8 @@ public class LocalStorage implements Storage {
     }
 
     @Override
-    public final Path getCachePath(RESOURCE res, String id, String subfolder) {
+    public final Path getCachePath(final RESOURCE res,
+            final String id, final String subfolder) {
         Path filePath;
         if (subfolder != null && !subfolder.isEmpty()) {
             filePath = Paths.get(path, res.name().toLowerCase(),
@@ -84,8 +85,14 @@ public class LocalStorage implements Storage {
     }
 
     @Override
-    public final void storeCache(RESOURCE res, String id) {
+    public final void storeCache(final RESOURCE res, final String id) {
         log.debug("Store Cache request not needed in local storage,"
+                + " it will be ignored!");
+    }
+
+    @Override
+    public final void createCache(final RESOURCE res, final String id) {
+        log.debug("Create Cache request not needed in local storage,"
                 + " it will be ignored!");
     }
 

@@ -173,7 +173,7 @@ public class TaskService extends BaseService {
                 Storage store = getStorage();
                 store.storeFile(Storage.RESOURCE.TASKS, id,
                         fdbp.getValueAs(InputStream.class),
-                        fName);
+                        fName, Constants.INPUTFOLDER);
                 EntityTransaction et = em.getTransaction();
                 try {
                     et.begin();

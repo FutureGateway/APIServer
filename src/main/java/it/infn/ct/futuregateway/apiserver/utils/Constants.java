@@ -76,6 +76,16 @@ public final class Constants {
     public static final String CACHEDIR = "CacheDir";
 
     /**
+     * Name of the attribute referring the CacheDir location.
+     */
+    public static final String INPUTFOLDER = "inputs";
+
+    /**
+     * Name of the attribute referring the CacheDir location.
+     */
+    public static final String OUTPUTFOLDER = "outputs";
+
+    /**
      * Name of the attribute referring the thread pool for task submission.
      */
     public static final String SUBMISSIONPOOL = "SubmissionThreadPool";
