@@ -27,7 +27,8 @@ import java.io.File;
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-public final class Defaults {
+public final class Defaults extends
+        it.infn.ct.futuregateway.apiserver.inframanager.Defaults {
 
     /**
      * Default path for ssh public key.
@@ -42,9 +43,4 @@ public final class Defaults {
     public static final String SSHPRIVATEKEY = System.getProperty("user.home")
             + File.separator + "sshkeys"
             + File.separator + "id_rsa";
-
-    /**
-     * Avoid the class be instantiable.
-     */
-    private Defaults() { }
 }

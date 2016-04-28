@@ -25,16 +25,12 @@ package it.infn.ct.futuregateway.apiserver.inframanager.gLite;
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-public final class Defaults {
+public final class Defaults extends
+        it.infn.ct.futuregateway.apiserver.inframanager.Defaults {
 
     /**
      * Number of time the WMS has to re-try the execution.
      */
     public static final int RETRYCOUNT = 3;
 
-
-    /**
-     * Avoid the class be instantiable.
-     */
-    private Defaults() { }
 }

@@ -52,13 +52,17 @@ public class TaskFile implements Serializable {
     public enum FILESTATUS {
 
         /**
-         * Input file does not provided.
+         * File does not provided.
          */
         NEEDED,
         /**
-         * Input file provided.
+         * File provided.
          */
-        READY
+        READY,
+        /**
+         * Error to store or make available the file.
+         */
+        ERROR
     }
 
     /**

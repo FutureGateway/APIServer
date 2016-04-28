@@ -37,14 +37,35 @@ public final class Storages {
 
     /**
      * Create a storage access object.
-     * The storage object is selected depending on the protocol specified in
-     * the url. If the url is without protocol the local file system is
-     * selected.
+     * The files are stored in a folder inside the local file system.
      *
-     * @param url The url to the storage
+     * @see Storages#getStorage(java.lang.String, java.lang.String) 
+     * @param path Path to a folder for caching the files
      * @return A storage access object
      */
-    public static Storage getStorage(final String url) {
-        return new LocalStorage(url);
+    public static Storage getStorage(final String path) {
+        return getStorage(null, path);
+    }
+
+    /**
+     * Create a storage access object.
+     * The storage object is selected depending on the protocol specified in
+     * the url. If the url is without protocol the local file system is
+     * selected. A cache folder contains the I/O files during the task running
+     * and then they are moved to the storage.
+     * <p>
+     * If the url is null the cache folder will be the storage connected with
+     * the service.
+     *
+     * @param url The url to the storage
+     * @param cachePath Path to a folder for caching the files
+     * @return A storage access object
+     */
+    public static Storage getStorage(final String url, final String cachePath) {
+        if (url == null || !url.contains("://")) {
+            return new LocalStorage(cachePath);
+        }
+        throw new UnsupportedOperationException("No plugin for storage at "
+                + url);
     }
 }

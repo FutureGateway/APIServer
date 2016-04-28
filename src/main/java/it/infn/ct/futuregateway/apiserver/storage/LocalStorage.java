@@ -65,6 +65,30 @@ public class LocalStorage implements Storage {
         this.path = aPath;
     }
 
+    @Override
+    public final Path getCachePath(RESOURCE res, String id, String subfolder) {
+        Path filePath;
+        if (subfolder != null && !subfolder.isEmpty()) {
+            filePath = Paths.get(path, res.name().toLowerCase(),
+                id, subfolder);
+        } else {
+            filePath = Paths.get(path, res.name().toLowerCase(), id);
+        }
+        try {
+            Files.createDirectories(filePath);
+        } catch (IOException ioe) {
+            log.error("Impossible to create the directory for " + filePath);
+            log.error(ioe);
+        }
+        return filePath;
+    }
+
+    @Override
+    public final void storeCache(RESOURCE res, String id) {
+        log.debug("Store Cache request not needed in local storage,"
+                + " it will be ignored!");
+    }
+
 
     @Override
     public final void storeFile(final RESOURCE res, final String id,
@@ -77,13 +101,12 @@ public class LocalStorage implements Storage {
     @Override
     public final void storeFile(final RESOURCE res, final String id,
             final InputStream input, final String destinationName,
-            final String operation) throws IOException {
+            final String subfolder) throws IOException {
 
         Path filePath;
-        if (operation != null && !operation.isEmpty()) {
-            filePath = Paths.get(
-                path, res.name().toLowerCase(),
-                id, operation, destinationName);
+        if (subfolder != null && !subfolder.isEmpty()) {
+            filePath = Paths.get(path, res.name().toLowerCase(),
+                id, subfolder, destinationName);
         } else {
             filePath = Paths.get(
                 path, res.name().toLowerCase(),

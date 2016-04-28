@@ -23,6 +23,7 @@ package it.infn.ct.futuregateway.apiserver.storage;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 
 /**
  *
@@ -89,10 +90,32 @@ public interface Storage {
      * @param id The ID of the resource to associate the files
      * @param input InputStream of the file to store
      * @param destinationName File destination
-     * @param action Action the file is associated with
+     * @param subfolder Sub folder the file is associated with
      * @throws IOException In case the file cannot be written
      */
     void storeFile(final RESOURCE res, final String id,
             final InputStream input, final String destinationName,
-            final String action) throws IOException;
+            final String subfolder) throws IOException;
+
+    /**
+     * Retrieves the path to cache folder for the resource.
+     *
+     * @param res The resource type
+     * @param id The ID of the resource associated
+     * @param subfolder Sub folder inside the the area. If the sub folder does
+     * not exist it will be created. If it is null the path will be to the
+     * top folder for the resource
+     * @return Path to the folder 
+     */
+    Path getCachePath(final RESOURCE res, final String id,
+            final String subfolder);
+
+    /**
+     * Moves the files in the cache folder into the storage for later
+     * retrieval.
+     *
+     * @param res The resource type
+     * @param id The ID of the resource associated
+     */
+    void storeCache(final RESOURCE res, final String id);
 }

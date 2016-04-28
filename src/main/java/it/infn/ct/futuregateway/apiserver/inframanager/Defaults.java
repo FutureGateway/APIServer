@@ -25,7 +25,7 @@ package it.infn.ct.futuregateway.apiserver.inframanager;
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-public final class Defaults {
+public class Defaults {
 
     /**
      * Proxy renewal option.
@@ -49,7 +49,20 @@ public final class Defaults {
             "fr.in2p3.jsaga.impl.SagaFactoryImpl";
 
     /**
+     * Default standard output of the job.
+     */
+    public static final String OUTPUT = "std.out";
+
+    /**
+     * Default standard error of the job.
+     */
+    public static final String ERROR = "std.err";
+
+    /**
      * Avoid the class be instantiable.
      */
-    private Defaults() { }
+    protected Defaults() {
+        throw new UnsupportedOperationException("Static utility class should "
+                + "not be allocated!");
+    } 
 }

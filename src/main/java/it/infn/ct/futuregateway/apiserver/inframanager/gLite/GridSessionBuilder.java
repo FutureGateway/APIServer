@@ -143,8 +143,7 @@ public final class GridSessionBuilder extends SessionBuilder {
         try {
             Context context = ContextFactory.createContext(
                     System.getProperty("saga.factory",
-                            it.infn.ct.futuregateway.apiserver.
-                                    inframanager.Defaults.SAGAFACTORY),
+                            Defaults.SAGAFACTORY),
                     "VOMS");
             context.setAttribute(Context.USERPROXY,
                     readRemoteProxy());

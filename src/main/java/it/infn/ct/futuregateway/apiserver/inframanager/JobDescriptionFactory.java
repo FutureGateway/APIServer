@@ -116,8 +116,8 @@ public final class JobDescriptionFactory {
         setOptionalParam(jd, prTask, JobDescription.WORKINGDIRECTORY);
         setOptionalParam(jd, prTask, JobDescription.INTERACTIVE);
         setOptionalParam(jd, prTask, JobDescription.INPUT);
-        setOptionalParam(jd, prTask, JobDescription.OUTPUT);
-        setOptionalParam(jd, prTask, JobDescription.ERROR);
+        setOptionalParam(jd, prTask, JobDescription.OUTPUT, Defaults.OUTPUT);
+        setOptionalParam(jd, prTask, JobDescription.ERROR, Defaults.ERROR);
         setOptionalParam(jd, prTask, JobDescription.CLEANUP);
         setOptionalParam(jd, prTask, JobDescription.JOBSTARTTIME);
         setOptionalParam(jd, prTask, JobDescription.WALLTIMELIMIT);
@@ -144,7 +144,7 @@ public final class JobDescriptionFactory {
     private static void setOptionalParam(
             final JobDescription desc, final Properties prop,
             final String name) {
-        setOptionalParam(desc, prop, name, false);
+        setOptionalParam(desc, prop, name, null, false);
      }
 
 
@@ -160,7 +160,37 @@ public final class JobDescriptionFactory {
     private static void setOptionalParam(
             final JobDescription desc, final Properties prop,
             final String name, final boolean multi) {
-        String value = prop.getProperty(name);
+        setOptionalParam(desc, prop, name, null, multi);
+    }
+
+    /**
+     * Sets an optional parameter in the job description.
+     *
+     * @param desc The job description to modify
+     * @param prop The set of properties for the job
+     * @param name The name of the properties to add
+     * @param dValue The default value of the parameter if not present
+     */
+    private static void setOptionalParam(
+            final JobDescription desc, final Properties prop,
+            final String name, final String dValue) {
+        setOptionalParam(desc, prop, name, dValue, false);
+    }
+
+    /**
+     * Sets an optional parameter in the job description.
+     *
+     * @param desc The job description to modify
+     * @param prop The set of properties for the job
+     * @param name The name of the properties to add
+     * @param dValue The default value of the parameter if not present
+     * @param multi True if the properties has multiple values, false otherwise.
+     * If there are multiple values these are separated by ',' or ';'
+     */
+    private static void setOptionalParam(
+            final JobDescription desc, final Properties prop,
+            final String name, final String dValue, final boolean multi) {
+        String value = prop.getProperty(name, dValue);
         if (value != null) {
             try {
                 if (multi) {

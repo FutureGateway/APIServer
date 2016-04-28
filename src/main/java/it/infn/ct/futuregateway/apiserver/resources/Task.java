@@ -693,4 +693,37 @@ public class Task extends Observable implements Serializable {
             notifyObservers();
         }
     }
+
+    /**
+     * Update the status of input files.
+     * Change the status value for the input file specified. If the name is not
+     * associated with any input file nothing happen.
+     * <p>
+     * There is not check on the file existence and real status which
+     * is delegated to the caller object.
+     *
+     * @param name File name
+     * @param aStatus New status
+     * @param url Url to retrieve the file. If null the download is managed by
+     * the task service so the url will be under the the task resource url.
+     */
+    public final void updateOutputFile(
+            final String name, final TaskFile.FILESTATUS aStatus,
+            final String url) {
+
+        TaskFileOutput tfo = IterableUtils.find(outputFiles,
+                new Predicate<TaskFileOutput>() {
+            @Override
+            public boolean evaluate(final TaskFileOutput t) {
+                return t.getName().equals(name);
+            }
+        });
+        if (tfo != null) {
+            tfo.setStatus(aStatus);
+            tfo.setUrl(url);
+            lastChange = new Date();
+            setChanged();
+            notifyObservers();
+        }
+    }
 }
