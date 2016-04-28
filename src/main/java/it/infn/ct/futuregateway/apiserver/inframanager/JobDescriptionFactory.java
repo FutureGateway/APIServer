@@ -96,6 +96,10 @@ public final class JobDescriptionFactory {
                     }
                 },
                 ";", "", "");
+        if (prTask.containsKey(JobDescription.ARGUMENTS)) {
+            arguments = prTask.getProperty(JobDescription.ARGUMENTS) + ";"
+                    + arguments;
+        }
         prTask.setProperty(JobDescription.ARGUMENTS, arguments);
         try {
             setRequiredParam(jd, prTask, JobDescription.EXECUTABLE);
@@ -127,9 +131,8 @@ public final class JobDescriptionFactory {
                     String path = store.getCachePath(
                             Storage.RESOURCE.TASKS, task.getId(),
                             Constants.OUTPUTFOLDER).toString();
-                    fTransf.add(Defaults.OUTPUT + "<" + path
-                                + FileSystems.getDefault().getSeparator()
-                            + Defaults.OUTPUT);
+                    fTransf.add(path + FileSystems.getDefault().getSeparator()
+                            + Defaults.OUTPUT + "<" + Defaults.OUTPUT);
                 }
                 jd.setVectorAttribute(JobDescription.FILETRANSFER,
                         fTransf.toArray(new String[fTransf.size()]));
@@ -167,7 +170,7 @@ public final class JobDescriptionFactory {
         setOptionalParam(jd, prTask, JobDescription.QUEUE);
         setOptionalParam(jd, prTask, JobDescription.JOBPROJECT);
         setOptionalParam(jd, prTask, JobDescription.JOBCONTACT, true);
-        return null;
+        return jd;
     }
 
 
