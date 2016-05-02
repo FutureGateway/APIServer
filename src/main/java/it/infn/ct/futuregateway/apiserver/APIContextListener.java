@@ -21,6 +21,7 @@
  */
 package it.infn.ct.futuregateway.apiserver;
 
+import it.infn.ct.futuregateway.apiserver.inframanager.MonitorQueue;
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.utils.ThreadPoolFactory;
 import java.nio.file.FileAlreadyExistsException;
@@ -100,17 +101,19 @@ public class APIContextListener implements ServletContextListener {
             tpe = (ExecutorService)
                     ctx.lookup("java:comp/env/threads/Submitter");
         } catch (NamingException ex) {
-            log.warn("Submitter thread not defined in the container. A thread "
-                    + "pool is created using provided configuration parameters "
-                    + "and defaults values");
+            log.warn("Submitter ExecutorService not defined in the container. "
+                    + "A thread pool is created using provided configuration "
+                    + "parameters and defaults values");
             int threadPoolSize = Constants.DEFAULTTHREADPOOLSIZE;
             try {
                 threadPoolSize = Integer.parseInt(sce.getServletContext().
-                    getInitParameter("SubmissioneThreadPoolSize"));
+                    getInitParameter(Constants.SUBMISSIONPOOLSIZEC));
             } catch (NumberFormatException nfe) {
-                log.info("Parameter 'SubmissioneThreadPoolSize' has a wrong"
-                        + " value or it is not present. Default value "
-                        + "10 is used");
+                log.debug(nfe);
+                log.info("Parameter '" + Constants.SUBMISSIONPOOLSIZEC
+                        + "' has a wrong value or it is not present. "
+                        + "Default value " + Constants.DEFAULTTHREADPOOLSIZE
+                        + " is used");
             }
             tpe = ThreadPoolFactory.getThreadPool(
                     threadPoolSize,
@@ -118,19 +121,55 @@ public class APIContextListener implements ServletContextListener {
                     Constants.MAXTHREADIDLELIFE);
         }
         sce.getServletContext().setAttribute(Constants.SUBMISSIONPOOL, tpe);
+        MonitorQueue mQueue;
+        try {
+            Context ctx = new InitialContext();
+            mQueue = (MonitorQueue) ctx.lookup("java:comp/env/queue/Monitor");
+        } catch (NamingException ex) {
+            log.warn("Monitor Queue not defined in the container. "
+                    + "A queue is created using provided configuration "
+                    + "parameters and defaults values");
+            int queueSize = Constants.MONITORBUFFERSIZE;
+            int threadPoolSize = Constants.DEFAULTTHREADPOOLSIZE;
+            int monitorInterval = Constants.MONITORCHECKINTERVAL;
+            try {
+                queueSize = Integer.parseInt(sce.getServletContext().
+                    getInitParameter(Constants.MONITORQUEUESIZEC));
+            } catch (NumberFormatException nfe) {
+                log.info("Parameter '" + Constants.MONITORQUEUESIZEC
+                        + "' has a wrong value or it is not present. "
+                        + "Default value " + Constants.MONITORQUEUESIZEC
+                        + " is used");
+            }
+            try {
+                threadPoolSize = Integer.parseInt(sce.getServletContext().
+                    getInitParameter(Constants.MONITORPOOLSIZEC));
+            } catch (NumberFormatException nfe) {
+                log.info("Parameter '" + Constants.MONITORPOOLSIZEC
+                        + "' has a wrong value or it is not present. "
+                        + "Default value " + Constants.DEFAULTTHREADPOOLSIZE
+                        + " is used");
+            }
+            try {
+                monitorInterval = Integer.parseInt(sce.getServletContext().
+                    getInitParameter(Constants.MONITORINTERVALC));
+            } catch (NumberFormatException nfe) {
+                log.info("Parameter '" + Constants.MONITORINTERVALC
+                        + "' has a wrong value or it is not present. "
+                        + "Default value " + Constants.MONITORCHECKINTERVAL
+                        + " is used");
+            }
+            mQueue = new MonitorQueue(queueSize, threadPoolSize,
+                    monitorInterval);
+        }
+        sce.getServletContext().setAttribute(Constants.MONITORQUEUE, mQueue);
     }
 
     @Override
     public final void contextDestroyed(final ServletContextEvent sce) {
         ExecutorService exServ;
-        try {
-            Context ctx = new InitialContext();
-            exServ = (ExecutorService)
-                    ctx.lookup("java:comp/env/threads/Submitter");
-        } catch (NamingException ex) {
-            exServ = (ExecutorService) sce.getServletContext().
-                    getAttribute("SubmissionThreadPool");
-        }
+        exServ = (ExecutorService) sce.getServletContext().
+                getAttribute("SubmissionThreadPool");
         exServ.shutdown();
         try {
             if (!exServ.awaitTermination(

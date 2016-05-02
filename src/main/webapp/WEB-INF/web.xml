@@ -11,10 +11,34 @@
     <context-param>
         <description>
             SubmissionThreadPoolSize: size of thread pool used for the task submission.
-            The maximum size is the 4 times this value. Default value is 10.
+            The maximum size is the 4 times this value. Default value is 20.
         </description>
         <param-name>SubmissionThreadPoolSize</param-name>
         <param-value>10</param-value>        
+    </context-param>
+    <context-param>
+        <description>
+            MonitorQueueSize: size of queue ot task to monitor.
+            Default value is 5000.
+        </description>
+        <param-name>MonitorQueueSize</param-name>
+        <param-value>5000</param-value>        
+    </context-param>
+    <context-param>
+        <description>
+            MonitorThreadPoolSize: size of thread pool used for the task monitoring.
+            Default value is 20.
+        </description>
+        <param-name>MonitorThreadPoolSize</param-name>
+        <param-value>10</param-value>        
+    </context-param>
+    <context-param>
+        <description>
+            MonitorInterval: interval between two status check on the same resource.
+            Default value is 60000.
+        </description>
+        <param-name>MonitorInterval</param-name>
+        <param-value>60000</param-value>        
     </context-param>
     <session-config>
         <session-timeout>
@@ -31,6 +55,12 @@
         <description></description>
         <res-ref-name>threads/Submitter</res-ref-name>
         <res-type>java.util.concurrent.ExecutorService</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+    <resource-ref>
+        <description></description>
+        <res-ref-name>queue/Monitor</res-ref-name>
+        <res-type>it.infn.ct.futuregateway.apiserver.inframanager.MonitorQueue</res-type>
         <res-auth>Container</res-auth>
     </resource-ref>
 </web-app>

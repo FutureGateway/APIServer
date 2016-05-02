@@ -1,5 +1,4 @@
-/**
- * *********************************************************************
+/***********************************************************************
  * Copyright (c) 2015:
  * Istituto Nazionale di Fisica Nucleare (INFN), Italy
  * Consorzio COMETA (COMETA), Italy
@@ -18,16 +17,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- **********************************************************************
- */
+ ***********************************************************************/
+
 package it.infn.ct.futuregateway.apiserver.utils;
 
+import it.infn.ct.futuregateway.apiserver.inframanager.MonitorQueue;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.RefAddr;
@@ -37,29 +33,28 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Custom creation of an ExecutorService using the parameters
- * provided in the context.
+ * Build the resource monitor.
+ * It is a MonitorQueue which is a combination of an activity queue and a thread
+ * pool.
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
- * @see java.util.concurrent.ExecutorService
  */
-public class ThreadPoolFactory implements ObjectFactory {
+public class MonitorQueueFactory implements ObjectFactory {
 
     /**
      * Logger object. Based on apache commons logging.
      */
-    private final Log log = LogFactory.getLog(ThreadPoolFactory.class);
+    private final Log log = LogFactory.getLog(MonitorQueueFactory.class);
+
 
     @Override
     public final Object getObjectInstance(final Object obj, final Name name,
             final Context ctx, final Hashtable<?, ?> env) throws Exception {
-
         Reference ref = (Reference) obj;
         Enumeration<RefAddr> addrs = ref.getAll();
         int threadPoolSize = Constants.DEFAULTTHREADPOOLSIZE;
-        int maxThreadPoolSize = Constants.MAXTHREADPOOLSIZETIMES
-                * threadPoolSize;
-        int maxThreadIdleTime = Constants.MAXTHREADPOOLSIZETIMES;
+        int bufferSize = Constants.MONITORBUFFERSIZE;
+        int checkInterval = Constants.MONITORCHECKINTERVAL;
         while (addrs.hasMoreElements()) {
             RefAddr addr = (RefAddr) addrs.nextElement();
             String addrName = addr.getType();
@@ -74,49 +69,26 @@ public class ThreadPoolFactory implements ObjectFactory {
                                 + ") applied.");
                     }
                     break;
-                case "maxPoolSize":
+                case "bufferSize":
                     try {
-                        maxThreadPoolSize = Integer.parseInt(addrValue);
+                        bufferSize = Integer.parseInt(addrValue);
                     } catch (NumberFormatException nfe) {
-                        log.warn("Attribute maxPoolSize format not correct."
-                                + " Default value (" + maxThreadPoolSize
+                        log.warn("Attribute bufferSize format not correct."
+                                + " Default value (" + bufferSize
                                 + ") applied.");
                     }
                     break;
-                case "maxThreadIdleTimeMills":
+                case "checkInterval":
                     try {
-                        maxThreadIdleTime = Integer.parseInt(addrValue);
+                        checkInterval = Integer.parseInt(addrValue);
                     } catch (NumberFormatException nfe) {
-                        log.warn("Attribute maxThreadIdleTimeMills format not"
-                                + " correct. Default value ("
-                                + maxThreadIdleTime + ") applied.");
+                        log.warn("Attribute checkInterval format not correct."
+                                + " Default value (" + checkInterval
+                                + ") applied.");
                     }
-                    break;
                 default:
             }
         }
-        log.info("A new thread pool created with name: " + name.toString());
-        return (ThreadPoolFactory.getThreadPool(threadPoolSize,
-                maxThreadPoolSize, maxThreadIdleTime));
-    }
-
-    /**
-     * Create a new ExecutorService.
-     * The ExecutorService is based on the ThreadPoolExecutor but only
-     * a subset of parameter can be specified.
-     *
-     * @param threadPoolSize The initial and minimum size of the pool
-     * @param maxThreadPoolSize The maximum size of the pool
-     * @param maxThreadIdleTime The time in milliseconds a thread can be idle
-     * @return The new ExecutorService
-     */
-    public static ExecutorService getThreadPool(final int threadPoolSize,
-                final int maxThreadPoolSize, final int maxThreadIdleTime) {
-        return new ThreadPoolExecutor(
-                threadPoolSize,
-                maxThreadPoolSize,
-                maxThreadIdleTime,
-                TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<Runnable>());
+        return new MonitorQueue(bufferSize, threadPoolSize, checkInterval);
     }
 }

@@ -60,6 +60,17 @@ public final class Constants {
     public static final int MAXTHREADWAIT = 5;
 
     /**
+     * Maximum waiting time for thread to stop.
+     * Waiting time in minutes for thread to complete their work during the
+     * shutdown of the thread pool.
+     */
+    public static final int MONITORBUFFERSIZE = 5000;
+
+    /**
+     * Interval waited by the monitor between checks.
+     */
+    public static final int MONITORCHECKINTERVAL = 60000;
+    /**
      * Mime type produced by the server.
      */
     public static final String  INDIGOMIMETYPE =
@@ -89,6 +100,31 @@ public final class Constants {
      * Name of the attribute referring the thread pool for task submission.
      */
     public static final String SUBMISSIONPOOL = "SubmissionThreadPool";
+
+    /**
+     * Configuration name for submitter pool size.
+     */
+    public static final String SUBMISSIONPOOLSIZEC = "SubmissionThreadPoolSize";
+
+    /**
+     * Name of the attribute referring the thread pool for task monitoring.
+     */
+    public static final String MONITORQUEUE = "MonitorQueue";
+
+    /**
+     * Configuration name for monitor queue size.
+     */
+    public static final String MONITORQUEUESIZEC = "MonitorQueueSize";
+
+    /**
+     * Configuration name for monitor pool size.
+     */
+    public static final String MONITORPOOLSIZEC = "MonitorThreadPoolSize";
+
+    /**
+     * Configuration name for monitor interval.
+     */
+    public static final String MONITORINTERVALC = "MonitorInterval";
 
     /**
      * Avoid the class be instantiable.

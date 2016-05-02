@@ -9,4 +9,8 @@
 		factory="it.infn.ct.futuregateway.apiserver.utils.ThreadPoolFactory"
 		maxPoolSize="20" maxThreadIdleTimeMills="30000" name="threads/Submitter"
 		poolSize="4" type="java.util.concurrent.ExecutorService" />
+	<Resource auth="Container"
+		factory="it.infn.ct.futuregateway.apiserver.utils.MonitorQueueFactory"
+		poolSize="4" bufferSize="4000" name="queue/Monitor" checkInterval="60000"
+                type="it.infn.ct.futuregateway.apiserver.inframanager.MonitorQueue" />
 </Context>
