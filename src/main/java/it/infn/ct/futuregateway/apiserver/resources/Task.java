@@ -224,6 +224,14 @@ public class Task extends Observable implements Serializable {
     private String nativeId;
 
     /**
+     * Last status check.
+     * Time of last status control on the remote infrastructure for the task
+     * in running status.
+     */
+    @XmlTransient
+    private Date lastStatusCheckTime;
+
+    /**
      * Retrieve the task identifier.
      *
      * @return The identifier of this task
@@ -663,6 +671,25 @@ public class Task extends Observable implements Serializable {
         this.nativeId = aNativeId;
         setChanged();
         notifyObservers();
+    }
+
+    /**
+     * Retrieves the instant of last check.
+     *
+     * @return The time stamp of the check
+     */
+    @Transient
+    public Date getLastStatusCheckTime() {
+        return lastStatusCheckTime;
+    }
+
+    /**
+     * Update the time of last status check for a running task.
+     */
+    public void updateCheckTime() {
+        if (status.equals(STATUS.RUNNING)) {
+            this.lastStatusCheckTime = new Date();
+        }
     }
 
     /**

@@ -21,8 +21,12 @@
 
 package it.infn.ct.futuregateway.apiserver.inframanager;
 
+import it.infn.ct.futuregateway.apiserver.resources.Application;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import java.util.concurrent.BlockingQueue;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.ogf.saga.job.Job;
 
 /**
  * Implement the action monitor. The activity to monitor is retrieved from a
@@ -32,6 +36,11 @@ import java.util.concurrent.BlockingQueue;
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 public class Monitor implements Runnable {
+
+    /**
+     * Logger object. Based on apache commons logging.
+     */
+    private final Log log = LogFactory.getLog(Monitor.class);
 
     /**
      * Queue with activity to monitor.
@@ -58,7 +67,63 @@ public class Monitor implements Runnable {
 
     @Override
     public final void run() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Task task;
+        while ((task = getNext()) != null) {
+            long remainingTime = checkInterval - System.currentTimeMillis()
+                    + task.getLastStatusCheckTime().getTime();
+            if (remainingTime > 0) {
+                try {
+                    Thread.sleep(remainingTime);
+                } catch (InterruptedException ie) {
+                    log.warn("Monitoring thread interrupted while waiting for "
+                            + "next check");
+                }
+            }
+            if (task.getApplicationDetail().getOutcome().equals(
+                Application.TYPE.JOB)) {
+                Job job;
+                throw new UnsupportedOperationException("Not yet implemented");
+            }
+            if (task.getApplicationDetail().getOutcome().equals(
+                Application.TYPE.RESOURCE)) {
+                throw new UnsupportedOperationException("Not yet implemented");
+            }
+            if (task.getStatus().equals(Task.STATUS.RUNNING)) {
+                task.updateCheckTime();
+                putBack(task);
+            }
+        }
     }
 
+
+    /**
+     * Retrieves the next task to monitor.
+     * @return The task
+     */
+    private Task getNext() {
+        Task t = null;
+        try {
+            t = bQueue.take();
+            if (t.getId() == null) {
+                return null;
+            }
+        } catch (InterruptedException ie) {
+            log.warn("Monitoring queue interrupted.");
+        }
+        return t;
+    }
+
+    /**
+     * Puts the task back in queue.
+     *
+     * @param t The task
+     */
+    private void putBack(final Task t) {
+        try {
+            bQueue.put(t);
+        } catch (InterruptedException ie) {
+            log.warn("Task cannot be added to the queue. "
+                    + "Interrupted while waiting");
+        }
+    }
 }

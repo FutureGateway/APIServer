@@ -22,7 +22,6 @@
 package it.infn.ct.futuregateway.apiserver.inframanager;
 
 import it.infn.ct.futuregateway.apiserver.resources.Task;
-import it.infn.ct.futuregateway.apiserver.utils.MonitorQueueFactory;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -43,7 +42,7 @@ public class MonitorQueue {
     /**
      * Logger object. Based on apache commons logging.
      */
-    private final Log log = LogFactory.getLog(MonitorQueueFactory.class);
+    private final Log log = LogFactory.getLog(MonitorQueue.class);
 
     /**
      * The queue of monitored activities.
@@ -133,7 +132,7 @@ public class MonitorQueue {
         try {
             monitorQueue.put(aTask);
         } catch (InterruptedException ex) {
-            log.error("Task cannot be added to the queue. "
+            log.warn("Task cannot be added to the queue. "
                     + "Interrupted while waiting");
         }
     }

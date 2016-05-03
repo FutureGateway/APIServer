@@ -59,6 +59,15 @@ public class APIContextListener implements ServletContextListener {
      */
     private EntityManagerFactory entityManagerFactory;
 
+    /**
+     * Monitor queue.
+     */
+    private MonitorQueue mQueue;
+
+    /**
+     * Submitter queue.
+     */
+    private ExecutorService execServ;
     @Override
     public final void contextInitialized(final ServletContextEvent sce) {
         log.info("Creation of the Hibernate SessionFactory for the context");
@@ -95,10 +104,9 @@ public class APIContextListener implements ServletContextListener {
         } catch (Exception e) {
             log.error("Impossible to initialise the temporary store");
         }
-        ExecutorService tpe;
         try {
             Context ctx = new InitialContext();
-            tpe = (ExecutorService)
+            execServ = (ExecutorService)
                     ctx.lookup("java:comp/env/threads/Submitter");
         } catch (NamingException ex) {
             log.warn("Submitter ExecutorService not defined in the container. "
@@ -115,13 +123,13 @@ public class APIContextListener implements ServletContextListener {
                         + "Default value " + Constants.DEFAULTTHREADPOOLSIZE
                         + " is used");
             }
-            tpe = ThreadPoolFactory.getThreadPool(
+            execServ = ThreadPoolFactory.getThreadPool(
                     threadPoolSize,
                     Constants.MAXTHREADPOOLSIZETIMES * threadPoolSize,
                     Constants.MAXTHREADIDLELIFE);
         }
-        sce.getServletContext().setAttribute(Constants.SUBMISSIONPOOL, tpe);
-        MonitorQueue mQueue;
+        sce.getServletContext().setAttribute(
+                Constants.SUBMISSIONPOOL, execServ);
         try {
             Context ctx = new InitialContext();
             mQueue = (MonitorQueue) ctx.lookup("java:comp/env/queue/Monitor");
@@ -162,22 +170,22 @@ public class APIContextListener implements ServletContextListener {
             mQueue = new MonitorQueue(queueSize, threadPoolSize,
                     monitorInterval);
         }
+        //FIXME: Fill the monitor during startup
         sce.getServletContext().setAttribute(Constants.MONITORQUEUE, mQueue);
     }
 
     @Override
     public final void contextDestroyed(final ServletContextEvent sce) {
-        ExecutorService exServ;
-        exServ = (ExecutorService) sce.getServletContext().
-                getAttribute("SubmissionThreadPool");
-        exServ.shutdown();
+        execServ.shutdown();
         try {
-            if (!exServ.awaitTermination(
+            if (!execServ.awaitTermination(
                     Constants.MAXTHREADWAIT, TimeUnit.MINUTES)) {
                 log.warn("Failed to shutdown the submission thread pool.");
             }
+            mQueue.shutDown();
         } catch (InterruptedException ex) {
             log.error(ex);
         }
+        entityManagerFactory.close();
     }
 }
