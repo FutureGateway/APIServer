@@ -70,7 +70,7 @@ public class MonitorQueue {
     /**
      * Build a monitor queue.
      * A monitor queue is made of two elements: queue and monitor thread. Both
-     * are provided.
+     * are created.
      *
      * @param bufferSize  A queue to store the activities
      * @param threadPoolSize A thread pool for the monitoring
