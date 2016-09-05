@@ -234,7 +234,7 @@ public final class JobDescriptionFactory {
                 if (multi) {
                     desc.setVectorAttribute(name, value.split(",|;"));
                 } else {
-                    desc.setAttribute(name, value);
+                    desc.setAttribute(name, value.split(",|;")[0]);
                 }
             } catch (NotImplementedException | AuthenticationFailedException
                     | AuthorizationFailedException | PermissionDeniedException
@@ -314,7 +314,7 @@ public final class JobDescriptionFactory {
             if (multi) {
                 desc.setVectorAttribute(name, value.split(",|;"));
             } else {
-                desc.setAttribute(name, value);
+                desc.setAttribute(name, value.split(",|;")[0]);
             }
         } catch (NotImplementedException | AuthenticationFailedException
                 | AuthorizationFailedException | PermissionDeniedException

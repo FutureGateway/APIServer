@@ -22,6 +22,7 @@
 package it.infn.ct.futuregateway.apiserver.inframanager;
 
 import it.infn.ct.futuregateway.apiserver.resources.Params;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import org.apache.commons.collections4.IterableUtils;
@@ -50,17 +51,7 @@ public final class Utilities {
      */
     public static String getParamterValue(final List<Params> params,
             final String name) {
-        Params tmpParam = IterableUtils.find(
-                params, new Predicate<Params>() {
-                    @Override
-                    public boolean evaluate(final Params t) {
-                        return t.getName().equals(name);
-                    }
-                });
-        if (tmpParam != null) {
-            return tmpParam.getValue();
-        }
-        return null;
+        return getParamterValue(params, name, null);
     }
 
 
@@ -116,9 +107,30 @@ public final class Utilities {
         for (Params par: params) {
             Object previous = pr.setProperty(par.getName(), par.getValue());
             if (previous != null) {
-                pr.setProperty(par.getName(), previous + "," + par.getValue());
+                pr.setProperty(par.getName(), par.getValue() + "," + previous);
             }
         }
         return pr;
+    }
+
+
+    /**
+     * Merge two set of parameters.
+     * If a parameter is present in both list the second will be selected
+     *
+     * @param originalparameters Initial list
+     * @param newParameters Parameters to add
+     * @return The new list of Params
+     */
+    public static List<Params> mergeParams(
+            final List<Params> originalparameters,
+            final List<Params> newParameters) {
+        List<Params> finalList = new LinkedList<>(newParameters);
+        for (Params p: originalparameters) {
+            if (getParamterValue(finalList, p.getName()) == null) {
+                finalList.add(p);
+            }
+        }
+        return finalList;
     }
 }
