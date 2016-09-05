@@ -6,7 +6,7 @@
 package it.infn.ct.futuregateway.apiserver.v1;
 
 import javax.persistence.EntityManagerFactory;
-import org.junit.Test;
+//import org.junit.Test;
 
 /**
  *
@@ -17,7 +17,7 @@ public class InfrastructureServiceTest {
     /**
      * EMF.
      */
-    EntityManagerFactory emf;
+    private EntityManagerFactory emf;
 
     /**
      * Build.
@@ -28,14 +28,14 @@ public class InfrastructureServiceTest {
     /**
      * Test of getInfraDetails method, of class InfrastructureService.
      */
-    @Test
+ //   @Test
     public void testGetInfraDetails() {
     }
 
     /**
      * Test of deleteInfra method, of class InfrastructureService.
      */
-    @Test
+//    @Test
     public void testDeleteInfra() {
     }
 
