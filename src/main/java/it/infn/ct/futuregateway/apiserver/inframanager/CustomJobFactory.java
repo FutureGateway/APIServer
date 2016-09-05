@@ -75,8 +75,10 @@ public final class CustomJobFactory {
      */
     public static Job createJob(final Task task, final Storage store)
             throws InfrastructureException, BadParameterException {
-        List<Params> infraParams = task.getAssociatedInfrastructure()
-                .getParameters();
+        List<Params> infraParams = Utilities.mergeParams(
+                task.getAssociatedInfrastructure().getParameters(),
+                task.getApplicationDetail().getParameters()
+                );
         String infraType = Utilities.getParamterValue(infraParams, "type");
         if (infraType == null) {
             LOG.debug("Infrastructure "
