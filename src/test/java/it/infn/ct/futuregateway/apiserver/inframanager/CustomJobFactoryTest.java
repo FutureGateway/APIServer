@@ -8,23 +8,21 @@ package it.infn.ct.futuregateway.apiserver.inframanager;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import java.nio.file.Paths;
-import java.util.Properties;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
 import org.junit.runner.RunWith;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.ogf.saga.job.JobDescription;
-import static org.mockito.ArgumentMatchers.eq;
+import org.ogf.saga.job.Job;
 
 /**
- * Test the JobDescriptionFactory.
+ *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 @RunWith(MockitoJUnitRunner.class)
-public class JobDescriptionFactoryTest {
+public class CustomJobFactoryTest {
 
     /**
      * Fake cache storage object.
@@ -32,23 +30,29 @@ public class JobDescriptionFactoryTest {
     @Mock
     private Storage storage;
 
-
     /**
-     * Test of createJobDescription method, of class JobDescriptionFactory.
+     * Test of createJob method, of class CustomJobFactory.
+     * The task has not the type or the resource defined
+     *
      * @throws Exception Impossible to perform the test
      */
-    @Test
-    public final void testCreateJobDescription() throws Exception {
+    @Test(expected = InfrastructureException.class)
+    public final void testCreateJobNoTypeNoRes() throws Exception {
         Task t = TestData.createTask();
         Storage s = TestData.createStorage();
         when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
                 anyString(), anyString())).thenReturn(Paths.get("/tmp"));
-        JobDescription jd = JobDescriptionFactory.createJobDescription(
-                    t, storage);
-        Properties prTask = Utilities.convertParamsToProperties(
-            t.getApplicationDetail().getParameters());
-        assertEquals("Executable not corresponding",
-                prTask.getProperty(JobDescription.EXECUTABLE),
-                jd.getAttribute(JobDescription.EXECUTABLE));
+        Job job = CustomJobFactory.createJob(t, storage);
+    }
+
+    /**
+     * Test of createJob method, of class CustomJobFactory.
+     * The task has the type or the resource defined
+     *
+     * @throws Exception 
+     */
+    @Test
+    public final void testCreateJobWithType() throws Exception {
+        
     }
 }
