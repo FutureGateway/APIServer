@@ -69,6 +69,10 @@ public class Monitor implements Runnable {
     public final void run() {
         Task task;
         while ((task = getNext()) != null) {
+            if (task.getLastStatusCheckTime() == null) {
+                task.updateCheckTime();
+            }
+
             long remainingTime = checkInterval - System.currentTimeMillis()
                     + task.getLastStatusCheckTime().getTime();
             if (remainingTime > 0) {
@@ -80,12 +84,14 @@ public class Monitor implements Runnable {
                 }
             }
             if (task.getApplicationDetail().getOutcome().equals(
-                Application.TYPE.JOB)) {
+                    Application.TYPE.JOB)) {
                 Job job;
-                throw new UnsupportedOperationException("Not yet implemented");
+                log.info("Monitoring Task: " + task.getId());
+                log.error("D'oh!!! Monitor features are not implemented yet");
+//              throw new UnsupportedOperationException("Not yet implemented");
             }
             if (task.getApplicationDetail().getOutcome().equals(
-                Application.TYPE.RESOURCE)) {
+                    Application.TYPE.RESOURCE)) {
                 throw new UnsupportedOperationException("Not yet implemented");
             }
             if (task.getStatus().equals(Task.STATUS.RUNNING)) {

@@ -21,6 +21,7 @@
 
 package it.infn.ct.futuregateway.apiserver.v1;
 
+import it.infn.ct.futuregateway.apiserver.inframanager.MonitorQueue;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import it.infn.ct.futuregateway.apiserver.storage.Storages;
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
@@ -152,4 +153,18 @@ abstract class BaseService {
                 getServletContext().
                 getAttribute(Constants.SUBMISSIONPOOL);
     }
+
+    /**
+     * Retrieve the submission thread pool.
+     * This thread pool will be used exclusively to manage the submission of
+     * tasks to the remote infrastructures.
+     *
+     * @return The monitor queue
+     */
+    protected final MonitorQueue getMonitorQueue() {
+        return (MonitorQueue) getRequest().
+                getServletContext().
+                getAttribute(Constants.MONITORQUEUE);
+    }
+
 }

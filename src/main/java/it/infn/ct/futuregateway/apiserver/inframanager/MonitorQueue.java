@@ -26,6 +26,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -143,9 +144,18 @@ public class MonitorQueue {
      * @throws InterruptedException If an interrupt raises while waiting
      */
     public final boolean shutDown() throws InterruptedException {
-        throw new UnsupportedOperationException("Shutdown has to be correctly "
-                + "integrated to avoid waiting the end of the queue");
-//        monitorPool.shutdown();
-//        return monitorPool.awaitTermination(0, TimeUnit.DAYS);
+        if (monitorPool.awaitTermination(0, TimeUnit.SECONDS)) {
+            log.info("All tasks completed");
+        } else {
+            log.info("Forcing shutdown...");
+            monitorPool.shutdownNow();
+        }
+
+        return true;
+
+//throw new UnsupportedOperationException("Shutdown has to be correctly "
+//+ "integrated to avoid waiting the end of the queue");
+//monitorPool.shutdown();
+//return monitorPool.awaitTermination(0, TimeUnit.DAYS);
     }
 }

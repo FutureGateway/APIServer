@@ -21,6 +21,7 @@
  */
 package it.infn.ct.futuregateway.apiserver.resources.observers;
 
+import it.infn.ct.futuregateway.apiserver.inframanager.MonitorQueue;
 import it.infn.ct.futuregateway.apiserver.inframanager.Submitter;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.resources.TaskFile;
@@ -64,6 +65,10 @@ public class TaskObserver implements Observer {
      */
     private final Storage store;
 
+    /**
+     * The monitor queue responsible for manage task monitors.
+     */
+    private MonitorQueue monitorQueue;
 
     /**
      * Generate the observer of the task.
@@ -86,6 +91,29 @@ public class TaskObserver implements Observer {
         this.store = aStorage;
     }
 
+    /**
+     * Generate the observer of the task.
+     * The Observer will monitor the task and trigger the operation requested
+     * to move the task to the next step until its execution complete.
+     *
+     * @param anEntityManagerFactory An EntityManagerFactory to retrieve the
+     * persistence context
+     * @param anExecutorService An ExecutorService to retrieve threads managing
+     * the task submission
+     * @param aStorage A storage object to move files to/from the server after
+     * or before the execution
+     * @param aMonitorQueue The monitorQueue
+     */
+    public TaskObserver(
+            final EntityManagerFactory anEntityManagerFactory,
+            final ExecutorService anExecutorService,
+            final Storage aStorage,
+            final MonitorQueue aMonitorQueue) {
+        this.emf = anEntityManagerFactory;
+        this.es = anExecutorService;
+        this.store = aStorage;
+        this.monitorQueue = aMonitorQueue;
+    }
 
     @Override
     public final void update(final Observable obs, final Object arg) {
@@ -127,6 +155,9 @@ public class TaskObserver implements Observer {
                     }
                 }
                 t.setStatus(Task.STATUS.READY);
+                break;
+            case RUNNING:
+                monitorQueue.addTaskToMonitor(t);
                 break;
             case DONE:
                 store.storeCache(Storage.RESOURCE.TASKS, t.getId());
