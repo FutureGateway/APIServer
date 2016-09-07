@@ -687,7 +687,7 @@ public class Task extends Observable implements Serializable {
      * Update the time of last status check for a running task.
      */
     public void updateCheckTime() {
-        if (status.equals(STATUS.RUNNING) || status.equals(STATUS.RUNNING)) {
+        if (status.equals(STATUS.RUNNING) || status.equals(STATUS.SCHEDULED)) {
             this.lastStatusCheckTime = new Date();
         }
     }

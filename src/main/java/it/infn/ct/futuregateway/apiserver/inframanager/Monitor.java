@@ -69,10 +69,6 @@ public class Monitor implements Runnable {
     public final void run() {
         Task task;
         while ((task = getNext()) != null) {
-            if (task.getLastStatusCheckTime() == null) {
-                task.updateCheckTime();
-            }
-
             long remainingTime = checkInterval - System.currentTimeMillis()
                     + task.getLastStatusCheckTime().getTime();
             if (remainingTime > 0) {

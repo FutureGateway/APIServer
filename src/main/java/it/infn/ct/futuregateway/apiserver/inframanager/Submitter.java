@@ -75,6 +75,12 @@ public class Submitter implements Runnable {
 
     @Override
     public final void run() {
+        if (!task.getStatus().equals(Task.STATUS.READY)) {
+            log.error("Task " + task.getApplicationId()
+                    + " submitted but not in READY status");
+            task.setStatus(Task.STATUS.ABORTED);
+            return;
+        }
         if (task.getApplicationDetail().getOutcome().equals(
                 Application.TYPE.JOB)) {
             Job job;
@@ -82,7 +88,8 @@ public class Submitter implements Runnable {
                 job = CustomJobFactory.createJob(task, store);
                 job.run();
                 task.setNativeId(job.getAttribute(Job.JOBID));
-                task.setStatus(Task.STATUS.RUNNING);
+                task.setStatus(Task.STATUS.SCHEDULED);
+                task.updateCheckTime();
             } catch (InfrastructureException ex) {
                 log.error("JobFactory does not work");
                 log.error(ex);

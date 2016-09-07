@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context path="">
-	<Resource auth="Container" driverClassName="org.hsqldb.jdbc.JDBCDriver"
-		maxIdle="30" maxWaitMillis="10000" name="jdbc/FutureGatewayDB"
-		password="futuregateway" type="javax.sql.DataSource"
-		url="jdbc:hsqldb:file:///tmp/futuregatewayTmp;shutdown=true;hsqldb.lock_file=true"
-		username="futuregateway" />
-	<Resource auth="Container"
-		factory="it.infn.ct.futuregateway.apiserver.utils.ThreadPoolFactory"
-		maxPoolSize="20" maxThreadIdleTimeMills="30000" name="threads/Submitter"
-		poolSize="4" type="java.util.concurrent.ExecutorService" />
-	<Resource auth="Container"
-		factory="it.infn.ct.futuregateway.apiserver.utils.MonitorQueueFactory"
-		poolSize="4" bufferSize="4000" name="queue/Monitor" checkInterval="60000"
-                type="it.infn.ct.futuregateway.apiserver.inframanager.MonitorQueue" />
+  <Resource auth="Container" driverClassName="org.hsqldb.jdbc.JDBCDriver" maxIdle="30" maxWaitMillis="10000" name="jdbc/FutureGatewayDB" password="futuregateway" type="javax.sql.DataSource" url="jdbc:hsqldb:file:///tmp/futuregatewayTmp;shutdown=true;hsqldb.lock_file=true" username="futuregateway"/>
+  <Resource auth="Container" factory="it.infn.ct.futuregateway.apiserver.utils.ThreadPoolFactory" maxPoolSize="20" maxThreadIdleTimeMills="30000" name="threads/Submitter" poolSize="4" type="java.util.concurrent.ExecutorService"/>
+  <Resource auth="Container" bufferSize="4000" checkInterval="60000" factory="it.infn.ct.futuregateway.apiserver.utils.MonitorQueueFactory" name="queue/Monitor" poolSize="4" type="it.infn.ct.futuregateway.apiserver.inframanager.MonitorQueue"/>
 </Context>
