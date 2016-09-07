@@ -18,6 +18,9 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.ogf.saga.job.JobDescription;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 
 /**
  *

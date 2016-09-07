@@ -90,7 +90,7 @@ public class Monitor implements Runnable {
                     Application.TYPE.RESOURCE)) {
                 throw new UnsupportedOperationException("Not yet implemented");
             }
-            if (task.getStatus().equals(Task.STATUS.RUNNING)) {
+            if (task.getState().equals(Task.STATE.RUNNING)) {
                 task.updateCheckTime();
                 putBack(task);
             }

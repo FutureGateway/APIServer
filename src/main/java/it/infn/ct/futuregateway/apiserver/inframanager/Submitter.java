@@ -75,10 +75,10 @@ public class Submitter implements Runnable {
 
     @Override
     public final void run() {
-        if (!task.getStatus().equals(Task.STATUS.READY)) {
+        if (!task.getState().equals(Task.STATE.READY)) {
             log.error("Task " + task.getApplicationId()
                     + " submitted but not in READY status");
-            task.setStatus(Task.STATUS.ABORTED);
+            task.setState(Task.STATE.ABORTED);
             return;
         }
         if (task.getApplicationDetail().getOutcome().equals(
@@ -88,26 +88,26 @@ public class Submitter implements Runnable {
                 job = CustomJobFactory.createJob(task, store);
                 job.run();
                 task.setNativeId(job.getAttribute(Job.JOBID));
-                task.setStatus(Task.STATUS.SCHEDULED);
+                task.setState(Task.STATE.SCHEDULED);
                 task.updateCheckTime();
             } catch (InfrastructureException ex) {
                 log.error("JobFactory does not work");
                 log.error(ex);
-                task.setStatus(Task.STATUS.ABORTED);
+                task.setState(Task.STATE.ABORTED);
             } catch (BadParameterException ex) {
                 log.error("Paramaters not correct for the task "
                         + task.getId()
                         + " using the infrastructure "
                         + task.getAssociatedInfrastructureId());
                 log.error(ex);
-                task.setStatus(Task.STATUS.ABORTED);
+                task.setState(Task.STATE.ABORTED);
             } catch (NotImplementedException | AuthenticationFailedException
                     | AuthorizationFailedException | PermissionDeniedException
                     | IncorrectStateException | DoesNotExistException
                     | TimeoutException | NoSuccessException ex) {
                 log.error("Impossible to submit the task: " + task.getId());
                 log.error(ex);
-                task.setStatus(Task.STATUS.ABORTED);
+                task.setState(Task.STATE.ABORTED);
             }
         }
         if (task.getApplicationDetail().getOutcome().equals(
