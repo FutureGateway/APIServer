@@ -48,8 +48,10 @@ public class Done extends TaskState {
     }
 
     @Override
-    public void action(ExecutorService anExecutorService, MonitorQueue aMonitorQueue, Storage aStorage) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public final void action(
+            final ExecutorService anExecutorService,
+            final MonitorQueue aMonitorQueue, final Storage aStorage) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

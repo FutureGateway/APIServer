@@ -50,9 +50,9 @@ public class Running extends TaskState {
     }
 
     @Override
-    public void action(
-            ExecutorService anExecutorService,
-            MonitorQueue aMonitorQueue, Storage aStorage) {
+    public final void action(
+            final ExecutorService anExecutorService,
+            final MonitorQueue aMonitorQueue, final Storage aStorage) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

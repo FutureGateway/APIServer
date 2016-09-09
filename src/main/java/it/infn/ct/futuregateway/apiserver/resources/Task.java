@@ -79,7 +79,7 @@ import org.hibernate.annotations.FetchMode;
  */
 @NamedQueries({
     @NamedQuery(name = "tasks.userAll",
-            query = "SELECT t.id, t.description, t.status, t.dateCreated"
+            query = "SELECT t.id, t.description, t.state, t.dateCreated"
             + " FROM Task t WHERE t.userName = :user"),
     @NamedQuery(name = "tasks.forApplication",
             query = "SELECT t.id FROM Task t WHERE "
@@ -507,8 +507,9 @@ public class Task extends Observable implements Serializable {
                 return new Scheduled(this);
             case WAITING:
                 return new Waiting(this);
+            default:
+                throw new TaskException("Inconsistent state");
         }
-        throw new TaskException("Inconsistent state");
     }
 
     /**

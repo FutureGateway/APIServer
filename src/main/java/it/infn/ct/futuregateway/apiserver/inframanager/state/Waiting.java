@@ -45,14 +45,14 @@ public class Waiting extends TaskState {
      * Builds the Waiting concrete state and associates the task.
      * @param aTask The associated task
      */
-    public Waiting(Task aTask) {
+    public Waiting(final Task aTask) {
         this.task = aTask;
     }
 
     @Override
-    public void action(
-            ExecutorService anExecutorService,
-            MonitorQueue aMonitorQueue, Storage aStorage) {
+    public final void action(
+            final ExecutorService anExecutorService,
+            final MonitorQueue aMonitorQueue, final Storage aStorage) {
         if (task.getInputFiles() != null) {
             for (TaskFile tf: task.getInputFiles()) {
                 if (tf.getStatus().equals(TaskFile.FILESTATUS.NEEDED)) {

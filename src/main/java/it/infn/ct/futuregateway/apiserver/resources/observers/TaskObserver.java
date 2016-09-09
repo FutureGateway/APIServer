@@ -22,11 +22,9 @@
 package it.infn.ct.futuregateway.apiserver.resources.observers;
 
 import it.infn.ct.futuregateway.apiserver.inframanager.MonitorQueue;
-import it.infn.ct.futuregateway.apiserver.inframanager.Submitter;
 import it.infn.ct.futuregateway.apiserver.inframanager.TaskException;
 import it.infn.ct.futuregateway.apiserver.inframanager.state.TaskState;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
-import it.infn.ct.futuregateway.apiserver.resources.TaskFile;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import java.util.Observable;
 import java.util.Observer;
