@@ -87,7 +87,7 @@ public class Submitter implements Runnable {
             try {
                 job = CustomJobFactory.createJob(task, store);
                 job.run();
-                task.setNativeId(job.getAttribute(Job.JOBID));                
+                task.setNativeId(job.getAttribute(Job.JOBID));
                 task.updateCheckTime();
             } catch (InfrastructureException ex) {
                 log.error("JobFactory does not work");
