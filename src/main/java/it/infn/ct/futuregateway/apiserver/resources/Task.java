@@ -485,8 +485,7 @@ public class Task extends Observable implements Serializable {
      * internal state information
      *
      * @return A concrete state for the task
-     * @throws it.infn.ct.futuregateway.apiserver.inframanager.TaskException
-     *         if the state cannot be identified
+     * @throws TaskException If the state cannot be identified
      */
     @Transient
     public TaskState getStateManager() throws TaskException {
