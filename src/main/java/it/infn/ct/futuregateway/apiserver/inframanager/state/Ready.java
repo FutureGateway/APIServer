@@ -25,9 +25,7 @@ import it.infn.ct.futuregateway.apiserver.inframanager.MonitorQueue;
 import it.infn.ct.futuregateway.apiserver.inframanager.Submitter;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -63,15 +61,12 @@ public class Ready extends TaskState {
     public final void action(
             final ExecutorService anExecutorService,
             final MonitorQueue aMonitorQueue, final Storage aStorage) {
-        aStorage.createCache(Storage.RESOURCE.TASKS, task.getId());
-        Future<?> taskThread =
-                anExecutorService.submit(new Submitter(task, aStorage));
-        try {
-            taskThread.get();
-        } catch (ExecutionException | InterruptedException ex) {
-            log.warn("Submission thread stop without control");
+        if (task.getNativeId() == null) {
+            anExecutorService.execute(new Submitter(task, aStorage));
+            log.debug("Submitted the task: " + task.getId());
+        } else {
+            task.setState(Task.STATE.SCHEDULED);
         }
-        log.debug("Submitted the task: " + task.getId());
     }
 
 }

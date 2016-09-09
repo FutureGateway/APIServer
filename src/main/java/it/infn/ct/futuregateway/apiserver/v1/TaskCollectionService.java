@@ -27,6 +27,7 @@ import it.infn.ct.futuregateway.apiserver.resources.Application;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.resources.TaskList;
 import it.infn.ct.futuregateway.apiserver.resources.observers.TaskObserver;
+import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -125,6 +126,8 @@ public class TaskCollectionService extends BaseService {
             }
             em.close();
         }
+        log.debug("Created cache storate for the task");
+        getStorage().createCache(Storage.RESOURCE.TASKS, task.getId());
         log.debug("Adding the observer");
         task.addObserver(new TaskObserver(getEntityManagerFactory(),
                 getSubmissionThreadPool(), getStorage(), getMonitorQueue()));
