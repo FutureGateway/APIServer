@@ -192,7 +192,7 @@ public class TaskCollectionServiceIT extends JerseyTest {
             Assert.assertEquals(task.getOutputFiles().size(),
                     newTask.getOutputFiles().size());
         }
-        Assert.assertEquals(Task.STATUS.WAITING, newTask.getStatus());
+        Assert.assertEquals(Task.STATE.WAITING, newTask.getState());
         Assert.assertEquals(task.getDescription(), newTask.getDescription());
         target("/v1.0/tasks/" + newTask.getId()).
                 request().delete();

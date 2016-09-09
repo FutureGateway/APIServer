@@ -80,15 +80,17 @@ public class Monitor implements Runnable {
                 }
             }
             if (task.getApplicationDetail().getOutcome().equals(
-                Application.TYPE.JOB)) {
+                    Application.TYPE.JOB)) {
                 Job job;
-                throw new UnsupportedOperationException("Not yet implemented");
+                log.info("Monitoring Task: " + task.getId());
+                log.error("D'oh!!! Monitor features are not implemented yet");
+//              throw new UnsupportedOperationException("Not yet implemented");
             }
             if (task.getApplicationDetail().getOutcome().equals(
-                Application.TYPE.RESOURCE)) {
+                    Application.TYPE.RESOURCE)) {
                 throw new UnsupportedOperationException("Not yet implemented");
             }
-            if (task.getStatus().equals(Task.STATUS.RUNNING)) {
+            if (task.getState().equals(Task.STATE.RUNNING)) {
                 task.updateCheckTime();
                 putBack(task);
             }

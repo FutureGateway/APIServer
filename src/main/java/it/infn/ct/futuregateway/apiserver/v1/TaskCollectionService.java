@@ -27,6 +27,7 @@ import it.infn.ct.futuregateway.apiserver.resources.Application;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.resources.TaskList;
 import it.infn.ct.futuregateway.apiserver.resources.observers.TaskObserver;
+import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -98,7 +99,7 @@ public class TaskCollectionService extends BaseService {
         }
         task.setDateCreated(new Date());
         task.setUserName(getUser());
-        task.setStatus(Task.STATUS.PENDING);
+        task.setState(Task.STATE.PENDING);
         EntityManager em = getEntityManager();
         EntityTransaction et = null;
         try {
@@ -125,11 +126,13 @@ public class TaskCollectionService extends BaseService {
             }
             em.close();
         }
+        log.debug("Created cache storate for the task");
+        getStorage().createCache(Storage.RESOURCE.TASKS, task.getId());
         log.debug("Adding the observer");
         task.addObserver(new TaskObserver(getEntityManagerFactory(),
-                getSubmissionThreadPool(), getStorage()));
+                getSubmissionThreadPool(), getStorage(), getMonitorQueue()));
         log.debug("Task in waiting for the next step");
-        task.setStatus(Task.STATUS.WAITING);
+        task.setState(Task.STATE.WAITING);
         return task;
     }
 
@@ -168,7 +171,7 @@ public class TaskCollectionService extends BaseService {
                 Task tmpTask = new Task();
                 tmpTask.setId((String) elem[idElem++]);
                 tmpTask.setDescription((String) elem[idElem++]);
-                tmpTask.setStatus((Task.STATUS) elem[idElem++]);
+                tmpTask.setState((Task.STATE) elem[idElem++]);
                 tmpTask.setDateCreated((Date) elem[idElem]);
                 lstTasks.add(tmpTask);
             }

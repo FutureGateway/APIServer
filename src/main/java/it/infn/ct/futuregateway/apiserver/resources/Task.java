@@ -21,6 +21,16 @@
  */
 package it.infn.ct.futuregateway.apiserver.resources;
 
+import it.infn.ct.futuregateway.apiserver.inframanager.TaskException;
+import it.infn.ct.futuregateway.apiserver.inframanager.state.Aborted;
+import it.infn.ct.futuregateway.apiserver.inframanager.state.Cancelled;
+import it.infn.ct.futuregateway.apiserver.inframanager.state.Done;
+import it.infn.ct.futuregateway.apiserver.inframanager.state.Pending;
+import it.infn.ct.futuregateway.apiserver.inframanager.state.Ready;
+import it.infn.ct.futuregateway.apiserver.inframanager.state.Running;
+import it.infn.ct.futuregateway.apiserver.inframanager.state.Scheduled;
+import it.infn.ct.futuregateway.apiserver.inframanager.state.TaskState;
+import it.infn.ct.futuregateway.apiserver.inframanager.state.Waiting;
 import it.infn.ct.futuregateway.apiserver.utils.LinkJaxbAdapter;
 import java.io.Serializable;
 import java.util.Date;
@@ -69,7 +79,7 @@ import org.hibernate.annotations.FetchMode;
  */
 @NamedQueries({
     @NamedQuery(name = "tasks.userAll",
-            query = "SELECT t.id, t.description, t.status, t.dateCreated"
+            query = "SELECT t.id, t.description, t.state, t.dateCreated"
             + " FROM Task t WHERE t.userName = :user"),
     @NamedQuery(name = "tasks.forApplication",
             query = "SELECT t.id FROM Task t WHERE "
@@ -88,9 +98,9 @@ import org.hibernate.annotations.FetchMode;
 public class Task extends Observable implements Serializable {
 
     /**
-     * Possible status for the task.
+     * Possible state for the task.
      */
-    public enum STATUS {
+    public enum STATE {
 
         /**
          * Task received by the user but not yet made persistent.
@@ -178,9 +188,10 @@ public class Task extends Observable implements Serializable {
     private List<TaskFileInput> inputFiles;
 
     /**
-     * The current status of the task.
+     * The current state of the task.
      */
-    private STATUS status;
+    @XmlElement(name = "status")
+    private STATE state;
 
     /**
      * The date when the task was created.
@@ -201,7 +212,7 @@ public class Task extends Observable implements Serializable {
     private Date dateCreated;
 
     /**
-     * The date of last task status update.
+     * The date of last task state update.
      */
     @XmlElement(name = "last_change")
     private Date lastChange;
@@ -224,9 +235,9 @@ public class Task extends Observable implements Serializable {
     private String nativeId;
 
     /**
-     * Last status check.
-     * Time of last status control on the remote infrastructure for the task
-     * in running status.
+     * Last state check.
+     * Time of last state control on the remote infrastructure for the task
+ in running state.
      */
     @XmlTransient
     private Date lastStatusCheckTime;
@@ -442,29 +453,63 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Returns the status of the task.
+     * Returns the state of the task.
      *
-     * @return The status.
+     * @return The state.
      * @see it.infn.ct.futuregateway.apiserver.v1.resources.Task.STATUS
      */
     @Enumerated(EnumType.STRING)
-    public STATUS getStatus() {
-        return status;
+    @Column(name = "status")
+    public STATE getState() {
+        return state;
     }
 
     /**
-     * Sets the status for the task.
+     * Sets the state for the task.
      *
-     * @param aStatus The status to associate with the task
+     * @param aStatus The state to associate with the task
      * @see it.infn.ct.futuregateway.apiserver.v1.resources.Task.STATUS
      */
-    public void setStatus(final STATUS aStatus) {
+    public void setState(final STATE aStatus) {
         lastChange = new Date();
         setChanged();
-        this.status = aStatus;
+        this.state = aStatus;
         notifyObservers();
     }
 
+    /**
+     * Returns a state manager.
+     * This implement a pattern like the state pattern but
+     * the concrete is not immediately associated with the task because a
+     * storage problem so it is generate on the fly starting from the
+     * internal state information
+     *
+     * @return A concrete state for the task
+     * @throws TaskException If the state cannot be identified
+     */
+    @Transient
+    public TaskState getStateManager() throws TaskException {
+        switch (state) {
+            case ABORTED:
+                return new Aborted(this);
+            case CANCELLED:
+                return new Cancelled(this);
+            case DONE:
+                return new Done(this);
+            case PENDING:
+                return new Pending(this);
+            case READY:
+                return new Ready(this);
+            case RUNNING:
+                return new Running(this);
+            case SCHEDULED:
+                return new Scheduled(this);
+            case WAITING:
+                return new Waiting(this);
+            default:
+                throw new TaskException("Inconsistent state");
+        }
+    }
 
     /**
      * Returns the runtime information.
@@ -544,9 +589,9 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Returns the time of last status change.
+     * Returns the time of last state change.
      *
-     * @return The time of last status change
+     * @return The time of last state change
      */
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     public Date getLastChange() {
@@ -554,9 +599,9 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Sets the time of last status change.
+     * Sets the time of last state change.
      *
-     * @param newChangeDate The time of last status change
+     * @param newChangeDate The time of last state change
      */
     public void setLastChange(final Date newChangeDate) {
         this.lastChange = newChangeDate;
@@ -684,24 +729,24 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Update the time of last status check for a running task.
+     * Update the time of last state check for a running task.
      */
     public void updateCheckTime() {
-        if (status.equals(STATUS.RUNNING)) {
+        if (state.equals(STATE.RUNNING) || state.equals(STATE.SCHEDULED)) {
             this.lastStatusCheckTime = new Date();
         }
     }
 
     /**
-     * Update the status of input files.
-     * Change the status value for the input file specified. If the name is not
-     * associated with any input file nothing happen.
-     * <p>
-     * There is not check on the file existence and real status which
-     * is delegated to the caller object.
+     * Update the state of input files.
+     * Change the state value for the input file specified. If the name is not
+ associated with any input file nothing happen.
+ <p>
+ There is not check on the file existence and real state which
+ is delegated to the caller object.
      *
      * @param name File name
-     * @param aStatus New status
+     * @param aStatus New state
      */
     public final void updateInputFileStatus(
             final String name, final TaskFile.FILESTATUS aStatus) {
@@ -722,15 +767,15 @@ public class Task extends Observable implements Serializable {
     }
 
     /**
-     * Update the status of input files.
-     * Change the status value for the input file specified. If the name is not
-     * associated with any input file nothing happen.
-     * <p>
-     * There is not check on the file existence and real status which
-     * is delegated to the caller object.
+     * Update the state of input files.
+     * Change the state value for the input file specified. If the name is not
+ associated with any input file nothing happen.
+ <p>
+ There is not check on the file existence and real state which
+ is delegated to the caller object.
      *
      * @param name File name
-     * @param aStatus New status
+     * @param aStatus New state
      * @param url Url to retrieve the file. If null the download is managed by
      * the task service so the url will be under the the task resource url.
      */

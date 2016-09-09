@@ -21,9 +21,10 @@
  */
 package it.infn.ct.futuregateway.apiserver.resources.observers;
 
-import it.infn.ct.futuregateway.apiserver.inframanager.Submitter;
+import it.infn.ct.futuregateway.apiserver.inframanager.MonitorQueue;
+import it.infn.ct.futuregateway.apiserver.inframanager.TaskException;
+import it.infn.ct.futuregateway.apiserver.inframanager.state.TaskState;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
-import it.infn.ct.futuregateway.apiserver.resources.TaskFile;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import java.util.Observable;
 import java.util.Observer;
@@ -64,6 +65,10 @@ public class TaskObserver implements Observer {
      */
     private final Storage store;
 
+    /**
+     * The monitor queue responsible for manage task monitors.
+     */
+    private MonitorQueue monitorQueue;
 
     /**
      * Generate the observer of the task.
@@ -86,6 +91,29 @@ public class TaskObserver implements Observer {
         this.store = aStorage;
     }
 
+    /**
+     * Generate the observer of the task.
+     * The Observer will monitor the task and trigger the operation requested
+     * to move the task to the next step until its execution complete.
+     *
+     * @param anEntityManagerFactory An EntityManagerFactory to retrieve the
+     * persistence context
+     * @param anExecutorService An ExecutorService to retrieve threads managing
+     * the task submission
+     * @param aStorage A storage object to move files to/from the server after
+     * or before the execution
+     * @param aMonitorQueue The monitorQueue
+     */
+    public TaskObserver(
+            final EntityManagerFactory anEntityManagerFactory,
+            final ExecutorService anExecutorService,
+            final Storage aStorage,
+            final MonitorQueue aMonitorQueue) {
+        this.emf = anEntityManagerFactory;
+        this.es = anExecutorService;
+        this.store = aStorage;
+        this.monitorQueue = aMonitorQueue;
+    }
 
     @Override
     public final void update(final Observable obs, final Object arg) {
@@ -113,36 +141,12 @@ public class TaskObserver implements Observer {
             em.close();
         }
         log.debug("Task " + t.getId() + " updated");
-        switch (t.getStatus()) {
-            case READY:
-                store.createCache(Storage.RESOURCE.TASKS, t.getId());
-                submit(t);
-                break;
-            case WAITING:
-                if (t.getInputFiles() != null) {
-                    for (TaskFile tf: t.getInputFiles()) {
-                        if (tf.getStatus().equals(TaskFile.FILESTATUS.NEEDED)) {
-                            return;
-                        }
-                    }
-                }
-                t.setStatus(Task.STATUS.READY);
-                break;
-            case DONE:
-                store.storeCache(Storage.RESOURCE.TASKS, t.getId());
-            default:
+        try {
+            TaskState ts = t.getStateManager();
+            ts.action(es, monitorQueue, store);
+        } catch (TaskException te) {
+            t.setState(Task.STATE.ABORTED);
+            log.error(te.getMessage());
         }
-    }
-
-    /**
-     * Submit the task to the remote infrastructure.
-     * Submission is performed in a separate thread and it is not blocking
-     * so the server can return immediately to the client.
-     *
-     * @param t The task to submit
-     */
-    private void submit(final Task t) {
-        es.execute(new Submitter(t, store));
-        log.debug("Submitted the task: " + t.getId());
     }
 }
