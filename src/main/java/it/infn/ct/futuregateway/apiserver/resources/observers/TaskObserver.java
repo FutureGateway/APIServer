@@ -70,26 +70,6 @@ public class TaskObserver implements Observer {
      */
     private MonitorQueue monitorQueue;
 
-    /**
-     * Generate the observer of the task.
-     * The Observer will monitor the task and trigger the operation requested
-     * to move the task to the next step until its execution complete.
-     *
-     * @param anEntityManagerFactory An EntityManagerFactory to retrieve the
-     * persistence context
-     * @param anExecutorService An ExecutorService to retrieve threads managing
-     * the task submission
-     * @param aStorage A storage object to move files to/from the server after
-     * or before the execution
-     */
-    public TaskObserver(
-            final EntityManagerFactory anEntityManagerFactory,
-            final ExecutorService anExecutorService,
-            final Storage aStorage) {
-        this.emf = anEntityManagerFactory;
-        this.es = anExecutorService;
-        this.store = aStorage;
-    }
 
     /**
      * Generate the observer of the task.

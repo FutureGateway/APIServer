@@ -53,7 +53,7 @@ public class Running extends TaskState {
     public final void action(
             final ExecutorService anExecutorService,
             final MonitorQueue aMonitorQueue, final Storage aStorage) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        aMonitorQueue.addTaskToMonitor(task);
     }
 
 }
