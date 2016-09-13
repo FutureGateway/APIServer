@@ -5,7 +5,6 @@
  */
 package it.infn.ct.futuregateway.apiserver.inframanager;
 
-import it.infn.ct.futuregateway.apiserver.resources.Params;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import java.nio.file.Paths;
@@ -39,8 +38,7 @@ public class CustomJobFactoryTest {
      */
     @Test(expected = InfrastructureException.class)
     public final void testCreateJobNoTypeNoRes() throws Exception {
-        Task t = TestData.createTask();
-        Storage s = TestData.createStorage();
+        Task t = TestData.createTask(TestData.TASKTYPE.BASIC);
         when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
                 anyString(), anyString())).thenReturn(Paths.get("/tmp"));
         Job job = CustomJobFactory.createJob(t, storage);
@@ -48,26 +46,27 @@ public class CustomJobFactoryTest {
 
     /**
      * Test of createJob method, of class CustomJobFactory.
-     * The task has the type or the resource defined
+     * The task has the type defined but the resource is not defined
      *
      * @throws Exception Impossible to perform the test
      */
-    @Test
+    @Test(expected = NullPointerException.class)
     public final void testCreateJobWithTypeSSH() throws Exception {
-        Task t = TestData.createTask();
-        Params type = new Params();
-        type.setName("type");
-        type.setValue("ssh");
-        t.getAssociatedInfrastructure().getParameters().add(type);
-        Params user = new Params();
-        user.setName("username");
-        user.setValue("testUser");
-        t.getAssociatedInfrastructure().getParameters().add(user);
-        Params pass = new Params();
-        pass.setName("password");
-        pass.setValue("testPass");
-        t.getAssociatedInfrastructure().getParameters().add(pass);
-        Storage s = TestData.createStorage();
+        Task t = TestData.createTask(TestData.TASKTYPE.SSH);
+        when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
+                anyString(), anyString())).thenReturn(Paths.get("/tmp"));
+        Job job = CustomJobFactory.createJob(t, storage);
+    }
+
+    /**
+     * Test of createJob method, of class CustomJobFactory.
+     * The task has the type and resource defined
+     *
+     * @throws Exception Impossible to perform the test
+     */
+    @Test(expected = InfrastructureException.class)
+    public final void testCreateGridJob() throws Exception {
+        Task t = TestData.createTask(TestData.TASKTYPE.SSHFULL);
         when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
                 anyString(), anyString())).thenReturn(Paths.get("/tmp"));
         Job job = CustomJobFactory.createJob(t, storage);

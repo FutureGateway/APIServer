@@ -39,8 +39,7 @@ public class JobDescriptionFactoryTest {
      */
     @Test
     public final void testCreateJobDescription() throws Exception {
-        Task t = TestData.createTask();
-        Storage s = TestData.createStorage();
+        Task t = TestData.createTask(TestData.TASKTYPE.BASIC);
         when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
                 anyString(), anyString())).thenReturn(Paths.get("/tmp"));
         JobDescription jd = JobDescriptionFactory.createJobDescription(

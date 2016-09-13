@@ -27,10 +27,9 @@ import it.infn.ct.futuregateway.apiserver.resources.Params;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.resources.TaskFile;
 import it.infn.ct.futuregateway.apiserver.resources.TaskFileInput;
-import it.infn.ct.futuregateway.apiserver.storage.LocalStorage;
-import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.ogf.saga.job.JobDescription;
 
@@ -41,9 +40,46 @@ import org.ogf.saga.job.JobDescription;
 public final class TestData {
 
     /**
-     * Folder name length.
+     * Indicates the infrastructure parameters to associate with the task.
+     * Task information are almost random
      */
-    private static final int STORAGE_PATH_RANDOM_FOLDER_NAME_LENGTH = 12;
+    public enum TASKTYPE {
+        /**
+         * Task with no type or resource associated.
+         */
+        BASIC,
+        /**
+         * Task with SSH type and no resource.
+         */
+        SSH,
+        /**
+         * Task with SSH type and resource.
+         */
+        SSHFULL,
+        /**
+         * Task with WMS type and resource.
+         */
+        GRID,
+        /**
+         * Task with OCCI type and resource.
+         */
+        OCCI,
+        /**
+         * Task with TOSCA type and resource.
+         */
+        TOSCA
+    }
+
+    /**
+     * Generated ID length.
+     */
+    private static final int IDLENGTH = 14;
+
+    /**
+     * Max length of random string as parameter value.
+     */
+    private static final int PROPERTYVALUEMAXLENGTH = 120;
+
     /**
      * Avoid the class be instantiable.
      */
@@ -53,48 +89,84 @@ public final class TestData {
     /**
      * Create a fake task.
      *
+     * @param type The type of infrastructure the task should be submitted
      * @return A task for test
      */
-    public static Task createTask() {
+    public static Task createTask(final TASKTYPE type) {
+        Random rand = new Random();
         Infrastructure i = new Infrastructure();
-        i.setId("testInfra");
+        i.setId(RandomStringUtils.randomAlphanumeric(IDLENGTH));
         i.setParameters(new LinkedList<Params>());
         List<Infrastructure> li = new LinkedList<>();
         li.add(i);
 
         Application a = new Application();
-        a.setId("testApp");
+        a.setId(RandomStringUtils.randomAlphanumeric(IDLENGTH));
         a.setInfrastructures(li);
         List<Params> lap = new LinkedList<>();
         Params exec = new Params();
         exec.setName(JobDescription.EXECUTABLE);
-        exec.setValue("myBinary");
+        exec.setValue(RandomStringUtils.randomAlphanumeric(
+                rand.nextInt(PROPERTYVALUEMAXLENGTH) + 1));
         lap.add(exec);
         a.setParameters(lap);
 
         Task t = new Task();
-        t.setId("testTask");
+        t.setId(RandomStringUtils.randomAlphanumeric(IDLENGTH));
         t.setApplicationDetail(a);
         t.setAssociatedInfrastructureId(i.getId());
         List<TaskFileInput> ltif = new LinkedList<>();
         TaskFileInput f = new TaskFileInput();
-        f.setName("aFileName");
-        f.setUrl("aFileLocalPath");
+        f.setName(RandomStringUtils.randomAlphanumeric(
+                        rand.nextInt(PROPERTYVALUEMAXLENGTH) + 1));
+        f.setUrl(RandomStringUtils.randomAlphanumeric(
+                        rand.nextInt(PROPERTYVALUEMAXLENGTH) + 1));
         f.setStatus(TaskFile.FILESTATUS.READY);
         ltif.add(f);
         t.setInputFiles(ltif);
+        Params infraType = new Params();
+        Params res = new Params();
+        switch (type) {
+            case BASIC:
+                break;
+            case GRID:
+                infraType.setName("type");
+                infraType.setValue("wms");
+                t.getAssociatedInfrastructure().getParameters().add(infraType);
+                res.setName("jobservice");
+                res.setValue("wms://"
+                        + RandomStringUtils.randomAlphanumeric(
+                                rand.nextInt(PROPERTYVALUEMAXLENGTH) + 1));
+                t.getAssociatedInfrastructure().getParameters().add(res);
+                break;
+            case OCCI:
+            case TOSCA:
+                break;
+            case SSHFULL:
+                res.setName("jobservice");
+                res.setValue("ssh://"
+                        + RandomStringUtils.randomAlphanumeric(
+                                rand.nextInt(PROPERTYVALUEMAXLENGTH) + 1));
+                t.getAssociatedInfrastructure().getParameters().add(res);
+            case SSH:
+                infraType.setName("type");
+                infraType.setValue("ssh");
+                t.getAssociatedInfrastructure().getParameters().add(infraType);
+                Params user = new Params();
+                user.setName("username");
+                user.setValue(RandomStringUtils.randomAlphanumeric(
+                        rand.nextInt(PROPERTYVALUEMAXLENGTH) + 1));
+                t.getAssociatedInfrastructure().getParameters().add(user);
+                Params pass = new Params();
+                pass.setName("password");
+                pass.setValue(RandomStringUtils.randomAlphanumeric(
+                        rand.nextInt(PROPERTYVALUEMAXLENGTH) + 1));
+                t.getAssociatedInfrastructure().getParameters().add(pass);
+                break;
+            default:
+        }
         return t;
     }
 
 
-    /**
-     * Create a fake storage.
-     *
-     * @return A storage for test
-     */
-    public static Storage createStorage() {
-        return new LocalStorage("/tmp/APIServiceTest/"
-                + RandomStringUtils.random(
-                        STORAGE_PATH_RANDOM_FOLDER_NAME_LENGTH));
-    }
 }

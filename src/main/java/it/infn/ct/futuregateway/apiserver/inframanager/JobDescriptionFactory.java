@@ -306,7 +306,7 @@ public final class JobDescriptionFactory {
             NotImplementedException, PermissionDeniedException,
             TimeoutException {
         String value = prop.getProperty(name);
-        if (value == null) {
+        if (value == null || value.isEmpty()) {
             throw new BadParameterException(
                     "Missing required attribute: " + name);
         }
