@@ -256,12 +256,15 @@ public abstract class SessionBuilder {
         StringBuilder strProxy = new StringBuilder();
         log.debug("Accessing the proxy " + proxy.toString());
         try {
-            String lnProxy;
             BufferedReader fileProxy = new BufferedReader(
                     new InputStreamReader(proxy.openStream()));
-            while ((lnProxy = fileProxy.readLine()) != null) {
+            String lnProxy = fileProxy.readLine();
+            if (lnProxy != null) {
                 strProxy.append(lnProxy);
+            }
+            while ((lnProxy = fileProxy.readLine()) != null) {
                 strProxy.append("\n");
+                strProxy.append(lnProxy);
             }
         } catch (IOException ioer) {
             log.error("Impossible to retrieve the remote proxy certificate from"

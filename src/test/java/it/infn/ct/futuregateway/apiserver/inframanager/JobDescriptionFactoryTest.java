@@ -20,14 +20,14 @@ import org.ogf.saga.job.JobDescription;
 import static org.mockito.ArgumentMatchers.eq;
 
 /**
- *
+ * Test the JobDescriptionFactory.
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 @RunWith(MockitoJUnitRunner.class)
 public class JobDescriptionFactoryTest {
 
     /**
-     * Ciccio.
+     * Fake cache storage object.
      */
     @Mock
     private Storage storage;
@@ -39,17 +39,11 @@ public class JobDescriptionFactoryTest {
      */
     @Test
     public final void testCreateJobDescription() throws Exception {
-        Task t = TestData.createTask();
-        Storage s = TestData.createStorage();
-        JobDescription jd = null;
+        Task t = TestData.createTask(TestData.TASKTYPE.BASIC);
         when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
                 anyString(), anyString())).thenReturn(Paths.get("/tmp"));
-        try {
-            jd = JobDescriptionFactory.createJobDescription(
+        JobDescription jd = JobDescriptionFactory.createJobDescription(
                     t, storage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         Properties prTask = Utilities.convertParamsToProperties(
             t.getApplicationDetail().getParameters());
         assertEquals("Executable not corresponding",

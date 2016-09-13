@@ -103,8 +103,8 @@ public final class CustomJobFactory {
         switch (infraType) {
             case "wsgram":
             case "gatekeeper":
-            case "gLite:":
-            case "wms:":
+            case "gLite":
+            case "wms":
                 sb = new GridSessionBuilder(
                         task.getAssociatedInfrastructure(), task.getUserName());
                 ResourceDiscovery rd = new ResourceDiscovery(infraParams,
