@@ -120,7 +120,6 @@ public class TaskService extends BaseService {
                 }
                 log.error(re);
                 log.error("Impossible to remove the task");
-                em.close();
                 throw new InternalServerErrorException("Errore to remove "
                         + "the task " + id);
             }
@@ -160,43 +159,36 @@ public class TaskService extends BaseService {
             throw new BadRequestException("Input not accessible!");
         }
         EntityManager em = getEntityManager();
-        Task task = em.find(Task.class, id);
-        task.addObserver(new TaskObserver(getEntityManagerFactory(),
-                getSubmissionThreadPool(), getStorage(), getMonitorQueue()));
-        if (task == null) {
-            throw new NotFoundException("Task " + id + " does not exist");
-        }
-        for (FormDataBodyPart fdbp : lstFiles) {
-            final String fName =
-                    fdbp.getFormDataContentDisposition().getFileName();
-            try {
-                Storage store = getStorage();
-                store.storeFile(Storage.RESOURCE.TASKS, id,
-                        fdbp.getValueAs(InputStream.class),
-                        fName, Constants.INPUTFOLDER);
-                EntityTransaction et = em.getTransaction();
+        try {
+            Task task = em.find(Task.class, id);
+            task.addObserver(new TaskObserver(getEntityManagerFactory(),
+                    getSubmissionThreadPool(), getStorage(),
+                    getMonitorQueue()));
+            if (task == null) {
+                throw new NotFoundException("Task " + id + " does not exist");
+            }
+            for (FormDataBodyPart fdbp : lstFiles) {
+                final String fName =
+                        fdbp.getFormDataContentDisposition().getFileName();
                 try {
-                    et.begin();
+                    Storage store = getStorage();
+                    store.storeFile(Storage.RESOURCE.TASKS, id,
+                            fdbp.getValueAs(InputStream.class),
+                            fName, Constants.INPUTFOLDER);
                     task.updateInputFileStatus(
                             fName, TaskFile.FILESTATUS.READY);
-                    et.commit();
-                } catch (RuntimeException re) {
-                    if (et != null && et.isActive()) {
-                        et.rollback();
-                    }
-                    log.error(re);
-                    log.error("Impossible to update the task");
-                    throw new InternalServerErrorException("Errore to update "
-                            + "the task");
-                } finally {
-                    em.close();
+                } catch (IOException ex) {
+                    log.error(ex);
+                    throw new InternalServerErrorException(
+                            "Errore to store input files");
                 }
-            } catch (IOException ex) {
-                log.error(ex);
-                throw new InternalServerErrorException("Errore to store input "
-                        + "files");
             }
+        } catch (IllegalArgumentException iae) {
+            log.error("Impossible to retrieve the task list");
+            log.error(iae);
+            throw new BadRequestException("Task '" + id + "' has a problem!");
+        } finally {
+            em.close();
         }
-        em.close();
     }
 }
