@@ -21,6 +21,7 @@
  */
 package it.infn.ct.futuregateway.apiserver.v1;
 
+import it.infn.ct.futuregateway.apiserver.utils.TestDataIT;
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.resources.Infrastructure;
 import java.util.UUID;
@@ -51,7 +52,7 @@ public class InfrastructureServiceIT extends JerseyTest {
      */
     @Test
     public final void testInfrastructureDetails() {
-        Infrastructure newInfra = TestData.createInfrastructure();
+        Infrastructure newInfra = TestDataIT.createInfrastructure();
         Response rs;
         rs = target("/v1.0/infrastructures").
                 request(Constants.INDIGOMIMETYPE).
@@ -88,7 +89,7 @@ public class InfrastructureServiceIT extends JerseyTest {
 
         rs = target("/v1.0/infrastructures").
                 request(Constants.INDIGOMIMETYPE).
-                post(Entity.entity(TestData.createInfrastructure(),
+                post(Entity.entity(TestDataIT.createInfrastructure(),
                         Constants.INDIGOMIMETYPE));
         String id = rs.readEntity(Infrastructure.class).getId();
         rs = target("/v1.0/infrastructures/" + id).

@@ -19,7 +19,7 @@
  * limitations under the License.
  ***********************************************************************/
 
-package it.infn.ct.futuregateway.apiserver.v1;
+package it.infn.ct.futuregateway.apiserver.utils;
 
 import it.infn.ct.futuregateway.apiserver.resources.Application;
 import it.infn.ct.futuregateway.apiserver.resources.Infrastructure;
@@ -33,14 +33,14 @@ import java.util.Random;
 import org.apache.commons.lang3.RandomStringUtils;
 
 /**
- * The TestData class contains all the data registered in the DB during the
- * integration tests.
+ * The TestDataIT class contains all the data registered in the DB during the
+ integration tests.
  * The provided methods allow to generate all the resources to store in the DB
  * and use for the the tests.
  *
  * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
-public final class TestData {
+public final class TestDataIT {
 
     /**
      * Max number of entities to add in a random list for test.
@@ -170,5 +170,5 @@ public final class TestData {
     /**
      * Utility class cannot be allocated.
      */
-    private TestData() { }
+    private TestDataIT() { }
 }

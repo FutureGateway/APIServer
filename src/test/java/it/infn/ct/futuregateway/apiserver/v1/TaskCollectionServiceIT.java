@@ -21,6 +21,7 @@
  */
 package it.infn.ct.futuregateway.apiserver.v1;
 
+import it.infn.ct.futuregateway.apiserver.utils.TestDataIT;
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.resources.Application;
 import it.infn.ct.futuregateway.apiserver.resources.Infrastructure;
@@ -68,20 +69,20 @@ public class TaskCollectionServiceIT extends JerseyTest {
     public final void prepareApplication() {
         infras = new LinkedList<>();
         for (int i = 0;
-                i < 1 + (int) TestData.MAX_ENTITIES_IN_LIST * Math.random();
+                i < 1 + (int) TestDataIT.MAX_ENTITIES_IN_LIST * Math.random();
                 i++) {
             Response rs = target("/v1.0/infrastructures").
                     request(Constants.INDIGOMIMETYPE).
-                    post(Entity.entity(TestData.createInfrastructure(),
+                    post(Entity.entity(TestDataIT.createInfrastructure(),
                             Constants.INDIGOMIMETYPE));
             infras.add(rs.readEntity(Infrastructure.class).getId());
         }
 
         apps = new LinkedList<>();
         for (int i = 0;
-                i < 1 + (int) TestData.MAX_ENTITIES_IN_LIST * Math.random();
+                i < 1 + (int) TestDataIT.MAX_ENTITIES_IN_LIST * Math.random();
                 i++) {
-            Application app = TestData.createApplication();
+            Application app = TestDataIT.createApplication();
             app.setInfrastructureIds(infras);
             Response rs = target("/v1.0/applications").
                     request(Constants.INDIGOMIMETYPE).
@@ -125,9 +126,9 @@ public class TaskCollectionServiceIT extends JerseyTest {
 
         List<Task> lstNewTask = new LinkedList<>();
         for (int i = 0;
-                i < (int) (1 + Math.random() * TestData.MAX_ENTITIES_IN_LIST);
+                i < (int) (1 + Math.random() * TestDataIT.MAX_ENTITIES_IN_LIST);
                 i++) {
-            Task newTask = TestData.createTask();
+            Task newTask = TestDataIT.createTask();
             newTask.setApplicationId(
                     apps.get((int) (Math.random() * apps.size())));
             lstNewTask.add(newTask);
@@ -154,7 +155,7 @@ public class TaskCollectionServiceIT extends JerseyTest {
      */
     @Test
     public final void testAddTask() {
-        Task task = TestData.createTask();
+        Task task = TestDataIT.createTask();
         Response rs;
 
         rs = target("/v1.0/tasks").
@@ -164,7 +165,7 @@ public class TaskCollectionServiceIT extends JerseyTest {
                 rs.getStatus());
 
         task.setApplicationId(RandomStringUtils.randomAlphanumeric(
-                (int) (1 + (Math.random() * TestData.MAX_STRING_LENGTH))));
+                (int) (1 + (Math.random() * TestDataIT.MAX_STRING_LENGTH))));
         rs = target("/v1.0/tasks").
                 request(Constants.INDIGOMIMETYPE).
                 post(Entity.entity(task, Constants.INDIGOMIMETYPE));
@@ -204,7 +205,7 @@ public class TaskCollectionServiceIT extends JerseyTest {
      */
     @Test
     public final void testDeleteAssociatedApplication() {
-        Task task = TestData.createTask();
+        Task task = TestDataIT.createTask();
         Response rs;
 
         task.setApplicationId(apps.get(0));

@@ -21,6 +21,7 @@
  */
 package it.infn.ct.futuregateway.apiserver.v1;
 
+import it.infn.ct.futuregateway.apiserver.utils.TestDataIT;
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.resources.Application;
 import it.infn.ct.futuregateway.apiserver.resources.ApplicationList;
@@ -63,10 +64,10 @@ public class ApplicationCollectionServiceIT extends JerseyTest {
     public final void prepareInfrastructure() {
         infra = new LinkedList<>();
         for (int i = 0;
-                i < 1 + (int) TestData.MAX_ENTITIES_IN_LIST * Math.random();
+                i < 1 + (int) TestDataIT.MAX_ENTITIES_IN_LIST * Math.random();
                 i++) {
             Entity<Infrastructure> infraEntity = Entity.entity(
-                    TestData.createInfrastructure(),
+                    TestDataIT.createInfrastructure(),
                     Constants.INDIGOMIMETYPE);
             Response rs = target("/v1.0/infrastructures").
                     request(Constants.INDIGOMIMETYPE).post(infraEntity);
@@ -106,9 +107,9 @@ public class ApplicationCollectionServiceIT extends JerseyTest {
 
         List<Application> lstNewApp = new LinkedList<>();
         for (int i = 0;
-                i < (int) (1 + Math.random() * TestData.MAX_ENTITIES_IN_LIST);
+                i < (int) (1 + Math.random() * TestDataIT.MAX_ENTITIES_IN_LIST);
                 i++) {
-            Application newApp = TestData.createApplication();
+            Application newApp = TestDataIT.createApplication();
             newApp.setInfrastructureIds(infra);
             lstNewApp.add(newApp);
             target("/v1.0/applications").request(Constants.INDIGOMIMETYPE).
@@ -134,7 +135,7 @@ public class ApplicationCollectionServiceIT extends JerseyTest {
      */
     @Test
     public final void testAddApplication() {
-        Application app = TestData.createApplication();
+        Application app = TestDataIT.createApplication();
         Response rs;
 
         rs = target("/v1.0/applications").
@@ -169,7 +170,7 @@ public class ApplicationCollectionServiceIT extends JerseyTest {
      */
     @Test
     public final void testDeleteAssociatedInfrastructure() {
-        Application app = TestData.createApplication();
+        Application app = TestDataIT.createApplication();
         Response rs;
 
         app.setInfrastructureIds(infra);

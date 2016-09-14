@@ -21,6 +21,7 @@
  */
 package it.infn.ct.futuregateway.apiserver.v1;
 
+import it.infn.ct.futuregateway.apiserver.utils.TestDataIT;
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.resources.Application;
 import it.infn.ct.futuregateway.apiserver.resources.Infrastructure;
@@ -64,10 +65,10 @@ public class ApplicationServiceIT extends JerseyTest {
     public final void prepareInfrastructure() {
         infra = new LinkedList<>();
         for (int i = 0;
-                i < 1 + (int) TestData.MAX_ENTITIES_IN_LIST * Math.random();
+                i < 1 + (int) TestDataIT.MAX_ENTITIES_IN_LIST * Math.random();
                 i++) {
             Entity<Infrastructure> infraEntity = Entity.entity(
-                    TestData.createInfrastructure(),
+                    TestDataIT.createInfrastructure(),
                     Constants.INDIGOMIMETYPE);
             Response rs = target("/v1.0/infrastructures").
                     request(Constants.INDIGOMIMETYPE).post(infraEntity);
@@ -93,7 +94,7 @@ public class ApplicationServiceIT extends JerseyTest {
      */
     @Test
     public final void testApplicationDetails() {
-        Application newApp = TestData.createApplication();
+        Application newApp = TestDataIT.createApplication();
         newApp.setInfrastructureIds(infra);
         Response rs;
         rs = target("/v1.0/applications").
@@ -136,7 +137,7 @@ public class ApplicationServiceIT extends JerseyTest {
         Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(),
                 rs.getStatus());
 
-        Application testApp = TestData.createApplication();
+        Application testApp = TestDataIT.createApplication();
         testApp.setInfrastructureIds(infra);
         rs = target("/v1.0/applications").
                 request(Constants.INDIGOMIMETYPE).
