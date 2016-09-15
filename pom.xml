@@ -238,6 +238,11 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>${coveralls.version}</version>
+            </plugin>
         </plugins>
     </build>
     <repositories>
@@ -267,5 +272,6 @@
         <mockito.version>2.0.111-beta</mockito.version>
         <h2.version>LATEST</h2.version>
         <jacoco.version>0.7.7.201606060606</jacoco.version>
+        <coveralls.version>4.2.0</coveralls.version>
     </properties>
 </project>
