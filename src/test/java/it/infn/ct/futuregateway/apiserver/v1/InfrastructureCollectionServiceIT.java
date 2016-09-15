@@ -21,6 +21,7 @@
  */
 package it.infn.ct.futuregateway.apiserver.v1;
 
+import it.infn.ct.futuregateway.apiserver.utils.TestDataIT;
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.resources.Infrastructure;
 import it.infn.ct.futuregateway.apiserver.resources.InfrastructureList;
@@ -65,9 +66,9 @@ public class InfrastructureCollectionServiceIT extends JerseyTest {
 
         List<Infrastructure> lstNewInfra = new LinkedList<>();
         for (int i = 0;
-                i < (int) (1 + Math.random() * TestData.MAX_ENTITIES_IN_LIST);
+                i < (int) (1 + Math.random() * TestDataIT.MAX_ENTITIES_IN_LIST);
                 i++) {
-            Infrastructure newInfra = TestData.createInfrastructure();
+            Infrastructure newInfra = TestDataIT.createInfrastructure();
             lstNewInfra.add(newInfra);
             target("/v1.0/infrastructures").request(Constants.INDIGOMIMETYPE).
                     post(Entity.entity(newInfra, Constants.INDIGOMIMETYPE));
@@ -93,7 +94,7 @@ public class InfrastructureCollectionServiceIT extends JerseyTest {
     @Test
     public final void testAddInfrastructure() {
         //FIXME: Add test for infrastructures missing some parameters
-        Infrastructure infra = TestData.createInfrastructure();
+        Infrastructure infra = TestDataIT.createInfrastructure();
         Entity<Infrastructure> infraEntity = Entity.entity(infra,
                 Constants.INDIGOMIMETYPE);
         Response rs = target("/v1.0/infrastructures").

@@ -21,6 +21,7 @@
  */
 package it.infn.ct.futuregateway.apiserver.v1;
 
+import it.infn.ct.futuregateway.apiserver.utils.TestDataIT;
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.resources.Application;
 import it.infn.ct.futuregateway.apiserver.resources.Infrastructure;
@@ -71,10 +72,10 @@ public class TaskServiceIT extends  JerseyTest {
     public final void prepareApplication() {
         infras = new LinkedList<>();
         for (int i = 0;
-                i < 1 + (int) TestData.MAX_ENTITIES_IN_LIST * Math.random();
+                i < 1 + (int) TestDataIT.MAX_ENTITIES_IN_LIST * Math.random();
                 i++) {
             Entity<Infrastructure> infraEntity = Entity.entity(
-                    TestData.createInfrastructure(),
+                    TestDataIT.createInfrastructure(),
                     Constants.INDIGOMIMETYPE);
             Response rs = target("/v1.0/infrastructures").
                     request(Constants.INDIGOMIMETYPE).post(infraEntity);
@@ -83,9 +84,9 @@ public class TaskServiceIT extends  JerseyTest {
 
         apps = new LinkedList<>();
         for (int i = 0;
-                i < 1 + (int) TestData.MAX_ENTITIES_IN_LIST * Math.random();
+                i < 1 + (int) TestDataIT.MAX_ENTITIES_IN_LIST * Math.random();
                 i++) {
-            Application app = TestData.createApplication();
+            Application app = TestDataIT.createApplication();
             app.setInfrastructureIds(infras);
             Entity<Application> appEntity = Entity.entity(
                     app,
@@ -119,7 +120,7 @@ public class TaskServiceIT extends  JerseyTest {
      */
     @Test
     public final void testTaskDetails() {
-        Task newTask = TestData.createTask();
+        Task newTask = TestDataIT.createTask();
         newTask.setApplicationId(apps.get((int) (Math.random() * apps.size())));
         Response rs;
         rs = target("/v1.0/tasks").
@@ -176,7 +177,7 @@ public class TaskServiceIT extends  JerseyTest {
         Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(),
                 rs.getStatus());
 
-        Task testTask = TestData.createTask();
+        Task testTask = TestDataIT.createTask();
         testTask.setApplicationId(
                 apps.get((int) (Math.random() * apps.size())));
         rs = target("/v1.0/tasks").

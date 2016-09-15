@@ -19,7 +19,7 @@
  * limitations under the License.
  ***********************************************************************/
 
-package it.infn.ct.futuregateway.apiserver.inframanager;
+package it.infn.ct.futuregateway.apiserver.utils;
 
 import it.infn.ct.futuregateway.apiserver.resources.Application;
 import it.infn.ct.futuregateway.apiserver.resources.Infrastructure;
