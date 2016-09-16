@@ -141,7 +141,6 @@
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api</artifactId>
             <version>${saga.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
