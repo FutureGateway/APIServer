@@ -21,10 +21,10 @@
 
 package it.infn.ct.futuregateway.apiserver.inframanager.state;
 
-import it.infn.ct.futuregateway.apiserver.inframanager.MonitorQueue;
 import it.infn.ct.futuregateway.apiserver.inframanager.Submitter;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,7 +60,7 @@ public class Ready extends TaskState {
     @Override
     public final void action(
             final ExecutorService anExecutorService,
-            final MonitorQueue aMonitorQueue, final Storage aStorage) {
+            final BlockingQueue<Task> aBlockingQueue, final Storage aStorage) {
         if (task.getNativeId() == null) {
             anExecutorService.execute(new Submitter(task, aStorage));
             log.debug("Submitted the task: " + task.getId());

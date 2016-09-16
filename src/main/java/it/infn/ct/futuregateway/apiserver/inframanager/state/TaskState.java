@@ -21,8 +21,9 @@
 
 package it.infn.ct.futuregateway.apiserver.inframanager.state;
 
-import it.infn.ct.futuregateway.apiserver.inframanager.MonitorQueue;
+import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -38,11 +39,11 @@ public abstract class TaskState {
      * Perform the action connected with the task.
      *
      * @param anExecutorService Executor performing active action on the task
-     * @param aMonitorQueue Queue for monitored tasks
+     * @param aBlockingQueue Queue for monitored tasks
      * @param aStorage Cache storage
      */
     public abstract void action(
             ExecutorService anExecutorService,
-            MonitorQueue aMonitorQueue,
+            BlockingQueue<Task> aBlockingQueue,
             Storage aStorage);
 }

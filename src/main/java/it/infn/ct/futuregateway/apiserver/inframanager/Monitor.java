@@ -21,12 +21,12 @@
 
 package it.infn.ct.futuregateway.apiserver.inframanager;
 
+import it.infn.ct.futuregateway.apiserver.inframanager.state.TaskState;
 import it.infn.ct.futuregateway.apiserver.resources.Application;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import java.util.concurrent.BlockingQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ogf.saga.job.Job;
 
 /**
  * Implement the action monitor. The activity to monitor is retrieved from a
@@ -69,26 +69,33 @@ public class Monitor implements Runnable {
     public final void run() {
         Task task;
         while ((task = getNext()) != null) {
-            long remainingTime = checkInterval - System.currentTimeMillis()
-                    + task.getLastStatusCheckTime().getTime();
-            if (remainingTime > 0) {
-                try {
-                    Thread.sleep(remainingTime);
-                } catch (InterruptedException ie) {
-                    log.warn("Monitoring thread interrupted while waiting for "
-                            + "next check");
+            if (task.getLastStatusCheckTime() != null) {
+                long remainingTime = checkInterval - System.currentTimeMillis()
+                        + task.getLastStatusCheckTime().getTime();
+                if (remainingTime > 0) {
+                    try {
+                        Thread.sleep(remainingTime);
+                    } catch (InterruptedException ie) {
+                        log.warn("Monitoring thread interrupted while waiting "
+                                + "for next check");
+                    }
                 }
-            }
-            if (task.getApplicationDetail().getOutcome().equals(
-                    Application.TYPE.JOB)) {
-                Job job;
-                log.info("Monitoring Task: " + task.getId());
-                log.error("D'oh!!! Monitor features are not implemented yet");
-//              throw new UnsupportedOperationException("Not yet implemented");
-            }
-            if (task.getApplicationDetail().getOutcome().equals(
-                    Application.TYPE.RESOURCE)) {
-                throw new UnsupportedOperationException("Not yet implemented");
+                if (task.getApplicationDetail().getOutcome().equals(
+                        Application.TYPE.JOB)) {
+                    log.info("Monitoring Task: " + task.getId());
+                    try {
+                        TaskState ts = task.getStateManager();
+                        ts.action(null, bQueue, null);
+                    } catch (TaskException te) {
+                        task.setState(Task.STATE.ABORTED);
+                        log.error(te.getMessage());
+                    }
+                }
+                if (task.getApplicationDetail().getOutcome().equals(
+                        Application.TYPE.RESOURCE)) {
+                    throw new UnsupportedOperationException("Not implemented "
+                            + "yet");
+                }
             }
 
         }
@@ -112,17 +119,4 @@ public class Monitor implements Runnable {
         return t;
     }
 
-    /**
-     * Puts the task back in queue.
-     *
-     * @param t The task
-     */
-    private void putBack(final Task t) {
-        try {
-            bQueue.put(t);
-        } catch (InterruptedException ie) {
-            log.warn("Task cannot be added to the queue. "
-                    + "Interrupted while waiting");
-        }
-    }
 }
