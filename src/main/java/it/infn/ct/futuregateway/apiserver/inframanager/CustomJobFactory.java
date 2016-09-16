@@ -34,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
 import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.error.IncorrectURLException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
@@ -72,9 +73,11 @@ public final class CustomJobFactory {
      * some problem in the configuration or in the infrastructure
      * @throws BadParameterException The task cannot be submitted because some
      * parameters are missed or not correct
+     * @throws DoesNotExistException exception
      */
     public static Job createJob(final Task task, final Storage store)
-            throws InfrastructureException, BadParameterException {
+            throws InfrastructureException, BadParameterException,
+            DoesNotExistException {
         List<Params> infraParams = Utilities.mergeParams(
                 task.getAssociatedInfrastructure().getParameters(),
                 task.getApplicationDetail().getParameters()
@@ -157,9 +160,13 @@ public final class CustomJobFactory {
                             System.getProperty("saga.factory",
                                     Defaults.SAGAFACTORY),
                             resource));
-            JobDescription jd = JobDescriptionFactory.createJobDescription(
-                    task, store);
-            return js.createJob(jd);
+            if (task.getNativeId() == null) {
+                JobDescription jd = JobDescriptionFactory.createJobDescription(
+                        task, store);
+                return js.createJob(jd);
+            } else {
+                return js.getJob(Utilities.getNativeid(task.getNativeId()));
+            }
         } catch (AuthenticationFailedException | AuthorizationFailedException
                 | IncorrectURLException | NoSuccessException
                 | NotImplementedException | PermissionDeniedException
