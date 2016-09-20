@@ -23,7 +23,6 @@ package it.infn.ct.futuregateway.apiserver.inframanager.state;
 
 import it.infn.ct.futuregateway.apiserver.inframanager.CustomJobFactory;
 import it.infn.ct.futuregateway.apiserver.inframanager.InfrastructureException;
-import it.infn.ct.futuregateway.apiserver.inframanager.TaskException;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import java.util.concurrent.BlockingQueue;
@@ -79,40 +78,37 @@ public class Running extends TaskState {
                 | DoesNotExistException | NotImplementedException
                 | TimeoutException | NoSuccessException ex) {
             log.error("Error checking job status: " + ex.getMessage());
+            return;
         }
-        try {
-            if (state != null) {
-                task.updateCheckTime();
-                switch (state) {
-                    case DONE:
-                        task.setState(Task.STATE.DONE);
-                        break;
-                    case RUNNING:
-                        try {
-                            aBlockingQueue.put(task);
-                        } catch (InterruptedException ex) {
-                            log.error(ex.getMessage());
-                            task.setState(Task.STATE.ABORTED);
-                        }
-                        break;
-                    case FAILED:
-                    case CANCELED:
-                    case NEW:
-                    case SUSPENDED:
-                        task.setState(Task.STATE.ABORTED);
-                        break;
-                    default:
-                        log.error("Task: " + task.getId() + " is in a invalid "
-                                + " state: " + state);
-                        task.setState(Task.STATE.ABORTED);
-                        break;
+
+        task.updateCheckTime();
+        switch (state) {
+            case DONE:
+                task.setState(Task.STATE.DONE);
+                break;
+            case RUNNING:
+                try {
+                    aBlockingQueue.put(task);
+                } catch (InterruptedException ex) {
+                    log.error(ex.getMessage());
+                    task.setState(Task.STATE.ABORTED);
                 }
-            } else {
-                throw new TaskException("Unable to retrieve job state.");
-            }
-        } catch (TaskException ex) {
-            log.error(ex.getMessage());
+                break;
+            case CANCELED:
+                task.setState(Task.STATE.CANCELLED);
+                break;
+            case FAILED:
+            case NEW:
+            case SUSPENDED:
+                task.setState(Task.STATE.ABORTED);
+                break;
+            default:
+                log.error("Task: " + task.getId() + " is in a invalid state: "
+                        + state);
+                task.setState(Task.STATE.ABORTED);
+                break;
         }
+
     }
 
 }

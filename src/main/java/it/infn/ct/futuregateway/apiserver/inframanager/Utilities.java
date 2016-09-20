@@ -25,8 +25,6 @@ import it.infn.ct.futuregateway.apiserver.resources.Params;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Predicate;
 
@@ -71,11 +69,11 @@ public final class Utilities {
             final String name, final String defaultValue) {
         Params tmpParam = IterableUtils.find(
                 params, new Predicate<Params>() {
-            @Override
-            public boolean evaluate(final Params t) {
-                return t.getName().equals(name);
-            }
-        });
+                    @Override
+                    public boolean evaluate(final Params t) {
+                        return t.getName().equals(name);
+                    }
+                });
         if (tmpParam != null) {
             return tmpParam.getValue();
         }
@@ -136,19 +134,4 @@ public final class Utilities {
         return finalList;
     }
 
-    /**
-     * Returns the native job id.
-     *
-     * @param nativeId native id associated to the task
-     * @return the native id
-     */
-    public static String getNativeid(final String nativeId) {
-        String jobNativeId = null;
-        Pattern pattern = Pattern.compile("\\[(.*)\\]-\\[(.*)\\]");
-        Matcher matcher = pattern.matcher(nativeId);
-        if (matcher.find()) {
-            jobNativeId = matcher.group(2);
-        }
-        return jobNativeId;
-    }
 }
