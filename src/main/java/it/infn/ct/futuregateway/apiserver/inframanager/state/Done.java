@@ -50,7 +50,7 @@ public class Done extends TaskState {
     /**
      * Logger object. Based on apache commons logging.
      */
-    private static final Log log = LogFactory.getLog(Scheduled.class);
+    private final Log log = LogFactory.getLog(Scheduled.class);
     /**
      * Reference to the task.
      */

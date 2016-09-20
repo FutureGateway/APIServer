@@ -50,7 +50,7 @@ public class Running extends TaskState {
     /**
      * Logger object. Based on apache commons logging.
      */
-    private static final Log log = LogFactory.getLog(Running.class);
+    private final Log log = LogFactory.getLog(Running.class);
 
     /**
      * Reference to the task.
@@ -81,7 +81,7 @@ public class Running extends TaskState {
             return;
         }
 
-        task.updateCheckTime();
+        this.task.updateCheckTime();
         switch (state) {
             case DONE:
                 this.task.setState(Task.STATE.DONE);
@@ -95,12 +95,12 @@ public class Running extends TaskState {
                 }
                 break;
             case CANCELED:
-                task.setState(Task.STATE.CANCELLED);
+                this.task.setState(Task.STATE.CANCELLED);
                 break;
             case FAILED:
             case NEW:
             case SUSPENDED:
-                task.setState(Task.STATE.ABORTED);
+                this.task.setState(Task.STATE.ABORTED);
                 break;
             default:
                 this.log.error("Task: " + this.task.getId() + " is in a invalid"
