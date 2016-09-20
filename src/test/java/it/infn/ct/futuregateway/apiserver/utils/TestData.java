@@ -73,12 +73,17 @@ public final class TestData {
     /**
      * Generated ID length.
      */
-    private static final int IDLENGTH = 14;
+    public static final int IDLENGTH = 14;
 
     /**
      * Max length of random string as parameter value.
      */
-    private static final int PROPERTYVALUEMAXLENGTH = 120;
+    public static final int PROPERTYVALUEMAXLENGTH = 120;
+
+    /**
+     * Path to local cache storage for test.
+     */
+    public static final String PATHTOTEMPSTORAGE = "/tmp/FGAPI/test";
 
     /**
      * Avoid the class be instantiable.

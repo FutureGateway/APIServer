@@ -261,8 +261,8 @@
         <javax.el>2.2.4</javax.el>
         <jaxb.version>2.2.11</jaxb.version>
         <servlet.api.version>3.1.0</servlet.api.version>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <external.container.factory>org.glassfish.jersey.test.external.ExternalTestContainerFactory</external.container.factory>

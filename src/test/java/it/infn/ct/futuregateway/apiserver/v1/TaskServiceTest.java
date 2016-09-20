@@ -23,10 +23,20 @@ package it.infn.ct.futuregateway.apiserver.v1;
 
 import it.infn.ct.futuregateway.apiserver.inframanager.MonitorQueue;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
+import it.infn.ct.futuregateway.apiserver.resources.TaskFile;
+import it.infn.ct.futuregateway.apiserver.resources.TaskFileInput;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import it.infn.ct.futuregateway.apiserver.utils.Constants;
 import it.infn.ct.futuregateway.apiserver.utils.TestData;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.ParseException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -35,17 +45,16 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.Mock;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 
 /**
  * Test the TaskService.
@@ -104,125 +113,163 @@ public class TaskServiceTest {
     private MonitorQueue mq;
 
     /**
+     * Fake form multipart body with input file.
+     */
+    @Mock
+    private FormDataBodyPart formBodyP;
+
+    /**
+     * Fake form data content disposition.
+     */
+    @Mock
+    private FormDataContentDisposition formContentDisp;
+
+    /**
      * Test of getTaskDetails method, of class TaskService.
      * Gets task details with the correct ID
-     *
-     * @throws Exception If the request cannot be generated.
      */
     @Test
-    public final void testGetTaskDetails() throws Exception {
+    public final void testGetTaskDetails() {
         Task t = TestData.createTask(TestData.TASKTYPE.SSH);
-        when(em.find(eq(Task.class), anyString())).thenReturn(t);
-        when(emf.createEntityManager()).thenReturn(em);
-        when(context.getAttribute(Constants.SESSIONFACTORY)).thenReturn(emf);
-        when(request.getServletContext()).thenReturn(context);
-        TaskService ts = new TaskService();
-        Field req = BaseService.class.getDeclaredField("request");
-        req.setAccessible(true);
-        req.set(ts, request);
-        assertNotNull(ts.getRequest());
+        Mockito.when(this.em.find(
+                ArgumentMatchers.eq(Task.class), ArgumentMatchers.anyString())).
+                thenReturn(t);
+        final TaskService ts = this.getTaskService();
         Task tDet = ts.getTaskDetails(t.getId());
-        assertEquals(t.getId(), tDet.getId());
-        assertEquals(t.getApplicationId(), tDet.getApplicationId());
+        Assert.assertEquals("Task details does not match",
+                t.getId(), tDet.getId());
     }
 
     /**
      * Test of getTaskDetails method, of class TaskService.
      * Gets task details with the wrong ID
-     *
-     * @throws Exception If the request cannot be generated.
      */
     @Test(expected = NotFoundException.class)
-    public final void testGetTaskDetailsNoID() throws Exception {
+    public final void testGetTaskDetailsNoID() {
         Task t = TestData.createTask(TestData.TASKTYPE.SSH);
-        when(em.find(eq(Task.class), anyString())).thenReturn(null);
-        when(emf.createEntityManager()).thenReturn(em);
-        when(context.getAttribute(Constants.SESSIONFACTORY)).thenReturn(emf);
-        when(request.getServletContext()).thenReturn(context);
-        TaskService ts = new TaskService();
-        Field req = BaseService.class.getDeclaredField("request");
-        req.setAccessible(true);
-        req.set(ts, request);
-        assertNotNull(ts.getRequest());
+        Mockito.when(this.em.find(
+                ArgumentMatchers.eq(Task.class), ArgumentMatchers.anyString())).
+                thenReturn(null);
+        final TaskService ts = this.getTaskService();
         Task tDet = ts.getTaskDetails(t.getId());
+        Assert.assertNull("Task details has to be null for a not existing task",
+                tDet);
     }
 
     /**
      * Test of deleteTask method, of class TaskService.
-     *
-     * @throws Exception If the request cannot be generated.
      */
     @Test
-    public final void testDeleteTask() throws Exception {
+    public final void testDeleteTask() {
         Task t = TestData.createTask(TestData.TASKTYPE.SSH);
-        when(em.find(eq(Task.class), anyString())).thenReturn(t);
-        when(em.getTransaction()).thenReturn(et);
-        when(emf.createEntityManager()).thenReturn(em);
-        when(context.getAttribute(Constants.SESSIONFACTORY)).thenReturn(emf);
-        when(context.getAttribute(Constants.CACHEDIR))
-                .thenReturn("/tmp/FGAPI/test");
-        when(request.getServletContext()).thenReturn(context);
-        TaskService ts = new TaskService();
-        Field req = BaseService.class.getDeclaredField("request");
-        req.setAccessible(true);
-        req.set(ts, request);
-        assertNotNull(ts.getRequest());
+        Mockito.when(this.em.find(
+                ArgumentMatchers.eq(Task.class), ArgumentMatchers.anyString()))
+                .thenReturn(t);
+        final TaskService ts = this.getTaskService();
         ts.deleteTask(t.getApplicationId());
-        verify(em).close();
-        verify(em).remove(t);
-        verify(et).commit();
+        Mockito.verify(this.em).close();
+        Mockito.verify(this.em).remove(t);
+        Mockito.verify(this.et).commit();
     }
 
     /**
      * Test of deleteTask method, of class TaskService.
      * Delete with exception to check the correct close of the entity manager
-     *
-     * @throws Exception If the request cannot be generated.
      */
     @Test
-    public final void testDeleteTaskException() throws Exception {
+    public final void testDeleteTaskException() {
         Task t = TestData.createTask(TestData.TASKTYPE.SSH);
-        when(em.find(eq(Task.class), anyString())).thenReturn(t);
-        when(em.getTransaction()).thenReturn(et);
-        doThrow(new RuntimeException()).when(em).remove(eq(t));
-        when(emf.createEntityManager()).thenReturn(em);
-        when(context.getAttribute(Constants.SESSIONFACTORY)).thenReturn(emf);
-        when(context.getAttribute(Constants.CACHEDIR))
-                .thenReturn("/tmp/FGAPI/test");
-        when(request.getServletContext()).thenReturn(context);
-        TaskService ts = new TaskService();
-        Field req = BaseService.class.getDeclaredField("request");
-        req.setAccessible(true);
-        req.set(ts, request);
-        assertNotNull(ts.getRequest());
+        Mockito.when(this.em.find(
+                ArgumentMatchers.eq(Task.class), ArgumentMatchers.anyString())).
+                thenReturn(t);
+        Mockito.doThrow(new RuntimeException()).when(em).remove(
+                ArgumentMatchers.eq(t));
+        final TaskService ts = this.getTaskService();
         try {
             ts.deleteTask(t.getApplicationId());
         } catch (InternalServerErrorException isee) {
+            Mockito.verify(this.em).close();
+            Mockito.verify(this.em).remove(t);
         }
-        verify(em).close();
-        verify(em).remove(t);
     }
 
     /**
      * Test of setInputFile method, of class TaskService.
      *
-     * @throws Exception If the request cannot be generated.
+     * @throws IOException In case of problem with the mock storage
+     * @throws ParseException If a problem with file exist
      */
     @Test
-    public final void testSetInputFile() throws Exception {
+    public final void testSetInputFile() throws IOException, ParseException {
         Task t = TestData.createTask(TestData.TASKTYPE.SSH);
-        when(em.find(eq(Task.class), anyString())).thenReturn(t);
-        when(em.getTransaction()).thenReturn(et);
-        doThrow(new RuntimeException()).when(em).remove(eq(t));
-        when(emf.createEntityManager()).thenReturn(em);
-        when(context.getAttribute(Constants.SESSIONFACTORY)).thenReturn(emf);
-        when(context.getAttribute(Constants.CACHEDIR))
-                .thenReturn("/tmp/FGAPI/test");
-        when(request.getServletContext()).thenReturn(context);
-        TaskService ts = new TaskService();
-        Field req = BaseService.class.getDeclaredField("request");
-        req.setAccessible(true);
-        req.set(ts, request);
-        assertNotNull(ts.getRequest());
+        t.setState(Task.STATE.WAITING);
+        final TaskService ts = this.getTaskService();
+        Mockito.when(this.em.find(
+                ArgumentMatchers.eq(Task.class), ArgumentMatchers.anyString())).
+                thenReturn(t);
+        final List<FormDataBodyPart> lstFiles = new LinkedList<>();
+        final String fileName =
+                RandomStringUtils.randomAlphanumeric(TestData.IDLENGTH);
+        final List<TaskFileInput> lTfi = new LinkedList<>();
+        final TaskFileInput pFile = new TaskFileInput();
+        pFile.setName(fileName);
+        lTfi.add(pFile);
+        final TaskFileInput fFile = new TaskFileInput();
+        fFile.setName(RandomStringUtils.randomAlphanumeric(TestData.IDLENGTH));
+        lTfi.add(fFile);
+        t.setInputFiles(lTfi);
+        lstFiles.add(this.formBodyP);
+        Mockito.when(this.formBodyP.getFormDataContentDisposition()).
+                thenReturn(this.formContentDisp);
+        Mockito.when(this.formBodyP.getValueAs(InputStream.class)).
+                thenReturn(new ByteArrayInputStream(
+                        RandomStringUtils.randomAlphanumeric(
+                                TestData.PROPERTYVALUEMAXLENGTH).getBytes()));
+        Mockito.when(this.formContentDisp.getFileName()).thenReturn(fileName);
+        try {
+            Files.createDirectories(Paths.get(TestData.PATHTOTEMPSTORAGE));
+        } catch (Exception e) {
+            Assert.fail("Storage problem");
+        }
+        ts.setInputFile(fileName, lstFiles);
+        t.getInputFiles().stream().forEach((tFile) -> {
+            if (tFile.getName().equals(fileName)) {
+                Assert.assertEquals("File status did not change after insert",
+                        TaskFile.FILESTATUS.READY, tFile.getStatus());
+            } else {
+                Assert.assertEquals("File status changed without insert",
+                        TaskFile.FILESTATUS.NEEDED, tFile.getStatus());
+            }
+        });
     }
+
+    /**
+     * Create a TaskService for test.
+     * Add the mock and perform the basic customisation.
+     *
+     * @return A TaskService with provided mocks
+     */
+    private TaskService getTaskService() {
+        TaskService ts = null;
+        try {
+            Mockito.when(this.em.getTransaction()).thenReturn(this.et);
+            Mockito.when(this.emf.createEntityManager()).thenReturn(this.em);
+            Mockito.when(this.context.getAttribute(Constants.SESSIONFACTORY)).
+                    thenReturn(this.emf);
+            Mockito.when(this.context.getAttribute(Constants.CACHEDIR)).
+                    thenReturn(TestData.PATHTOTEMPSTORAGE);
+            Mockito.when(this.request.getServletContext()).
+                    thenReturn(this.context);
+            ts = new TaskService();
+            Field req = BaseService.class.getDeclaredField("request");
+            req.setAccessible(true);
+            req.set(ts, this.request);
+        } catch (IllegalAccessException | IllegalArgumentException
+                | NoSuchFieldException ex) {
+            Assert.fail("Impossible to generate the TaskService");
+        }
+        Assert.assertNotNull(ts.getRequest());
+        return ts;
+    }
+
 }
