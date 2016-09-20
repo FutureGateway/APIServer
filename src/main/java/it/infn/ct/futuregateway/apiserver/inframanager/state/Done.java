@@ -50,7 +50,7 @@ public class Done extends TaskState {
     /**
      * Logger object. Based on apache commons logging.
      */
-    private static final Log LOG = LogFactory.getLog(Scheduled.class);
+    private static final Log log = LogFactory.getLog(Scheduled.class);
     /**
      * Reference to the task.
      */
@@ -75,7 +75,7 @@ public class Done extends TaskState {
                 | DoesNotExistException | NotImplementedException
                 | PermissionDeniedException | IncorrectStateException
                 | TimeoutException | NoSuccessException ex) {
-            LOG.error("Unable to retrive get job for task " + this.task.getId()
+            log.error("Unable to retrive get job for task " + this.task.getId()
                     + "Exception: " + ex.getMessage());
             this.task.setState(Task.STATE.ABORTED);
         }

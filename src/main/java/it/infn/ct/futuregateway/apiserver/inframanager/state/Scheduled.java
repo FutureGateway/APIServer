@@ -50,7 +50,7 @@ public class Scheduled extends TaskState {
     /**
      * Logger object. Based on apache commons logging.
      */
-    private static final Log LOG = LogFactory.getLog(Scheduled.class);
+    private final Log log = LogFactory.getLog(Scheduled.class);
 
     /**
      * Reference to the task.
@@ -77,7 +77,7 @@ public class Scheduled extends TaskState {
         } catch (InfrastructureException | BadParameterException
                 | DoesNotExistException | NotImplementedException
                 | TimeoutException | NoSuccessException ex) {
-            LOG.error("Error checking job status: " + ex.getMessage());
+            this.log.error("Error checking job status: " + ex.getMessage());
             return;
         }
 
@@ -98,7 +98,7 @@ public class Scheduled extends TaskState {
                 this.task.setState(Task.STATE.ABORTED);
                 break;
             default:
-                LOG.error("Task: " + this.task.getId() + " is in a invalid"
+                this.log.error("Task: " + this.task.getId() + " is in a invalid"
                         + " state: " + state);
                 this.task.setState(Task.STATE.ABORTED);
                 break;

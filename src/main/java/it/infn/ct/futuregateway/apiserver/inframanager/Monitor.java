@@ -40,7 +40,7 @@ public class Monitor implements Runnable {
     /**
      * Logger object. Based on apache commons logging.
      */
-    private static final Log LOG = LogFactory.getLog(Monitor.class);
+    private final Log log = LogFactory.getLog(Monitor.class);
 
     /**
      * Queue with activity to monitor.
@@ -76,19 +76,19 @@ public class Monitor implements Runnable {
                 try {
                     Thread.sleep(remainingTime);
                 } catch (InterruptedException ex) {
-                    LOG.warn("Monitoring thread interrupted while waiting "
+                    this.log.warn("Monitoring thread interrupted while waiting "
                             + "for next check");
                 }
             }
             if (task.getApplicationDetail().getOutcome().equals(
                     Application.TYPE.JOB)) {
-                LOG.debug("Monitoring Task: " + task.getId());
+                this.log.debug("Monitoring Task: " + task.getId());
                 try {
                     final TaskState ts = task.getStateManager();
                     ts.action(null, this.bQueue, null);
                 } catch (TaskException ex) {
                     task.setState(Task.STATE.ABORTED);
-                    LOG.error(ex.getMessage());
+                    this.log.error(ex.getMessage());
                 }
             }
             if (task.getApplicationDetail().getOutcome().equals(
@@ -112,7 +112,7 @@ public class Monitor implements Runnable {
                 return null;
             }
         } catch (InterruptedException ie) {
-            LOG.warn("Monitoring queue interrupted.");
+            log.warn("Monitoring queue interrupted.");
         }
         return t;
     }

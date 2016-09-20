@@ -50,7 +50,7 @@ public class Running extends TaskState {
     /**
      * Logger object. Based on apache commons logging.
      */
-    private static final Log LOG = LogFactory.getLog(Running.class);
+    private static final Log log = LogFactory.getLog(Running.class);
 
     /**
      * Reference to the task.
@@ -77,7 +77,7 @@ public class Running extends TaskState {
         } catch (InfrastructureException | BadParameterException
                 | DoesNotExistException | NotImplementedException
                 | TimeoutException | NoSuccessException ex) {
-            LOG.error("Error checking job status: " + ex.getMessage());
+            this.log.error("Error checking job status: " + ex.getMessage());
             return;
         }
 
@@ -90,7 +90,7 @@ public class Running extends TaskState {
                 try {
                     aBlockingQueue.put(this.task);
                 } catch (InterruptedException ex) {
-                    LOG.error(ex.getMessage());
+                    this.log.error(ex.getMessage());
                     this.task.setState(Task.STATE.ABORTED);
                 }
                 break;
@@ -103,7 +103,7 @@ public class Running extends TaskState {
                 task.setState(Task.STATE.ABORTED);
                 break;
             default:
-                LOG.error("Task: " + this.task.getId() + " is in a invalid"
+                this.log.error("Task: " + this.task.getId() + " is in a invalid"
                         + " state: " + state);
                 this.task.setState(Task.STATE.ABORTED);
                 break;
