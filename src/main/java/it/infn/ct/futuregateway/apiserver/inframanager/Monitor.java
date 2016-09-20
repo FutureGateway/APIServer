@@ -69,33 +69,30 @@ public class Monitor implements Runnable {
     public final void run() {
         Task task;
         while ((task = getNext()) != null) {
-            if (task.getLastStatusCheckTime() != null) {
-                long remainingTime = checkInterval - System.currentTimeMillis()
-                        + task.getLastStatusCheckTime().getTime();
-                if (remainingTime > 0) {
-                    try {
-                        Thread.sleep(remainingTime);
-                    } catch (InterruptedException ie) {
-                        log.warn("Monitoring thread interrupted while waiting "
-                                + "for next check");
-                    }
+            long remainingTime = checkInterval - System.currentTimeMillis()
+                    + task.getLastStatusCheckTime().getTime();
+            if (remainingTime > 0) {
+                try {
+                    Thread.sleep(remainingTime);
+                } catch (InterruptedException ie) {
+                    log.warn("Monitoring thread interrupted while waiting "
+                            + "for next check");
                 }
-                if (task.getApplicationDetail().getOutcome().equals(
-                        Application.TYPE.JOB)) {
-                    log.info("Monitoring Task: " + task.getId());
-                    try {
-                        TaskState ts = task.getStateManager();
-                        ts.action(null, bQueue, null);
-                    } catch (TaskException te) {
-                        task.setState(Task.STATE.ABORTED);
-                        log.error(te.getMessage());
-                    }
+            }
+            if (task.getApplicationDetail().getOutcome().equals(
+                    Application.TYPE.JOB)) {
+                log.debug("Monitoring Task: " + task.getId());
+                try {
+                    TaskState ts = task.getStateManager();
+                    ts.action(null, bQueue, null);
+                } catch (TaskException te) {
+                    task.setState(Task.STATE.ABORTED);
+                    log.error(te.getMessage());
                 }
-                if (task.getApplicationDetail().getOutcome().equals(
-                        Application.TYPE.RESOURCE)) {
-                    throw new UnsupportedOperationException("Not implemented "
-                            + "yet");
-                }
+            }
+            if (task.getApplicationDetail().getOutcome().equals(
+                    Application.TYPE.RESOURCE)) {
+                throw new UnsupportedOperationException("Not implemented yet");
             }
 
         }

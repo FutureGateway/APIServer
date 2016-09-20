@@ -29,6 +29,8 @@ import it.infn.ct.futuregateway.apiserver.resources.Params;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ogf.saga.error.AuthenticationFailedException;
@@ -100,8 +102,21 @@ public final class CustomJobFactory {
             }
         }
 
+        String[] parsedJobId =  new String[2];
+        if (task.getNativeId() != null) {
+            Pattern pattern = Pattern.compile("\\[(.*)\\]-\\[(.*)\\]");
+            Matcher matcher = pattern.matcher(task.getNativeId());
+            if (matcher.find()) {
+                parsedJobId[0] = matcher.group(1);
+                parsedJobId[1] = matcher.group(2);
+            }
+        } else {
+            parsedJobId[0] = Utilities.getParamterValue(infraParams,
+                    "jobservice");
+        }
+
         SessionBuilder sb;
-        String resource = Utilities.getParamterValue(infraParams, "jobservice");
+        String resource = parsedJobId[0];
 
         switch (infraType) {
             case "wsgram":
@@ -160,12 +175,12 @@ public final class CustomJobFactory {
                             System.getProperty("saga.factory",
                                     Defaults.SAGAFACTORY),
                             resource));
-            if (task.getNativeId() == null) {
+            if (parsedJobId[1] == null) {
                 JobDescription jd = JobDescriptionFactory.createJobDescription(
                         task, store);
                 return js.createJob(jd);
             } else {
-                return js.getJob(Utilities.getNativeid(task.getNativeId()));
+                return js.getJob(parsedJobId[1]);
             }
         } catch (AuthenticationFailedException | AuthorizationFailedException
                 | IncorrectURLException | NoSuccessException
