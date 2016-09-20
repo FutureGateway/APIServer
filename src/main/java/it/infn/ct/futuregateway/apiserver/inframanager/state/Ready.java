@@ -42,7 +42,7 @@ public class Ready extends TaskState {
     /**
      * Logger object. Based on apache commons logging.
      */
-    private final Log log = LogFactory.getLog(Ready.class);
+    private static final Log LOG = LogFactory.getLog(Ready.class);
 
     /**
      * Reference to the task.
@@ -61,11 +61,11 @@ public class Ready extends TaskState {
     public final void action(
             final ExecutorService anExecutorService,
             final BlockingQueue<Task> aBlockingQueue, final Storage aStorage) {
-        if (task.getNativeId() == null) {
-            anExecutorService.execute(new Submitter(task, aStorage));
-            log.debug("Submitted the task: " + task.getId());
+        if (this.task.getNativeId() == null) {
+            anExecutorService.execute(new Submitter(this.task, aStorage));
+            LOG.debug("Submitted the task: " + this.task.getId());
         } else {
-            task.setState(Task.STATE.SCHEDULED);
+            this.task.setState(Task.STATE.SCHEDULED);
         }
     }
 

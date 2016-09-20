@@ -50,7 +50,7 @@ public class Running extends TaskState {
     /**
      * Logger object. Based on apache commons logging.
      */
-    private final Log log = LogFactory.getLog(Running.class);
+    private static final Log LOG = LogFactory.getLog(Running.class);
 
     /**
      * Reference to the task.
@@ -70,28 +70,28 @@ public class Running extends TaskState {
             final ExecutorService anExecutorService,
             final BlockingQueue<Task> aBlockingQueue, final Storage aStorage) {
 
-        State state = null;
+        State state;
         try {
-            Job job = CustomJobFactory.createJob(task, aStorage);
+            final Job job = CustomJobFactory.createJob(this.task, aStorage);
             state = job.getState();
         } catch (InfrastructureException | BadParameterException
                 | DoesNotExistException | NotImplementedException
                 | TimeoutException | NoSuccessException ex) {
-            log.error("Error checking job status: " + ex.getMessage());
+            LOG.error("Error checking job status: " + ex.getMessage());
             return;
         }
 
         task.updateCheckTime();
         switch (state) {
             case DONE:
-                task.setState(Task.STATE.DONE);
+                this.task.setState(Task.STATE.DONE);
                 break;
             case RUNNING:
                 try {
-                    aBlockingQueue.put(task);
+                    aBlockingQueue.put(this.task);
                 } catch (InterruptedException ex) {
-                    log.error(ex.getMessage());
-                    task.setState(Task.STATE.ABORTED);
+                    LOG.error(ex.getMessage());
+                    this.task.setState(Task.STATE.ABORTED);
                 }
                 break;
             case CANCELED:
@@ -103,9 +103,9 @@ public class Running extends TaskState {
                 task.setState(Task.STATE.ABORTED);
                 break;
             default:
-                log.error("Task: " + task.getId() + " is in a invalid state: "
-                        + state);
-                task.setState(Task.STATE.ABORTED);
+                LOG.error("Task: " + this.task.getId() + " is in a invalid"
+                        + " state: " + state);
+                this.task.setState(Task.STATE.ABORTED);
                 break;
         }
 

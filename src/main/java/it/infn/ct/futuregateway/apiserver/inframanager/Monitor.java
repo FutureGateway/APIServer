@@ -40,7 +40,7 @@ public class Monitor implements Runnable {
     /**
      * Logger object. Based on apache commons logging.
      */
-    private final Log log = LogFactory.getLog(Monitor.class);
+    private static final Log LOG = LogFactory.getLog(Monitor.class);
 
     /**
      * Queue with activity to monitor.
@@ -69,25 +69,26 @@ public class Monitor implements Runnable {
     public final void run() {
         Task task;
         while ((task = getNext()) != null) {
-            long remainingTime = checkInterval - System.currentTimeMillis()
+            final long remainingTime = this.checkInterval
+                    - System.currentTimeMillis()
                     + task.getLastStatusCheckTime().getTime();
             if (remainingTime > 0) {
                 try {
                     Thread.sleep(remainingTime);
-                } catch (InterruptedException ie) {
-                    log.warn("Monitoring thread interrupted while waiting "
+                } catch (InterruptedException ex) {
+                    LOG.warn("Monitoring thread interrupted while waiting "
                             + "for next check");
                 }
             }
             if (task.getApplicationDetail().getOutcome().equals(
                     Application.TYPE.JOB)) {
-                log.debug("Monitoring Task: " + task.getId());
+                LOG.debug("Monitoring Task: " + task.getId());
                 try {
-                    TaskState ts = task.getStateManager();
-                    ts.action(null, bQueue, null);
-                } catch (TaskException te) {
+                    final TaskState ts = task.getStateManager();
+                    ts.action(null, this.bQueue, null);
+                } catch (TaskException ex) {
                     task.setState(Task.STATE.ABORTED);
-                    log.error(te.getMessage());
+                    LOG.error(ex.getMessage());
                 }
             }
             if (task.getApplicationDetail().getOutcome().equals(
@@ -111,7 +112,7 @@ public class Monitor implements Runnable {
                 return null;
             }
         } catch (InterruptedException ie) {
-            log.warn("Monitoring queue interrupted.");
+            LOG.warn("Monitoring queue interrupted.");
         }
         return t;
     }

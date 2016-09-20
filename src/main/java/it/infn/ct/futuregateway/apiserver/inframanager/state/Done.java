@@ -50,7 +50,7 @@ public class Done extends TaskState {
     /**
      * Logger object. Based on apache commons logging.
      */
-    private final Log log = LogFactory.getLog(Scheduled.class);
+    private static final Log LOG = LogFactory.getLog(Scheduled.class);
     /**
      * Reference to the task.
      */
@@ -69,15 +69,15 @@ public class Done extends TaskState {
             final ExecutorService anExecutorService,
             final BlockingQueue<Task> aBlockingQueue, final Storage aStorage) {
         try {
-            Job job = CustomJobFactory.createJob(task, aStorage);
+            final Job job = CustomJobFactory.createJob(this.task, aStorage);
             ((JobImpl) job).postStagingAndCleanup();
         } catch (InfrastructureException | BadParameterException
                 | DoesNotExistException | NotImplementedException
                 | PermissionDeniedException | IncorrectStateException
                 | TimeoutException | NoSuccessException ex) {
-            log.error("Unable to retrive get job for task " + task.getId()
+            LOG.error("Unable to retrive get job for task " + this.task.getId()
                     + "Exception: " + ex.getMessage());
-            task.setState(Task.STATE.ABORTED);
+            this.task.setState(Task.STATE.ABORTED);
         }
     }
 

@@ -102,10 +102,10 @@ public final class CustomJobFactory {
             }
         }
 
-        String[] parsedJobId =  new String[2];
+        String[] parsedJobId = new String[2];
         if (task.getNativeId() != null) {
-            Pattern pattern = Pattern.compile("\\[(.*)\\]-\\[(.*)\\]");
-            Matcher matcher = pattern.matcher(task.getNativeId());
+            final Pattern pattern = Pattern.compile("\\[(.*)\\]-\\[(.*)\\]");
+            final Matcher matcher = pattern.matcher(task.getNativeId());
             if (matcher.find()) {
                 parsedJobId[0] = matcher.group(1);
                 parsedJobId[1] = matcher.group(2);
@@ -175,13 +175,15 @@ public final class CustomJobFactory {
                             System.getProperty("saga.factory",
                                     Defaults.SAGAFACTORY),
                             resource));
+            Job job;
             if (parsedJobId[1] == null) {
-                JobDescription jd = JobDescriptionFactory.createJobDescription(
-                        task, store);
-                return js.createJob(jd);
+                final JobDescription jd =
+                        JobDescriptionFactory.createJobDescription(task, store);
+                job = js.createJob(jd);
             } else {
-                return js.getJob(parsedJobId[1]);
+                job = js.getJob(parsedJobId[1]);
             }
+            return job;
         } catch (AuthenticationFailedException | AuthorizationFailedException
                 | IncorrectURLException | NoSuccessException
                 | NotImplementedException | PermissionDeniedException

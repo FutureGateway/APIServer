@@ -68,7 +68,7 @@ public class TaskObserver implements Observer {
     /**
      * The monitor queue responsible for manage task monitors.
      */
-    private MonitorQueue monitorQueue;
+    private final MonitorQueue monitorQueue;
 
 
     /**

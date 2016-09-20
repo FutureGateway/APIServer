@@ -53,14 +53,14 @@ public class Waiting extends TaskState {
     public final void action(
             final ExecutorService anExecutorService,
             final BlockingQueue<Task> aBlockingQueue, final Storage aStorage) {
-        if (task.getInputFiles() != null) {
-            for (TaskFile tf: task.getInputFiles()) {
+        if (this.task.getInputFiles() != null) {
+            for (TaskFile tf : this.task.getInputFiles()) {
                 if (tf.getStatus().equals(TaskFile.FILESTATUS.NEEDED)) {
                     return;
                 }
             }
         }
-        task.setState(Task.STATE.READY);
+        this.task.setState(Task.STATE.READY);
     }
 
 }
