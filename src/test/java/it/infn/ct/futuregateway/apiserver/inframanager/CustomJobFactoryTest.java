@@ -21,10 +21,14 @@
 
 package it.infn.ct.futuregateway.apiserver.inframanager;
 
+import it.infn.ct.futuregateway.apiserver.resources.Params;
 import it.infn.ct.futuregateway.apiserver.utils.TestData;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import java.nio.file.Paths;
+import java.util.List;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -87,5 +91,27 @@ public class CustomJobFactoryTest {
         when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
                 anyString(), anyString())).thenReturn(Paths.get("/tmp"));
         Job job = CustomJobFactory.createJob(t, storage);
+    }
+
+    /**
+     * Test of createJob method, of class CustomJobFactory.
+     * The task has native id
+     *
+     * @throws Exception Impossible to perform the test
+     */
+    @Test(expected = InfrastructureException.class)
+    public final void testCreateJobWithNativeJobId() throws Exception {
+        Task t = TestData.createTask(TestData.TASKTYPE.SSHFULL);
+        when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
+                anyString(), anyString())).thenReturn(Paths.get("/tmp"));
+        List<Params> infraParams =
+                t.getAssociatedInfrastructure().getParameters();
+        t.setNativeId("["
+                + Utilities.getParamterValue(infraParams, "jobservice")
+                + "]-["
+                + RandomStringUtils.randomAlphanumeric(TestData.IDLENGTH)
+                + "]");
+        Job job = CustomJobFactory.createJob(t, storage);
+        Assert.fail("Remote service not called by JSAGA.");
     }
 }
