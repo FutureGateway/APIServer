@@ -68,7 +68,7 @@ public class CancelledTest {
         task.setState(Task.STATE.CANCELLED);
 
         try {
-            TaskState taskState = task.getStateManager();
+            final TaskState taskState = task.getStateManager();
             taskState.action(this.executorService, this.blockingQueue,
                     this.storage);
         } catch (TaskException ex) {

@@ -106,7 +106,7 @@ public class ReadyTest {
         final List<Params> infraParams =
                 task.getAssociatedInfrastructure().getParameters();
         task.setNativeId("["
-                + Utilities.getParamterValue(infraParams, "jobservice")
+                + Utilities.getParameterValue(infraParams, "jobservice")
                 + "]-["
                 + RandomStringUtils.randomAlphanumeric(TestData.IDLENGTH)
                 + "]");
@@ -115,7 +115,7 @@ public class ReadyTest {
                 anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
 
         try {
-            TaskState taskState = task.getStateManager();
+            final TaskState taskState = task.getStateManager();
             taskState.action(this.executorService, this.blockingQueue,
                     this.storage);
         } catch (TaskException ex) {

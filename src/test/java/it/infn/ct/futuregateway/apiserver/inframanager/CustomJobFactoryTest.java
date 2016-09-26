@@ -21,6 +21,7 @@
 
 package it.infn.ct.futuregateway.apiserver.inframanager;
 
+import it.infn.ct.futuregateway.apiserver.resources.Infrastructure;
 import it.infn.ct.futuregateway.apiserver.resources.Params;
 import it.infn.ct.futuregateway.apiserver.utils.TestData;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
@@ -32,11 +33,10 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.ogf.saga.job.Job;
+import static org.mockito.ArgumentMatchers.eq;
 
 /**
  *
@@ -64,10 +64,10 @@ public class CustomJobFactoryTest {
      */
     @Test(expected = InfrastructureException.class)
     public final void testCreateJobNoTypeNoRes() throws Exception {
-        Task t = TestData.createTask(TestData.TASKTYPE.BASIC);
+        final Task task = TestData.createTask(TestData.TASKTYPE.BASIC);
         when(this.storage.getCachePath(eq(Storage.RESOURCE.TASKS),
                 anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
-        Job job = CustomJobFactory.createJob(t, this.storage);
+        CustomJobFactory.createJob(task, this.storage);
     }
 
     /**
@@ -78,10 +78,10 @@ public class CustomJobFactoryTest {
      */
     @Test(expected = NullPointerException.class)
     public final void testCreateJobWithTypeSSH() throws Exception {
-        Task t = TestData.createTask(TestData.TASKTYPE.SSH);
+        final Task task = TestData.createTask(TestData.TASKTYPE.SSH);
         when(this.storage.getCachePath(eq(Storage.RESOURCE.TASKS),
                 anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
-        Job job = CustomJobFactory.createJob(t, this.storage);
+        CustomJobFactory.createJob(task, this.storage);
     }
 
     /**
@@ -92,10 +92,10 @@ public class CustomJobFactoryTest {
      */
     @Test(expected = InfrastructureException.class)
     public final void testCreateGridJob() throws Exception {
-        Task t = TestData.createTask(TestData.TASKTYPE.SSHFULL);
+        final Task task = TestData.createTask(TestData.TASKTYPE.SSHFULL);
         when(this.storage.getCachePath(eq(Storage.RESOURCE.TASKS),
                 anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
-        Job job = CustomJobFactory.createJob(t, this.storage);
+        CustomJobFactory.createJob(task, this.storage);
     }
 
     /**
@@ -106,17 +106,18 @@ public class CustomJobFactoryTest {
      */
     @Test(expected = InfrastructureException.class)
     public final void testCreateJobWithNativeJobId() throws Exception {
-        Task t = TestData.createTask(TestData.TASKTYPE.SSHFULL);
+        final Task task = TestData.createTask(TestData.TASKTYPE.SSHFULL);
         when(this.storage.getCachePath(eq(Storage.RESOURCE.TASKS),
                 anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
-        final List<Params> infraParams =
-                t.getAssociatedInfrastructure().getParameters();
-        t.setNativeId("["
-                + Utilities.getParamterValue(infraParams, "jobservice")
-                + "]-["
-                + RandomStringUtils.randomAlphanumeric(TestData.IDLENGTH)
-                + "]");
-        Job job = CustomJobFactory.createJob(t, this.storage);
+        final Infrastructure infrastructure =
+                task.getAssociatedInfrastructure();
+        final List<Params> infraParams = infrastructure.getParameters();
+        final String jobService = Utilities.getParameterValue(infraParams,
+                "jobservice");
+        final String jobId = RandomStringUtils.randomAlphanumeric(
+                TestData.IDLENGTH);
+        task.setNativeId("[" + jobService + "]-[" + jobId + "]");
+        CustomJobFactory.createJob(task, this.storage);
         Assert.fail("Remote service not called by JSAGA.");
     }
 
@@ -128,15 +129,16 @@ public class CustomJobFactoryTest {
      */
     @Test(expected = NullPointerException.class)
     public final void testCreateJobWithWrongNativeJobId() throws Exception {
-        Task t = TestData.createTask(TestData.TASKTYPE.SSHFULL);
+        final Task task = TestData.createTask(TestData.TASKTYPE.SSHFULL);
         when(this.storage.getCachePath(eq(Storage.RESOURCE.TASKS),
                 anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
-        final List<Params> infraParams =
-                t.getAssociatedInfrastructure().getParameters();
-        t.setNativeId("["
-                + Utilities.getParamterValue(infraParams, "jobservice")
-                + "]");
-        Job job = CustomJobFactory.createJob(t, this.storage);
+        final Infrastructure infrastructure =
+                task.getAssociatedInfrastructure();
+        final List<Params> infraParams = infrastructure.getParameters();
+        final String jobService = Utilities.getParameterValue(infraParams,
+                "jobservice");
+        task.setNativeId("[" + jobService + "]");
+        CustomJobFactory.createJob(task, this.storage);
         Assert.fail("Job created even though it has a no valid native id.");
     }
 }

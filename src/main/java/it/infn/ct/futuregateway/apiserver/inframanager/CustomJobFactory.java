@@ -84,12 +84,12 @@ public final class CustomJobFactory {
                 task.getAssociatedInfrastructure().getParameters(),
                 task.getApplicationDetail().getParameters()
                 );
-        String infraType = Utilities.getParamterValue(infraParams, "type");
+        String infraType = Utilities.getParameterValue(infraParams, "type");
         if (infraType == null) {
             LOG.debug("Infrastructure "
                     + task.getAssociatedInfrastructure().getId()
                     + " has not 'type' defined");
-            infraType = Utilities.getParamterValue(infraParams, "jobservice");
+            infraType = Utilities.getParameterValue(infraParams, "jobservice");
             if (infraType == null) {
                 String msg = "Infrastructure "
                         + task.getAssociatedInfrastructure().getId()
@@ -104,7 +104,7 @@ public final class CustomJobFactory {
 
         String[] parsedJobId = {null, null};
         if (task.getNativeId() == null) {
-            parsedJobId[0] = Utilities.getParamterValue(infraParams,
+            parsedJobId[0] = Utilities.getParameterValue(infraParams,
                     "jobservice");
         } else {
             final Pattern pattern = Pattern.compile("\\[(.*)\\]-\\[(.*)\\]");
@@ -168,7 +168,7 @@ public final class CustomJobFactory {
                         + infraType + "' not supported");
         }
         try {
-            JobService jobService = JobFactory.createJobService(
+            final JobService jobService = JobFactory.createJobService(
                     System.getProperty("saga.factory", Defaults.SAGAFACTORY),
                     sb.getSession(),
                     URLFactory.createURL(

@@ -70,43 +70,42 @@ public class Running extends TaskState {
             final ExecutorService anExecutorService,
             final BlockingQueue<Task> aBlockingQueue, final Storage aStorage) {
 
-        State state;
         try {
             final Job job = CustomJobFactory.createJob(this.task, aStorage);
-            state = job.getState();
+            final State state = job.getState();
+
+            this.task.updateCheckTime();
+            switch (state) {
+                case DONE:
+                    this.task.setState(Task.STATE.DONE);
+                    break;
+                case RUNNING:
+                    try {
+                        aBlockingQueue.put(this.task);
+                    } catch (InterruptedException ex) {
+                        this.log.error(ex.getMessage());
+                        this.task.setState(Task.STATE.ABORTED);
+                    }
+                    break;
+                case CANCELED:
+                    this.task.setState(Task.STATE.CANCELLED);
+                    break;
+                case FAILED:
+                case NEW:
+                case SUSPENDED:
+                    this.task.setState(Task.STATE.ABORTED);
+                    break;
+                default:
+                    this.log.error("Task: " + this.task.getId()
+                            + " is in a invalid state: " + state);
+                    this.task.setState(Task.STATE.ABORTED);
+                    break;
+            }
         } catch (InfrastructureException | BadParameterException
                 | DoesNotExistException | NotImplementedException
                 | TimeoutException | NoSuccessException ex) {
-            this.log.error("Error checking job status: " + ex.getMessage());
-            return;
-        }
-
-        this.task.updateCheckTime();
-        switch (state) {
-            case DONE:
-                this.task.setState(Task.STATE.DONE);
-                break;
-            case RUNNING:
-                try {
-                    aBlockingQueue.put(this.task);
-                } catch (InterruptedException ex) {
-                    this.log.error(ex.getMessage());
-                    this.task.setState(Task.STATE.ABORTED);
-                }
-                break;
-            case CANCELED:
-                this.task.setState(Task.STATE.CANCELLED);
-                break;
-            case FAILED:
-            case NEW:
-            case SUSPENDED:
-                this.task.setState(Task.STATE.ABORTED);
-                break;
-            default:
-                this.log.error("Task: " + this.task.getId() + " is in a invalid"
-                        + " state: " + state);
-                this.task.setState(Task.STATE.ABORTED);
-                break;
+            final String msg = ex.getMessage();
+            this.log.error("Error checking job status: " + msg);
         }
 
     }

@@ -68,7 +68,7 @@ public class PendingTest {
         task.setState(Task.STATE.PENDING);
 
         try {
-            TaskState taskState = task.getStateManager();
+            final TaskState taskState = task.getStateManager();
             taskState.action(this.executorService, this.blockingQueue,
                     this.storage);
         } catch (TaskException ex) {
