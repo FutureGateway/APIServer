@@ -18,6 +18,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***********************************************************************/
+
 package it.infn.ct.futuregateway.apiserver.inframanager.state;
 
 import it.infn.ct.futuregateway.apiserver.inframanager.TaskException;
@@ -53,7 +54,7 @@ public class WaitingTest {
      * Fake executor service.
      */
     @Mock
-    private ExecutorService ec;
+    private ExecutorService executorService;
 
     /**
      * Fake cache storage object.
@@ -65,37 +66,38 @@ public class WaitingTest {
      * Fake Blocking queue.
      */
     @Mock
-    private BlockingQueue<Task> bq;
+    private BlockingQueue<Task> blockingQueue;
 
     /**
      * Test of action method, of class Waiting.
      */
     @Test
     public final void testAction() {
-        Task t = TestData.createTask(TestData.TASKTYPE.SSHFULL);
-        t.setState(Task.STATE.WAITING);
+        final Task task = TestData.createTask(TestData.TASKTYPE.SSHFULL);
+        task.setState(Task.STATE.WAITING);
 
-        Random rand = new Random();
+        final Random rand = new Random();
 
-        List<TaskFileInput> ltif = new LinkedList<>();
-        TaskFileInput f = new TaskFileInput();
-        f.setName(RandomStringUtils.randomAlphanumeric(
+        final List<TaskFileInput> ltif = new LinkedList<>();
+        final TaskFileInput fileInput = new TaskFileInput();
+        fileInput.setName(RandomStringUtils.randomAlphanumeric(
                         rand.nextInt(PROPERTYVALUEMAXLENGTH) + 1));
-        f.setUrl(RandomStringUtils.randomAlphanumeric(
+        fileInput.setUrl(RandomStringUtils.randomAlphanumeric(
                         rand.nextInt(PROPERTYVALUEMAXLENGTH) + 1));
-        f.setStatus(TaskFile.FILESTATUS.READY);
-        ltif.add(f);
-        t.setInputFiles(ltif);
+        fileInput.setStatus(TaskFile.FILESTATUS.READY);
+        ltif.add(fileInput);
+        task.setInputFiles(ltif);
 
-        TaskState ts;
+        final TaskState taskState;
         try {
-            ts = t.getStateManager();
-            ts.action(ec, bq, storage);
+            taskState = task.getStateManager();
+            taskState.action(this.executorService, this.blockingQueue,
+                    this.storage);
         } catch (TaskException ex) {
-            ex.printStackTrace();
+            Assert.fail("Tast failed for: " + ex.getMessage());
         }
         Assert.assertEquals("All files are redy", Task.STATE.READY,
-                t.getState());
+                task.getState());
     }
 
     /**
@@ -103,20 +105,21 @@ public class WaitingTest {
      */
     @Test
     public final void testActionNoInputFile() {
-        Task t = TestData.createTask(TestData.TASKTYPE.SSHFULL);
-        t.setState(Task.STATE.WAITING);
+        final Task task = TestData.createTask(TestData.TASKTYPE.SSHFULL);
+        task.setState(Task.STATE.WAITING);
 
-        t.setInputFiles(null);
+        task.setInputFiles(null);
 
-        TaskState ts;
+        final TaskState taskState;
         try {
-            ts = t.getStateManager();
-            ts.action(ec, bq, storage);
+            taskState = task.getStateManager();
+            taskState.action(this.executorService, this.blockingQueue,
+                    this.storage);
         } catch (TaskException ex) {
-            ex.printStackTrace();
+            Assert.fail("Tast failed for: " + ex.getMessage());
         }
         Assert.assertEquals("No input files needed", Task.STATE.READY,
-                t.getState());
+                task.getState());
     }
 
 }

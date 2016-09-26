@@ -75,8 +75,8 @@ public class Done extends TaskState {
                 | DoesNotExistException | NotImplementedException
                 | PermissionDeniedException | IncorrectStateException
                 | TimeoutException | NoSuccessException ex) {
-            log.error("Unable to retrive get job for task " + this.task.getId()
-                    + "Exception: " + ex.getMessage());
+            this.log.error("Unable to retrive get job for task "
+                    + this.task.getId() + "Exception: " + ex.getMessage());
             this.task.setState(Task.STATE.ABORTED);
         }
     }

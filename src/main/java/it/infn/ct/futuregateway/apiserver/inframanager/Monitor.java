@@ -84,8 +84,8 @@ public class Monitor implements Runnable {
                     Application.TYPE.JOB)) {
                 this.log.debug("Monitoring Task: " + task.getId());
                 try {
-                    final TaskState ts = task.getStateManager();
-                    ts.action(null, this.bQueue, null);
+                    final TaskState taskState = task.getStateManager();
+                    taskState.action(null, this.bQueue, null);
                 } catch (TaskException ex) {
                     task.setState(Task.STATE.ABORTED);
                     this.log.error(ex.getMessage());

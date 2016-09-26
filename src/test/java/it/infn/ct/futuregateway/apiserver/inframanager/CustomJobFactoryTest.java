@@ -104,7 +104,7 @@ public class CustomJobFactoryTest {
         Task t = TestData.createTask(TestData.TASKTYPE.SSHFULL);
         when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
                 anyString(), anyString())).thenReturn(Paths.get("/tmp"));
-        List<Params> infraParams =
+        final List<Params> infraParams =
                 t.getAssociatedInfrastructure().getParameters();
         t.setNativeId("["
                 + Utilities.getParamterValue(infraParams, "jobservice")

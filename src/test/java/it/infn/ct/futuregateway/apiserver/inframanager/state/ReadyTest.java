@@ -18,6 +18,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***********************************************************************/
+
 package it.infn.ct.futuregateway.apiserver.inframanager.state;
 
 import it.infn.ct.futuregateway.apiserver.inframanager.TaskException;
@@ -34,11 +35,11 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 
 /**
  *
@@ -49,10 +50,15 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ReadyTest {
 
     /**
+     * Path to cache directory.
+     */
+    private static final String TMP_FOLDER = "/tmp";
+
+    /**
      * Fake executor service.
      */
     @Mock
-    private ExecutorService ec;
+    private ExecutorService executorService;
 
     /**
      * Fake cache storage object.
@@ -64,28 +70,29 @@ public class ReadyTest {
      * Fake Blocking queue.
      */
     @Mock
-    private BlockingQueue<Task> bq;
+    private BlockingQueue<Task> blockingQueue;
 
     /**
      * Test of action method, of class Ready.
      */
     @Test
     public final void testAction() {
-        Task t = TestData.createTask(TestData.TASKTYPE.SSH);
-        t.setState(Task.STATE.READY);
-        Mockito.when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
-                anyString(), anyString())).thenReturn(Paths.get("/tmp"));
+        final Task task = TestData.createTask(TestData.TASKTYPE.SSH);
+        task.setState(Task.STATE.READY);
+        Mockito.when(this.storage.getCachePath(eq(Storage.RESOURCE.TASKS),
+                anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
 
-        TaskState ts;
+        TaskState taskState;
         try {
-            ts = t.getStateManager();
-            ts.action(ec, bq, storage);
+            taskState = task.getStateManager();
+            taskState.action(this.executorService, this.blockingQueue,
+                    this.storage);
         } catch (TaskException ex) {
-            ex.printStackTrace();
+            Assert.fail("Tast failed for: " + ex.getMessage());
         }
 
         Assert.assertEquals("Task status did not change after submit",
-                Task.STATE.READY, t.getState());
+                Task.STATE.READY, task.getState());
     }
 
     /**
@@ -93,28 +100,29 @@ public class ReadyTest {
      */
     @Test
     public final void testActionWithNativeId() {
-        Task t = TestData.createTask(TestData.TASKTYPE.SSHFULL);
-        t.setState(Task.STATE.READY);
-        List<Params> infraParams =
-                t.getAssociatedInfrastructure().getParameters();
-        t.setNativeId("["
+        final Task task = TestData.createTask(TestData.TASKTYPE.SSHFULL);
+        task.setState(Task.STATE.READY);
+        final List<Params> infraParams =
+                task.getAssociatedInfrastructure().getParameters();
+        task.setNativeId("["
                 + Utilities.getParamterValue(infraParams, "jobservice")
                 + "]-["
                 + RandomStringUtils.randomAlphanumeric(TestData.IDLENGTH)
                 + "]");
         Mockito.when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
-                anyString(), anyString())).thenReturn(Paths.get("/tmp"));
+                anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
 
-        TaskState ts;
+        final TaskState taskState;
         try {
-            ts = t.getStateManager();
-            ts.action(ec, bq, storage);
+            taskState = task.getStateManager();
+            taskState.action(this.executorService, this.blockingQueue,
+                    this.storage);
         } catch (TaskException ex) {
-            ex.printStackTrace();
+            Assert.fail("Tast failed for: " + ex.getMessage());
         }
 
         Assert.assertEquals("Task state changed.",
-                        Task.STATE.SCHEDULED, t.getState());
+                        Task.STATE.SCHEDULED, task.getState());
     }
 
 }

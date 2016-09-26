@@ -70,7 +70,7 @@ public class Scheduled extends TaskState {
             final ExecutorService anExecutorService,
             final BlockingQueue<Task> aBlockingQueue, final Storage aStorage) {
 
-        State state = null;
+        State state;
         try {
             final Job job = CustomJobFactory.createJob(this.task, aStorage);
             state = job.getState();
