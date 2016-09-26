@@ -111,12 +111,11 @@ public class ReadyTest {
                 + RandomStringUtils.randomAlphanumeric(TestData.IDLENGTH)
                 + "]");
 
-        Mockito.when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
+        Mockito.when(this.storage.getCachePath(eq(Storage.RESOURCE.TASKS),
                 anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
 
-        TaskState taskState;
         try {
-            taskState = task.getStateManager();
+            TaskState taskState = task.getStateManager();
             taskState.action(this.executorService, this.blockingQueue,
                     this.storage);
         } catch (TaskException ex) {

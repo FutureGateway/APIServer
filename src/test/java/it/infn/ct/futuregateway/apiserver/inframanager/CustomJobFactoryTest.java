@@ -46,6 +46,11 @@ import org.ogf.saga.job.Job;
 public class CustomJobFactoryTest {
 
     /**
+     * Path to cache directory.
+     */
+    private static final String TMP_FOLDER = "/tmp";
+
+    /**
      * Fake cache storage object.
      */
     @Mock
@@ -60,9 +65,9 @@ public class CustomJobFactoryTest {
     @Test(expected = InfrastructureException.class)
     public final void testCreateJobNoTypeNoRes() throws Exception {
         Task t = TestData.createTask(TestData.TASKTYPE.BASIC);
-        when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
-                anyString(), anyString())).thenReturn(Paths.get("/tmp"));
-        Job job = CustomJobFactory.createJob(t, storage);
+        when(this.storage.getCachePath(eq(Storage.RESOURCE.TASKS),
+                anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
+        Job job = CustomJobFactory.createJob(t, this.storage);
     }
 
     /**
@@ -74,9 +79,9 @@ public class CustomJobFactoryTest {
     @Test(expected = NullPointerException.class)
     public final void testCreateJobWithTypeSSH() throws Exception {
         Task t = TestData.createTask(TestData.TASKTYPE.SSH);
-        when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
-                anyString(), anyString())).thenReturn(Paths.get("/tmp"));
-        Job job = CustomJobFactory.createJob(t, storage);
+        when(this.storage.getCachePath(eq(Storage.RESOURCE.TASKS),
+                anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
+        Job job = CustomJobFactory.createJob(t, this.storage);
     }
 
     /**
@@ -88,9 +93,9 @@ public class CustomJobFactoryTest {
     @Test(expected = InfrastructureException.class)
     public final void testCreateGridJob() throws Exception {
         Task t = TestData.createTask(TestData.TASKTYPE.SSHFULL);
-        when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
-                anyString(), anyString())).thenReturn(Paths.get("/tmp"));
-        Job job = CustomJobFactory.createJob(t, storage);
+        when(this.storage.getCachePath(eq(Storage.RESOURCE.TASKS),
+                anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
+        Job job = CustomJobFactory.createJob(t, this.storage);
     }
 
     /**
@@ -102,8 +107,8 @@ public class CustomJobFactoryTest {
     @Test(expected = InfrastructureException.class)
     public final void testCreateJobWithNativeJobId() throws Exception {
         Task t = TestData.createTask(TestData.TASKTYPE.SSHFULL);
-        when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
-                anyString(), anyString())).thenReturn(Paths.get("/tmp"));
+        when(this.storage.getCachePath(eq(Storage.RESOURCE.TASKS),
+                anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
         final List<Params> infraParams =
                 t.getAssociatedInfrastructure().getParameters();
         t.setNativeId("["
@@ -111,7 +116,27 @@ public class CustomJobFactoryTest {
                 + "]-["
                 + RandomStringUtils.randomAlphanumeric(TestData.IDLENGTH)
                 + "]");
-        Job job = CustomJobFactory.createJob(t, storage);
+        Job job = CustomJobFactory.createJob(t, this.storage);
         Assert.fail("Remote service not called by JSAGA.");
+    }
+
+    /**
+     * Test of createJob method, of class CustomJobFactory.
+     * The task has wrong native id
+     *
+     * @throws Exception Impossible to perform the test
+     */
+    @Test(expected = NullPointerException.class)
+    public final void testCreateJobWithWrongNativeJobId() throws Exception {
+        Task t = TestData.createTask(TestData.TASKTYPE.SSHFULL);
+        when(this.storage.getCachePath(eq(Storage.RESOURCE.TASKS),
+                anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
+        final List<Params> infraParams =
+                t.getAssociatedInfrastructure().getParameters();
+        t.setNativeId("["
+                + Utilities.getParamterValue(infraParams, "jobservice")
+                + "]");
+        Job job = CustomJobFactory.createJob(t, this.storage);
+        Assert.fail("Job created even though it has a no valid native id.");
     }
 }

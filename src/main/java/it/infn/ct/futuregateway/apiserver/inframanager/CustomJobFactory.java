@@ -102,7 +102,7 @@ public final class CustomJobFactory {
             }
         }
 
-        String[] parsedJobId = new String[2];
+        String[] parsedJobId = {null, null};
         if (task.getNativeId() == null) {
             parsedJobId[0] = Utilities.getParamterValue(infraParams,
                     "jobservice");
@@ -168,7 +168,7 @@ public final class CustomJobFactory {
                         + infraType + "' not supported");
         }
         try {
-            JobService js = JobFactory.createJobService(
+            JobService jobService = JobFactory.createJobService(
                     System.getProperty("saga.factory", Defaults.SAGAFACTORY),
                     sb.getSession(),
                     URLFactory.createURL(
@@ -177,11 +177,11 @@ public final class CustomJobFactory {
                             resource));
             Job job;
             if (parsedJobId[1] == null) {
-                final JobDescription jd =
+                final JobDescription jobDescription =
                         JobDescriptionFactory.createJobDescription(task, store);
-                job = js.createJob(jd);
+                job = jobService.createJob(jobDescription);
             } else {
-                job = js.getJob(parsedJobId[1]);
+                job = jobService.getJob(parsedJobId[1]);
             }
             return job;
         } catch (AuthenticationFailedException | AuthorizationFailedException
