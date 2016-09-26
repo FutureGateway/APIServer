@@ -72,7 +72,7 @@ public class PendingTest {
             taskState.action(this.executorService, this.blockingQueue,
                     this.storage);
         } catch (TaskException ex) {
-            Assert.fail("Calle action failed for: " + ex.getMessage());
+            Assert.fail("Call action failed for: " + ex.getMessage());
         }
         Assert.assertEquals("Called action on pending state.",
                 Task.STATE.PENDING, task.getState());

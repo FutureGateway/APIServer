@@ -72,7 +72,7 @@ public class AbortedTest {
             taskState.action(this.executorService, this.blockingQueue,
                     this.storage);
         } catch (TaskException ex) {
-            Assert.fail("Calle action failde for: " + ex.getMessage());
+            Assert.fail("Call action failed for: " + ex.getMessage());
         }
         Assert.assertEquals("Called action on aborted state.",
                 Task.STATE.ABORTED, task.getState());

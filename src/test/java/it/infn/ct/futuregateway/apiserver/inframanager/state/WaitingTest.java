@@ -93,9 +93,9 @@ public class WaitingTest {
             taskState.action(this.executorService, this.blockingQueue,
                     this.storage);
         } catch (TaskException ex) {
-            Assert.fail("Tast failed for: " + ex.getMessage());
+            Assert.fail("Test failed for: " + ex.getMessage());
         }
-        Assert.assertEquals("All files are redy", Task.STATE.READY,
+        Assert.assertEquals("All files are ready", Task.STATE.READY,
                 task.getState());
     }
 
@@ -113,7 +113,7 @@ public class WaitingTest {
             taskState.action(this.executorService, this.blockingQueue,
                     this.storage);
         } catch (TaskException ex) {
-            Assert.fail("Tast failed for: " + ex.getMessage());
+            Assert.fail("Test failed for: " + ex.getMessage());
         }
         Assert.assertEquals("No input files needed", Task.STATE.READY,
                 task.getState());
