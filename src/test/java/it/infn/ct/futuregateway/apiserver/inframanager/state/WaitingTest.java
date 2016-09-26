@@ -77,9 +77,9 @@ public class WaitingTest {
         task.setState(Task.STATE.WAITING);
 
         final Random rand = new Random();
-
         final List<TaskFileInput> ltif = new LinkedList<>();
         final TaskFileInput fileInput = new TaskFileInput();
+
         fileInput.setName(RandomStringUtils.randomAlphanumeric(
                         rand.nextInt(PROPERTYVALUEMAXLENGTH) + 1));
         fileInput.setUrl(RandomStringUtils.randomAlphanumeric(
@@ -88,7 +88,7 @@ public class WaitingTest {
         ltif.add(fileInput);
         task.setInputFiles(ltif);
 
-        final TaskState taskState;
+        TaskState taskState;
         try {
             taskState = task.getStateManager();
             taskState.action(this.executorService, this.blockingQueue,
@@ -107,10 +107,9 @@ public class WaitingTest {
     public final void testActionNoInputFile() {
         final Task task = TestData.createTask(TestData.TASKTYPE.SSHFULL);
         task.setState(Task.STATE.WAITING);
-
         task.setInputFiles(null);
 
-        final TaskState taskState;
+        TaskState taskState;
         try {
             taskState = task.getStateManager();
             taskState.action(this.executorService, this.blockingQueue,

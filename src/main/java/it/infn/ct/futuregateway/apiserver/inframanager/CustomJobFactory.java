@@ -102,15 +102,13 @@ public final class CustomJobFactory {
             }
         }
 
-        String[] parsedJobId;
+        String[] parsedJobId = new String[2];
         if (task.getNativeId() == null) {
-            parsedJobId = new String[1];
             parsedJobId[0] = Utilities.getParamterValue(infraParams,
                     "jobservice");
         } else {
             final Pattern pattern = Pattern.compile("\\[(.*)\\]-\\[(.*)\\]");
             final Matcher matcher = pattern.matcher(task.getNativeId());
-            parsedJobId = new String[2];
             if (matcher.find()) {
                 parsedJobId[0] = matcher.group(1);
                 parsedJobId[1] = matcher.group(2);

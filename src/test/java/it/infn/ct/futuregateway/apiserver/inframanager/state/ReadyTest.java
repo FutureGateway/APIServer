@@ -102,6 +102,7 @@ public class ReadyTest {
     public final void testActionWithNativeId() {
         final Task task = TestData.createTask(TestData.TASKTYPE.SSHFULL);
         task.setState(Task.STATE.READY);
+
         final List<Params> infraParams =
                 task.getAssociatedInfrastructure().getParameters();
         task.setNativeId("["
@@ -109,10 +110,11 @@ public class ReadyTest {
                 + "]-["
                 + RandomStringUtils.randomAlphanumeric(TestData.IDLENGTH)
                 + "]");
+
         Mockito.when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
                 anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
 
-        final TaskState taskState;
+        TaskState taskState;
         try {
             taskState = task.getStateManager();
             taskState.action(this.executorService, this.blockingQueue,
