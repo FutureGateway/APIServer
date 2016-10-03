@@ -58,8 +58,6 @@ import org.mockito.Mockito;
 
 /**
  * Test the TaskService.
- *
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 @RunWith(MockitoJUnitRunner.class)
 public class TaskServiceTest {
@@ -123,6 +121,12 @@ public class TaskServiceTest {
      */
     @Mock
     private FormDataContentDisposition formContentDisp;
+
+    /**
+     * Create the tester.
+     */
+    public TaskServiceTest() {
+    }
 
     /**
      * Test of getTaskDetails method, of class TaskService.

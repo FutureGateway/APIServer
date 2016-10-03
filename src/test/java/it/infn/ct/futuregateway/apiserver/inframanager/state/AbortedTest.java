@@ -34,9 +34,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- *
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
- * @author Mario Torrisi <mario.torrisi@ct.infn.it>
+ * Test the Aborted State.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class AbortedTest {
@@ -58,6 +56,12 @@ public class AbortedTest {
      */
     @Mock
     private BlockingQueue<Task> blockingQueue;
+
+    /**
+     * Create the tester.
+     */
+    public AbortedTest() {
+    }
 
     /**
      * Test of action method, of class Aborted.

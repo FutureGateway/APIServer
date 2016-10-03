@@ -38,8 +38,6 @@ import org.apache.commons.logging.LogFactory;
  * information system is specified then this is used and filtered accordingly.
  * Finally, if nothing is specified the information are retrieved from the
  * GOCDB for the selected VO.
- *
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 public class ResourceDiscovery {
     /**

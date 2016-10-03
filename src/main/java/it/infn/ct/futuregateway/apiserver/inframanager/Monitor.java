@@ -32,8 +32,6 @@ import org.apache.commons.logging.LogFactory;
  * Implement the action monitor. The activity to monitor is retrieved from a
  * queue and if the resource is not in a final state it is added to the queue
  * again.
- *
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 public class Monitor implements Runnable {
 

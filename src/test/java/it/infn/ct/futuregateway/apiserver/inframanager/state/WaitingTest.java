@@ -41,9 +41,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 
 /**
- *
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
- * @author Mario Torrisi <mario.torrisi@ct.infn.it>
+ * Test the Waiting State.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class WaitingTest {
@@ -65,6 +63,12 @@ public class WaitingTest {
      */
     @Mock
     private BlockingQueue<Task> blockingQueue;
+
+    /**
+     * Create the tester.
+     */
+    public WaitingTest() {
+    }
 
     /**
      * Test of action method, of class Waiting.
@@ -91,7 +95,7 @@ public class WaitingTest {
             taskState.action(this.executorService, this.blockingQueue,
                     this.storage);
         } catch (TaskException ex) {
-            Assert.fail("Test failed for: " + ex.getMessage());
+            Assert.fail(ex.getMessage());
         }
         Assert.assertEquals("All files are ready", Task.STATE.READY,
                 task.getState());
@@ -111,7 +115,7 @@ public class WaitingTest {
             taskState.action(this.executorService, this.blockingQueue,
                     this.storage);
         } catch (TaskException ex) {
-            Assert.fail("Test failed for: " + ex.getMessage());
+            Assert.fail(ex.getMessage());
         }
         Assert.assertEquals("No input files needed", Task.STATE.READY,
                 task.getState());

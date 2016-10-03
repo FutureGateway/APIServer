@@ -42,9 +42,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 
 /**
- *
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
- * @author Mario Torrisi <mario.torrisi@ct.infn.it>
+ * Test the Ready State.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ReadyTest {
@@ -71,6 +69,12 @@ public class ReadyTest {
      */
     @Mock
     private BlockingQueue<Task> blockingQueue;
+
+    /**
+     * Create the tester.
+     */
+    public ReadyTest() {
+    }
 
     /**
      * Test of action method, of class Ready.

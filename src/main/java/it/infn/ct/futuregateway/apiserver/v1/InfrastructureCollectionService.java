@@ -44,7 +44,6 @@ import org.apache.commons.logging.LogFactory;
  * infrastructure collection as defined in the documentation.
  *
  * @see http://docs.csgfapis.apiary.io/#reference/v1.0/application-collection
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 @Path("/infrastructures")
 public class InfrastructureCollectionService extends BaseService {

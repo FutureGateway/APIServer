@@ -42,9 +42,6 @@ import org.ogf.saga.job.Job;
 /**
  * Concrete state <i>Done</i> for the task.
  * No specific action connected with the aborted state.
- *
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
- * @author Mario Torrisi <mario.torrisi@ct.infn.it>
  */
 public class Done extends TaskState {
     /**

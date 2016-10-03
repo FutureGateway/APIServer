@@ -38,8 +38,7 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- *
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
+ * Test the CustomJobFactory.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class CustomJobFactoryTest {
