@@ -86,7 +86,7 @@ public class ReadyTest {
             taskState.action(this.executorService, this.blockingQueue,
                     this.storage);
         } catch (TaskException ex) {
-            Assert.fail("Tast failed for: " + ex.getMessage());
+            Assert.fail(ex.getMessage());
         }
 
         Assert.assertEquals("Task status did not change after submit",
@@ -117,7 +117,7 @@ public class ReadyTest {
             taskState.action(this.executorService, this.blockingQueue,
                     this.storage);
         } catch (TaskException ex) {
-            Assert.fail("Tast failed for: " + ex.getMessage());
+            Assert.fail(ex.getMessage());
         }
 
         Assert.assertEquals("Task state changed.",

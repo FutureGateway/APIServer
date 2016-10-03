@@ -36,6 +36,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.ogf.saga.error.DoesNotExistException;
 
 /**
  * Test the CustomJobFactory.
@@ -133,7 +134,7 @@ public class CustomJobFactoryTest {
      *
      * @throws Exception Impossible to perform the test
      */
-    @Test(expected = NullPointerException.class)
+    @Test(expected = DoesNotExistException.class)
     public final void testCreateJobWithWrongNativeJobId() throws Exception {
         final Task task = TestData.createTask(TestData.TASKTYPE.SSHFULL);
         Mockito.when(this.storage.getCachePath(

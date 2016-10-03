@@ -95,6 +95,15 @@ public final class CustomJobFactory {
             if (matcher.find()) {
                 jobServiceEP = matcher.group(1);
                 nativeID = matcher.group(2);
+            } else {
+                StringBuilder msg = new StringBuilder();
+                msg.append("Native id '");
+                msg.append(nativeID);
+                msg.append("' for task ");
+                msg.append(task.getId());
+                msg.append(" is not valid!");
+                LOG.error(msg);
+                throw new DoesNotExistException(msg.toString());
             }
         }
 
