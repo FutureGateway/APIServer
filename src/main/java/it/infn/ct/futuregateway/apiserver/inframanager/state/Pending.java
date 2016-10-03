@@ -47,6 +47,15 @@ public class Pending extends TaskState {
         this.task = aTask;
     }
 
+    /**
+     * Pending state is preliminary and no action are requested.
+     * In this state some input is still missing and the state change is
+     * performed by the service.
+     *
+     * @param anExecutorService Executor performing active action on the task
+     * @param aBlockingQueue Queue for monitored tasks
+     * @param aStorage Cache storage
+     */
     @Override
     public final void action(
             final ExecutorService anExecutorService,

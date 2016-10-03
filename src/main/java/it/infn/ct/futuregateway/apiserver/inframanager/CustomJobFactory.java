@@ -85,13 +85,26 @@ public final class CustomJobFactory {
                 task.getApplicationDetail().getParameters()
                 );
         String infraType = Utilities.getParameterValue(infraParams, "type");
-        final String jobServiceEndPoint = Utilities.getParameterValue(
-                infraParams, "jobservice");
+
+        String jobServiceEP = null;
+        String nativeID = null;
+        if (task.getNativeId() == null) {
+            jobServiceEP = Utilities.getParameterValue(
+                    infraParams, "jobservice");
+        } else {
+            final Pattern pattern = Pattern.compile("\\[(.*)\\]-\\[(.*)\\]");
+            final Matcher matcher = pattern.matcher(task.getNativeId());
+            if (matcher.find()) {
+                jobServiceEP = matcher.group(1);
+                nativeID = matcher.group(2);
+            }
+        }
+
         if (infraType == null) {
             LOG.debug("Infrastructure "
                     + task.getAssociatedInfrastructure().getId()
                     + " has not 'type' defined");
-            infraType = jobServiceEndPoint;
+            infraType = jobServiceEP;
             if (infraType == null) {
                 String msg = "Infrastructure "
                         + task.getAssociatedInfrastructure().getId()
@@ -104,19 +117,6 @@ public final class CustomJobFactory {
             }
         }
 
-        String[] parsedJobId = new String[2];
-        if (task.getNativeId() == null) {
-            parsedJobId[0] = jobServiceEndPoint;
-            parsedJobId[1] = null;
-        } else {
-            final Pattern pattern = Pattern.compile("\\[(.*)\\]-\\[(.*)\\]");
-            final Matcher matcher = pattern.matcher(task.getNativeId());
-            if (matcher.find()) {
-                parsedJobId[0] = matcher.group(1);
-                parsedJobId[1] = matcher.group(2);
-            }
-        }
-
         SessionBuilder sb;
         switch (infraType) {
             case "wsgram":
@@ -126,9 +126,9 @@ public final class CustomJobFactory {
                 sb = new GridSessionBuilder(
                         task.getAssociatedInfrastructure(), task.getUserName());
                 ResourceDiscovery rd = new ResourceDiscovery(infraParams,
-                        sb.getVO(), parsedJobId[0]);
+                        sb.getVO(), jobServiceEP);
                 try {
-                    parsedJobId[0] = rd.getJobResource(
+                    jobServiceEP = rd.getJobResource(
                             ResourceDiscovery.ResourceType.WMS);
                 } catch (NoResorucesAvailable nra) {
                     throw new InfrastructureException("No service resources"
@@ -174,14 +174,14 @@ public final class CustomJobFactory {
                     URLFactory.createURL(
                             System.getProperty("saga.factory",
                                     Defaults.SAGAFACTORY),
-                            parsedJobId[0]));
+                            jobServiceEP));
             Job job;
-            if (parsedJobId[1] == null) {
+            if (nativeID == null) {
                 final JobDescription jobDescription =
                         JobDescriptionFactory.createJobDescription(task, store);
                 job = jobService.createJob(jobDescription);
             } else {
-                job = jobService.getJob(parsedJobId[1]);
+                job = jobService.getJob(nativeID);
             }
             return job;
         } catch (AuthenticationFailedException | AuthorizationFailedException
