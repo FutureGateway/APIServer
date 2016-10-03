@@ -84,7 +84,6 @@ public final class CustomJobFactory {
                 task.getAssociatedInfrastructure().getParameters(),
                 task.getApplicationDetail().getParameters()
                 );
-        String infraType = Utilities.getParameterValue(infraParams, "type");
 
         String jobServiceEP = Utilities.getParameterValue(
                     infraParams, "jobservice");
@@ -96,17 +95,16 @@ public final class CustomJobFactory {
                 jobServiceEP = matcher.group(1);
                 nativeID = matcher.group(2);
             } else {
-                StringBuilder msg = new StringBuilder();
-                msg.append("Native id '");
-                msg.append(nativeID);
-                msg.append("' for task ");
-                msg.append(task.getId());
-                msg.append(" is not valid!");
+                final StringBuilder msg = new StringBuilder();
+                msg.append("Native id '").append(nativeID).
+                        append("' for task ").append(task.getId()).
+                        append(" is not valid!");
                 LOG.error(msg);
                 throw new DoesNotExistException(msg.toString());
             }
         }
 
+        String infraType = Utilities.getParameterValue(infraParams, "type");
         if (infraType == null) {
             LOG.debug("Infrastructure "
                     + task.getAssociatedInfrastructure().getId()
