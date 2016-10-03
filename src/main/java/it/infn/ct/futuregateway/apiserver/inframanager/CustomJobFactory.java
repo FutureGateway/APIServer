@@ -85,7 +85,7 @@ public final class CustomJobFactory {
                 task.getApplicationDetail().getParameters()
                 );
         String infraType = Utilities.getParameterValue(infraParams, "type");
-        String jobServiceEndPoint = Utilities.getParameterValue(
+        final String jobServiceEndPoint = Utilities.getParameterValue(
                 infraParams, "jobservice");
         if (infraType == null) {
             LOG.debug("Infrastructure "

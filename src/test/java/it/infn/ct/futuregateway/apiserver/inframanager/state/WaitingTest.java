@@ -27,8 +27,6 @@ import it.infn.ct.futuregateway.apiserver.resources.TaskFile;
 import it.infn.ct.futuregateway.apiserver.resources.TaskFileInput;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import it.infn.ct.futuregateway.apiserver.utils.TestData;
-import static it.infn.ct.futuregateway.apiserver.utils.TestData
-        .PROPERTYVALUEMAXLENGTH;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -81,9 +79,9 @@ public class WaitingTest {
         final TaskFileInput fileInput = new TaskFileInput();
 
         fileInput.setName(RandomStringUtils.randomAlphanumeric(
-                        rand.nextInt(PROPERTYVALUEMAXLENGTH) + 1));
+                        rand.nextInt(TestData.PROPERTYVALUEMAXLENGTH) + 1));
         fileInput.setUrl(RandomStringUtils.randomAlphanumeric(
-                        rand.nextInt(PROPERTYVALUEMAXLENGTH) + 1));
+                        rand.nextInt(TestData.PROPERTYVALUEMAXLENGTH) + 1));
         fileInput.setStatus(TaskFile.FILESTATUS.READY);
         fileInputs.add(fileInput);
         task.setInputFiles(fileInputs);
@@ -109,7 +107,7 @@ public class WaitingTest {
         task.setInputFiles(null);
 
         try {
-            TaskState taskState = task.getStateManager();
+            final TaskState taskState = task.getStateManager();
             taskState.action(this.executorService, this.blockingQueue,
                     this.storage);
         } catch (TaskException ex) {

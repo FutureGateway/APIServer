@@ -107,12 +107,12 @@ public class ResourceDiscovery {
      * retrieved and this is done during the initialisation phase.
      *
      * @param params Infrastructure params
-     * @param vo VO name associated
+     * @param virtualOrganisation VO name associated
      * @param resourceEndPoint Resource to force. If specified the resource will
-     * not be selected from a list but this will be used
+     *     not be selected from a list but this will be used
      */
-    public ResourceDiscovery(final List<Params> params, final String vo,
-            final String resourceEndPoint) {
+    public ResourceDiscovery(final List<Params> params,
+            final String virtualOrganisation, final String resourceEndPoint) {
         throw new UnsupportedOperationException("Not implemented");
     }
 

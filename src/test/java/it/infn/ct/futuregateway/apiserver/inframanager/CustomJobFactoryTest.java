@@ -66,8 +66,8 @@ public class CustomJobFactoryTest {
         final Task task = TestData.createTask(TestData.TASKTYPE.BASIC);
         Mockito.when(this.storage.getCachePath(
                 ArgumentMatchers.eq(Storage.RESOURCE.TASKS),
-                ArgumentMatchers.anyString(), ArgumentMatchers.anyString()))
-                .thenReturn(Paths.get(TMP_FOLDER));
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).
+                thenReturn(Paths.get(TMP_FOLDER));
         CustomJobFactory.createJob(task, this.storage);
     }
 
@@ -82,8 +82,8 @@ public class CustomJobFactoryTest {
         final Task task = TestData.createTask(TestData.TASKTYPE.SSH);
         Mockito.when(this.storage.getCachePath(
                 ArgumentMatchers.eq(Storage.RESOURCE.TASKS),
-                ArgumentMatchers.anyString(), ArgumentMatchers.anyString()))
-                .thenReturn(Paths.get(TMP_FOLDER));
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).
+                thenReturn(Paths.get(TMP_FOLDER));
         CustomJobFactory.createJob(task, this.storage);
     }
 
@@ -98,8 +98,8 @@ public class CustomJobFactoryTest {
         final Task task = TestData.createTask(TestData.TASKTYPE.SSHFULL);
         Mockito.when(this.storage.getCachePath(
                 ArgumentMatchers.eq(Storage.RESOURCE.TASKS),
-                ArgumentMatchers.anyString(), ArgumentMatchers.anyString()))
-                .thenReturn(Paths.get(TMP_FOLDER));
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).
+                thenReturn(Paths.get(TMP_FOLDER));
         CustomJobFactory.createJob(task, this.storage);
     }
 
@@ -114,8 +114,8 @@ public class CustomJobFactoryTest {
         final Task task = TestData.createTask(TestData.TASKTYPE.SSHFULL);
         Mockito.when(this.storage.getCachePath(
                 ArgumentMatchers.eq(Storage.RESOURCE.TASKS),
-                ArgumentMatchers.anyString(), ArgumentMatchers.anyString()))
-                .thenReturn(Paths.get(TMP_FOLDER));
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).
+                thenReturn(Paths.get(TMP_FOLDER));
         final Infrastructure infrastructure =
                 task.getAssociatedInfrastructure();
         final List<Params> infraParams = infrastructure.getParameters();
@@ -139,8 +139,8 @@ public class CustomJobFactoryTest {
         final Task task = TestData.createTask(TestData.TASKTYPE.SSHFULL);
         Mockito.when(this.storage.getCachePath(
                 ArgumentMatchers.eq(Storage.RESOURCE.TASKS),
-                ArgumentMatchers.anyString(), ArgumentMatchers.anyString()))
-                .thenReturn(Paths.get(TMP_FOLDER));
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).
+                thenReturn(Paths.get(TMP_FOLDER));
         final Infrastructure infrastructure =
                 task.getAssociatedInfrastructure();
         final List<Params> infraParams = infrastructure.getParameters();
