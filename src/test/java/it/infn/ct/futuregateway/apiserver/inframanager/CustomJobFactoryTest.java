@@ -32,11 +32,10 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.mockito.ArgumentMatchers.anyString;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
-import static org.mockito.Mockito.when;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import static org.mockito.ArgumentMatchers.eq;
 
 /**
  *
@@ -65,8 +64,10 @@ public class CustomJobFactoryTest {
     @Test(expected = InfrastructureException.class)
     public final void testCreateJobNoTypeNoRes() throws Exception {
         final Task task = TestData.createTask(TestData.TASKTYPE.BASIC);
-        when(this.storage.getCachePath(eq(Storage.RESOURCE.TASKS),
-                anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
+        Mockito.when(this.storage.getCachePath(
+                ArgumentMatchers.eq(Storage.RESOURCE.TASKS),
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyString()))
+                .thenReturn(Paths.get(TMP_FOLDER));
         CustomJobFactory.createJob(task, this.storage);
     }
 
@@ -79,8 +80,10 @@ public class CustomJobFactoryTest {
     @Test(expected = NullPointerException.class)
     public final void testCreateJobWithTypeSSH() throws Exception {
         final Task task = TestData.createTask(TestData.TASKTYPE.SSH);
-        when(this.storage.getCachePath(eq(Storage.RESOURCE.TASKS),
-                anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
+        Mockito.when(this.storage.getCachePath(
+                ArgumentMatchers.eq(Storage.RESOURCE.TASKS),
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyString()))
+                .thenReturn(Paths.get(TMP_FOLDER));
         CustomJobFactory.createJob(task, this.storage);
     }
 
@@ -93,8 +96,10 @@ public class CustomJobFactoryTest {
     @Test(expected = InfrastructureException.class)
     public final void testCreateGridJob() throws Exception {
         final Task task = TestData.createTask(TestData.TASKTYPE.SSHFULL);
-        when(this.storage.getCachePath(eq(Storage.RESOURCE.TASKS),
-                anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
+        Mockito.when(this.storage.getCachePath(
+                ArgumentMatchers.eq(Storage.RESOURCE.TASKS),
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyString()))
+                .thenReturn(Paths.get(TMP_FOLDER));
         CustomJobFactory.createJob(task, this.storage);
     }
 
@@ -107,8 +112,10 @@ public class CustomJobFactoryTest {
     @Test(expected = InfrastructureException.class)
     public final void testCreateJobWithNativeJobId() throws Exception {
         final Task task = TestData.createTask(TestData.TASKTYPE.SSHFULL);
-        when(this.storage.getCachePath(eq(Storage.RESOURCE.TASKS),
-                anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
+        Mockito.when(this.storage.getCachePath(
+                ArgumentMatchers.eq(Storage.RESOURCE.TASKS),
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyString()))
+                .thenReturn(Paths.get(TMP_FOLDER));
         final Infrastructure infrastructure =
                 task.getAssociatedInfrastructure();
         final List<Params> infraParams = infrastructure.getParameters();
@@ -130,8 +137,10 @@ public class CustomJobFactoryTest {
     @Test(expected = NullPointerException.class)
     public final void testCreateJobWithWrongNativeJobId() throws Exception {
         final Task task = TestData.createTask(TestData.TASKTYPE.SSHFULL);
-        when(this.storage.getCachePath(eq(Storage.RESOURCE.TASKS),
-                anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
+        Mockito.when(this.storage.getCachePath(
+                ArgumentMatchers.eq(Storage.RESOURCE.TASKS),
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyString()))
+                .thenReturn(Paths.get(TMP_FOLDER));
         final Infrastructure infrastructure =
                 task.getAssociatedInfrastructure();
         final List<Params> infraParams = infrastructure.getParameters();

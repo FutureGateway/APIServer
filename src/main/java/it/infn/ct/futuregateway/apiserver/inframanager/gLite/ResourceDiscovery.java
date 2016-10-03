@@ -108,8 +108,11 @@ public class ResourceDiscovery {
      *
      * @param params Infrastructure params
      * @param vo VO name associated
+     * @param resourceEndPoint Resource to force. If specified the resource will
+     * not be selected from a list but this will be used
      */
-    public ResourceDiscovery(final List<Params> params, final String vo) {
+    public ResourceDiscovery(final List<Params> params, final String vo,
+            final String resourceEndPoint) {
         throw new UnsupportedOperationException("Not implemented");
     }
 

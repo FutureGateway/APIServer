@@ -85,11 +85,13 @@ public final class CustomJobFactory {
                 task.getApplicationDetail().getParameters()
                 );
         String infraType = Utilities.getParameterValue(infraParams, "type");
+        String jobServiceEndPoint = Utilities.getParameterValue(
+                infraParams, "jobservice");
         if (infraType == null) {
             LOG.debug("Infrastructure "
                     + task.getAssociatedInfrastructure().getId()
                     + " has not 'type' defined");
-            infraType = Utilities.getParameterValue(infraParams, "jobservice");
+            infraType = jobServiceEndPoint;
             if (infraType == null) {
                 String msg = "Infrastructure "
                         + task.getAssociatedInfrastructure().getId()
@@ -102,10 +104,10 @@ public final class CustomJobFactory {
             }
         }
 
-        String[] parsedJobId = {null, null};
+        String[] parsedJobId = new String[2];
         if (task.getNativeId() == null) {
-            parsedJobId[0] = Utilities.getParameterValue(infraParams,
-                    "jobservice");
+            parsedJobId[0] = jobServiceEndPoint;
+            parsedJobId[1] = null;
         } else {
             final Pattern pattern = Pattern.compile("\\[(.*)\\]-\\[(.*)\\]");
             final Matcher matcher = pattern.matcher(task.getNativeId());
@@ -116,8 +118,6 @@ public final class CustomJobFactory {
         }
 
         SessionBuilder sb;
-        String resource = parsedJobId[0];
-
         switch (infraType) {
             case "wsgram":
             case "gatekeeper":
@@ -126,9 +126,9 @@ public final class CustomJobFactory {
                 sb = new GridSessionBuilder(
                         task.getAssociatedInfrastructure(), task.getUserName());
                 ResourceDiscovery rd = new ResourceDiscovery(infraParams,
-                        sb.getVO());
+                        sb.getVO(), parsedJobId[0]);
                 try {
-                    resource = rd.getJobResource(
+                    parsedJobId[0] = rd.getJobResource(
                             ResourceDiscovery.ResourceType.WMS);
                 } catch (NoResorucesAvailable nra) {
                     throw new InfrastructureException("No service resources"
@@ -174,7 +174,7 @@ public final class CustomJobFactory {
                     URLFactory.createURL(
                             System.getProperty("saga.factory",
                                     Defaults.SAGAFACTORY),
-                            resource));
+                            parsedJobId[0]));
             Job job;
             if (parsedJobId[1] == null) {
                 final JobDescription jobDescription =
@@ -194,5 +194,4 @@ public final class CustomJobFactory {
                     + task.getAssociatedInfrastructureId());
         }
     }
-
 }
