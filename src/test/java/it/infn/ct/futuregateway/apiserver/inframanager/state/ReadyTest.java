@@ -71,12 +71,6 @@ public class ReadyTest {
     private BlockingQueue<Task> blockingQueue;
 
     /**
-     * Create the tester.
-     */
-    public ReadyTest() {
-    }
-
-    /**
      * Test of action method, of class Ready.
      */
     @Test

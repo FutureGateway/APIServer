@@ -31,9 +31,6 @@ import java.util.concurrent.ExecutorService;
  * Concrete state <i>Waiting</i> for the task.
  * When a task is in Waiting state the associated action will be to check the
  * required input and if present move to the next state.
- *
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
- * @author Mario Torrisi <mario.torrisi@ct.infn.it>
  */
 public class Waiting extends TaskState {
     /**

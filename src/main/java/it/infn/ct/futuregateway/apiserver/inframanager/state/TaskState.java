@@ -29,9 +29,6 @@ import java.util.concurrent.ExecutorService;
 /**
  * Abstract state for the task.
  * Based on state pattern
- *
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
- * @author Mario Torrisi <mario.torrisi@ct.infn.it>
  */
 public abstract class TaskState {
 

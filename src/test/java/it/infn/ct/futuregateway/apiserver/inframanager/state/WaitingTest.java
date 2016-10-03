@@ -65,12 +65,6 @@ public class WaitingTest {
     private BlockingQueue<Task> blockingQueue;
 
     /**
-     * Create the tester.
-     */
-    public WaitingTest() {
-    }
-
-    /**
      * Test of action method, of class Waiting.
      */
     @Test

@@ -42,9 +42,6 @@ import org.ogf.saga.task.State;
  * When a task is in Scheduled state the associated action will be to check the
  * state of the activity on the remote infrastructure and eventually move to
  * the next state.
- *
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
- * @author Mario Torrisi <mario.torrisi@ct.infn.it>
  */
 public class Scheduled extends TaskState {
     /**

@@ -58,12 +58,6 @@ public class PendingTest {
     private BlockingQueue<Task> blockingQueue;
 
     /**
-     * Create the tester.
-     */
-    public PendingTest() {
-    }
-
-    /**
      * Test of action method, of class Pending.
      */
     @Test

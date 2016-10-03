@@ -58,12 +58,6 @@ public class AbortedTest {
     private BlockingQueue<Task> blockingQueue;
 
     /**
-     * Create the tester.
-     */
-    public AbortedTest() {
-    }
-
-    /**
      * Test of action method, of class Aborted.
      */
     @Test

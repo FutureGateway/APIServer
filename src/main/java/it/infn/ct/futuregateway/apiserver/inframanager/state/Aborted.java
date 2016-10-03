@@ -44,18 +44,11 @@ public class Aborted extends TaskState {
         this.task = aTask;
     }
 
-    /**
-     * Action for aborted tasks.
-     * Aborted is a final state and no further actions have to be performed.
-     *
-     * @param anExecutorService Executor performing active action on the task
-     * @param aBlockingQueue Queue for monitored tasks
-     * @param aStorage Cache storage
-     */
     @Override
     public final void action(
             final ExecutorService anExecutorService,
             final BlockingQueue<Task> aBlockingQueue, final Storage aStorage) {
+        // Aborted is a final state and no further actions have to be performed.
     }
 
 }

@@ -33,9 +33,6 @@ import org.apache.commons.logging.LogFactory;
  * Concrete state <i>Ready</i> for the task.
  * When a task is in Ready state the associated action will be to submit
  * the task to the remote infrastructure
- *
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
- * @author Mario Torrisi <mario.torrisi@ct.infn.it>
  */
 public class Ready extends TaskState {
 
