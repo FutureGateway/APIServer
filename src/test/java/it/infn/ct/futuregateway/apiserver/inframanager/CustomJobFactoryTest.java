@@ -119,7 +119,7 @@ public class CustomJobFactoryTest {
                 task.getAssociatedInfrastructure();
         final List<Params> infraParams = infrastructure.getParameters();
         final String jobService = Utilities.getParameterValue(infraParams,
-                "jobservice");
+                TestData.PARAMJOBSERVICE);
         final String jobId = RandomStringUtils.randomAlphanumeric(
                 TestData.IDLENGTH);
         task.setNativeId("[" + jobService + "]-[" + jobId + "]");
@@ -144,7 +144,7 @@ public class CustomJobFactoryTest {
                 task.getAssociatedInfrastructure();
         final List<Params> infraParams = infrastructure.getParameters();
         final String jobService = Utilities.getParameterValue(infraParams,
-                "jobservice");
+                TestData.PARAMJOBSERVICE);
         task.setNativeId("[" + jobService + "]");
         CustomJobFactory.createJob(task, this.storage);
         Assert.fail("Job created even though it has a no valid native id.");

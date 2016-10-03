@@ -86,12 +86,10 @@ public final class CustomJobFactory {
                 );
         String infraType = Utilities.getParameterValue(infraParams, "type");
 
-        String jobServiceEP = null;
-        String nativeID = null;
-        if (task.getNativeId() == null) {
-            jobServiceEP = Utilities.getParameterValue(
+        String jobServiceEP = Utilities.getParameterValue(
                     infraParams, "jobservice");
-        } else {
+        String nativeID = null;
+        if (task.getNativeId() != null) {
             final Pattern pattern = Pattern.compile("\\[(.*)\\]-\\[(.*)\\]");
             final Matcher matcher = pattern.matcher(task.getNativeId());
             if (matcher.find()) {

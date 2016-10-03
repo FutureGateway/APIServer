@@ -123,12 +123,6 @@ public class TaskServiceTest {
     private FormDataContentDisposition formContentDisp;
 
     /**
-     * Create the tester.
-     */
-    public TaskServiceTest() {
-    }
-
-    /**
      * Test of getTaskDetails method, of class TaskService.
      * Gets task details with the correct ID
      */

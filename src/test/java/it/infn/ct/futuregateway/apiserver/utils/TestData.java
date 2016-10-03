@@ -86,6 +86,11 @@ public final class TestData {
     public static final String PATHTOTEMPSTORAGE = "/tmp/FGAPI/test";
 
     /**
+     * Param for jobservice.
+     */
+    public static final String PARAMJOBSERVICE = "jobservice";
+
+    /**
      * Avoid the class be instantiable.
      */
     private TestData() {
