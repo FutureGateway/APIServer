@@ -3,6 +3,13 @@
     <display-name>FutureGateway API Server</display-name>
     <context-param>
         <description>
+            Authentication filter to sucure the APIs
+        </description>
+        <param-name>AuthFilters</param-name>
+        <param-value>it.infn.ct.futuregateway.apiserver.filter.DumbAuthFilter</param-value>
+    </context-param>
+    <context-param>
+        <description>
             Path where files are temporary stored. Default value is 'FutureGatewayData' directory outside the webapp directory;
         </description>
         <param-name>CacheDir</param-name>

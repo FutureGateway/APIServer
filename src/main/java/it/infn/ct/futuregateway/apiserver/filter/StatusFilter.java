@@ -19,7 +19,7 @@
  * limitations under the License.
  ***********************************************************************/
 
-package it.infn.ct.futuregateway.apiserver.utils;
+package it.infn.ct.futuregateway.apiserver.filter;
 
 import it.infn.ct.futuregateway.apiserver.utils.annotations.Status;
 import java.io.IOException;

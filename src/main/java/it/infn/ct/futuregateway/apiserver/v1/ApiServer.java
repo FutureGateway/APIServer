@@ -21,8 +21,12 @@
 
 package it.infn.ct.futuregateway.apiserver.v1;
 
-import it.infn.ct.futuregateway.apiserver.utils.StatusFilter;
+import it.infn.ct.futuregateway.apiserver.filter.StatusFilter;
+import javax.servlet.ServletContext;
 import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Context;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.glassfish.jersey.linking.DeclarativeLinkingFeature;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -36,11 +40,21 @@ public class ApiServer extends ResourceConfig {
 
     /**
      * Register resources.
+     *
+     * @param context The servlet context to access configuration values
      */
-    public ApiServer() {
+    public ApiServer(@Context final ServletContext context) {
+        Log log = LogFactory.getLog(ApiServer.class);
         packages("it.infn.ct.futuregateway.apiserver.v1");
         register(StatusFilter.class);
         register(DeclarativeLinkingFeature.class);
         register(MultiPartFeature.class);
+        String aFilter = (String) context.getAttribute("AuthFilters");
+        try {
+            register(Class.forName(aFilter.trim()));
+            log.info("Registerd the authentication filter: " + aFilter);
+        } catch (ClassNotFoundException ex) {
+            log.error("The filter " + aFilter + " cannot be registered");
+        }
     }
 }
