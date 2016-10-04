@@ -95,12 +95,10 @@ public final class CustomJobFactory {
                 jobServiceEP = matcher.group(1);
                 nativeID = matcher.group(2);
             } else {
-                final StringBuilder msg = new StringBuilder();
-                msg.append("Native id '").append(nativeID).
-                        append("' for task ").append(task.getId()).
-                        append(" is not valid!");
+                final String msg = "Native id '" + nativeID + "' for task "
+                        + task.getId() + " is not valid!";
                 LOG.error(msg);
-                throw new DoesNotExistException(msg.toString());
+                throw new DoesNotExistException(msg);
             }
         }
 
@@ -109,17 +107,14 @@ public final class CustomJobFactory {
             LOG.debug("Infrastructure "
                     + task.getAssociatedInfrastructure().getId()
                     + " has not 'type' defined");
-            infraType = jobServiceEP;
-            if (infraType == null) {
+            if (jobServiceEP == null || jobServiceEP.isEmpty()) {
                 String msg = "Infrastructure "
                         + task.getAssociatedInfrastructure().getId()
                         + " has not 'type' or 'jobservice' defined";
                 LOG.error(msg);
                 throw new InfrastructureException(msg);
             }
-            if (infraType.contains(":")) {
-                infraType = infraType.substring(0, infraType.indexOf(":"));
-            }
+            infraType = jobServiceEP.substring(0, infraType.indexOf(":"));
         }
 
         SessionBuilder sb;
