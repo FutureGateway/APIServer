@@ -21,19 +21,33 @@
 
 package it.infn.ct.futuregateway.apiserver.inframanager.state;
 
-import it.infn.ct.futuregateway.apiserver.inframanager.MonitorQueue;
+import fr.in2p3.jsaga.impl.job.instance.JobImpl;
+import it.infn.ct.futuregateway.apiserver.inframanager.CustomJobFactory;
+import it.infn.ct.futuregateway.apiserver.inframanager.InfrastructureException;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.PermissionDeniedException;
+import org.ogf.saga.error.TimeoutException;
+import org.ogf.saga.job.Job;
 
 /**
  * Concrete state <i>Done</i> for the task.
  * No specific action connected with the aborted state.
- *
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
- * @author Mario Torrisi <mario.torrisi@ct.infn.it>
  */
 public class Done extends TaskState {
+    /**
+     * Logger object. Based on apache commons logging.
+     */
+    private final Log log = LogFactory.getLog(Scheduled.class);
     /**
      * Reference to the task.
      */
@@ -50,8 +64,18 @@ public class Done extends TaskState {
     @Override
     public final void action(
             final ExecutorService anExecutorService,
-            final MonitorQueue aMonitorQueue, final Storage aStorage) {
-        throw new UnsupportedOperationException("Not supported yet.");
+            final BlockingQueue<Task> aBlockingQueue, final Storage aStorage) {
+        try {
+            final Job job = CustomJobFactory.createJob(this.task, aStorage);
+            ((JobImpl) job).postStagingAndCleanup();
+        } catch (InfrastructureException | BadParameterException
+                | DoesNotExistException | NotImplementedException
+                | PermissionDeniedException | IncorrectStateException
+                | TimeoutException | NoSuccessException ex) {
+            this.log.error("Unable to retrive get job for task "
+                    + this.task.getId() + "Exception: " + ex.getMessage());
+            this.task.setState(Task.STATE.ABORTED);
+        }
     }
 
 }

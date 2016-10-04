@@ -21,49 +21,59 @@
 
 package it.infn.ct.futuregateway.apiserver.inframanager.state;
 
-import it.infn.ct.futuregateway.apiserver.inframanager.Submitter;
+import it.infn.ct.futuregateway.apiserver.inframanager.TaskException;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
+import it.infn.ct.futuregateway.apiserver.utils.TestData;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * Concrete state <i>Ready</i> for the task.
- * When a task is in Ready state the associated action will be to submit
- * the task to the remote infrastructure
+ * Test the Pending State.
  */
-public class Ready extends TaskState {
+@RunWith(MockitoJUnitRunner.class)
+public class PendingTest {
 
     /**
-     * Logger object. Based on apache commons logging.
+     * Fake executor service.
      */
-    private final Log log = LogFactory.getLog(Ready.class);
+    @Mock
+    private ExecutorService executorService;
 
     /**
-     * Reference to the task.
+     * Fake cache storage object.
      */
-    private Task task;
+    @Mock
+    private Storage storage;
 
-   /**
-     * Builds the Ready concrete state and associates the task.
-     * @param aTask The associated task
+    /**
+     * Fake Blocking queue.
      */
-    public Ready(final Task aTask) {
-        this.task = aTask;
-    }
+    @Mock
+    private BlockingQueue<Task> blockingQueue;
 
-    @Override
-    public final void action(
-            final ExecutorService anExecutorService,
-            final BlockingQueue<Task> aBlockingQueue, final Storage aStorage) {
-        if (this.task.getNativeId() == null) {
-            anExecutorService.execute(new Submitter(this.task, aStorage));
-            this.log.debug("Submitted the task: " + this.task.getId());
-        } else {
-            this.task.setState(Task.STATE.SCHEDULED);
+    /**
+     * Test of action method, of class Pending.
+     */
+    @Test
+    public final void callAction() {
+        final Task task = TestData.createTask(TestData.TASKTYPE.SSH);
+        task.setState(Task.STATE.PENDING);
+
+        try {
+            final TaskState taskState = task.getStateManager();
+            taskState.action(this.executorService, this.blockingQueue,
+                    this.storage);
+        } catch (TaskException ex) {
+            Assert.fail("Call action failed for: " + ex.getMessage());
         }
+        Assert.assertEquals("Called action on pending state.",
+                Task.STATE.PENDING, task.getState());
     }
 
 }

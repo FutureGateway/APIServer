@@ -35,8 +35,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- *
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
+ * Base service for the RESTful APIs.
  */
 abstract class BaseService {
 

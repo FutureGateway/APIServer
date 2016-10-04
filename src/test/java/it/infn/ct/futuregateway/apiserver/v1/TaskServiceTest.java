@@ -58,8 +58,6 @@ import org.mockito.Mockito;
 
 /**
  * Test the TaskService.
- *
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
  */
 @RunWith(MockitoJUnitRunner.class)
 public class TaskServiceTest {
@@ -254,6 +252,8 @@ public class TaskServiceTest {
         try {
             Mockito.when(this.em.getTransaction()).thenReturn(this.et);
             Mockito.when(this.emf.createEntityManager()).thenReturn(this.em);
+            Mockito.when(this.context.getAttribute(Constants.MONITORQUEUE)).
+                    thenReturn(this.mq);
             Mockito.when(this.context.getAttribute(Constants.SESSIONFACTORY)).
                     thenReturn(this.emf);
             Mockito.when(this.context.getAttribute(Constants.CACHEDIR)).

@@ -21,25 +21,33 @@
 
 package it.infn.ct.futuregateway.apiserver.inframanager;
 
+import it.infn.ct.futuregateway.apiserver.resources.Infrastructure;
+import it.infn.ct.futuregateway.apiserver.resources.Params;
 import it.infn.ct.futuregateway.apiserver.utils.TestData;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import java.nio.file.Paths;
+import java.util.List;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
-import static org.mockito.Mockito.when;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.ogf.saga.job.Job;
+import org.ogf.saga.error.DoesNotExistException;
 
 /**
- *
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
+ * Test the CustomJobFactory.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class CustomJobFactoryTest {
+
+    /**
+     * Path to cache directory.
+     */
+    private static final String TMP_FOLDER = "/tmp";
 
     /**
      * Fake cache storage object.
@@ -55,10 +63,12 @@ public class CustomJobFactoryTest {
      */
     @Test(expected = InfrastructureException.class)
     public final void testCreateJobNoTypeNoRes() throws Exception {
-        Task t = TestData.createTask(TestData.TASKTYPE.BASIC);
-        when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
-                anyString(), anyString())).thenReturn(Paths.get("/tmp"));
-        Job job = CustomJobFactory.createJob(t, storage);
+        final Task task = TestData.createTask(TestData.TASKTYPE.BASIC);
+        Mockito.when(this.storage.getCachePath(
+                ArgumentMatchers.eq(Storage.RESOURCE.TASKS),
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).
+                thenReturn(Paths.get(TMP_FOLDER));
+        CustomJobFactory.createJob(task, this.storage);
     }
 
     /**
@@ -69,10 +79,12 @@ public class CustomJobFactoryTest {
      */
     @Test(expected = NullPointerException.class)
     public final void testCreateJobWithTypeSSH() throws Exception {
-        Task t = TestData.createTask(TestData.TASKTYPE.SSH);
-        when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
-                anyString(), anyString())).thenReturn(Paths.get("/tmp"));
-        Job job = CustomJobFactory.createJob(t, storage);
+        final Task task = TestData.createTask(TestData.TASKTYPE.SSH);
+        Mockito.when(this.storage.getCachePath(
+                ArgumentMatchers.eq(Storage.RESOURCE.TASKS),
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).
+                thenReturn(Paths.get(TMP_FOLDER));
+        CustomJobFactory.createJob(task, this.storage);
     }
 
     /**
@@ -83,9 +95,59 @@ public class CustomJobFactoryTest {
      */
     @Test(expected = InfrastructureException.class)
     public final void testCreateGridJob() throws Exception {
-        Task t = TestData.createTask(TestData.TASKTYPE.SSHFULL);
-        when(storage.getCachePath(eq(Storage.RESOURCE.TASKS),
-                anyString(), anyString())).thenReturn(Paths.get("/tmp"));
-        Job job = CustomJobFactory.createJob(t, storage);
+        final Task task = TestData.createTask(TestData.TASKTYPE.SSHFULL);
+        Mockito.when(this.storage.getCachePath(
+                ArgumentMatchers.eq(Storage.RESOURCE.TASKS),
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).
+                thenReturn(Paths.get(TMP_FOLDER));
+        CustomJobFactory.createJob(task, this.storage);
+    }
+
+    /**
+     * Test of createJob method, of class CustomJobFactory.
+     * The task has native id
+     *
+     * @throws Exception Impossible to perform the test
+     */
+    @Test(expected = InfrastructureException.class)
+    public final void testCreateJobWithNativeJobId() throws Exception {
+        final Task task = TestData.createTask(TestData.TASKTYPE.SSHFULL);
+        Mockito.when(this.storage.getCachePath(
+                ArgumentMatchers.eq(Storage.RESOURCE.TASKS),
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).
+                thenReturn(Paths.get(TMP_FOLDER));
+        final Infrastructure infrastructure =
+                task.getAssociatedInfrastructure();
+        final List<Params> infraParams = infrastructure.getParameters();
+        final String jobService = Utilities.getParameterValue(infraParams,
+                TestData.PARAMJOBSERVICE);
+        final String jobId = RandomStringUtils.randomAlphanumeric(
+                TestData.IDLENGTH);
+        task.setNativeId("[" + jobService + "]-[" + jobId + "]");
+        CustomJobFactory.createJob(task, this.storage);
+        Assert.fail("Remote service not called by JSAGA.");
+    }
+
+    /**
+     * Test of createJob method, of class CustomJobFactory.
+     * The task has wrong native id
+     *
+     * @throws Exception Impossible to perform the test
+     */
+    @Test(expected = DoesNotExistException.class)
+    public final void testCreateJobWithWrongNativeJobId() throws Exception {
+        final Task task = TestData.createTask(TestData.TASKTYPE.SSHFULL);
+        Mockito.when(this.storage.getCachePath(
+                ArgumentMatchers.eq(Storage.RESOURCE.TASKS),
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).
+                thenReturn(Paths.get(TMP_FOLDER));
+        final Infrastructure infrastructure =
+                task.getAssociatedInfrastructure();
+        final List<Params> infraParams = infrastructure.getParameters();
+        final String jobService = Utilities.getParameterValue(infraParams,
+                TestData.PARAMJOBSERVICE);
+        task.setNativeId("[" + jobService + "]");
+        CustomJobFactory.createJob(task, this.storage);
+        Assert.fail("Job created even though it has a no valid native id.");
     }
 }

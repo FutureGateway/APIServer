@@ -19,28 +19,10 @@
  * limitations under the License.
  ***********************************************************************/
 
-package it.infn.ct.futuregateway.apiserver.inframanager.state;
-
-import it.infn.ct.futuregateway.apiserver.resources.Task;
-import it.infn.ct.futuregateway.apiserver.storage.Storage;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-
 /**
- * Abstract state for the task.
- * Based on state pattern
+ * This Package ......
+ *
+ * @author Marco Fargetta <marco.fargetta@ct.infn.it>
+ * @author Mario Torrisi <mario.torrisi@ct.infn.it>
  */
-public abstract class TaskState {
-
-    /**
-     * Perform the action connected with the task.
-     *
-     * @param anExecutorService Executor performing active action on the task
-     * @param aBlockingQueue Queue for monitored tasks
-     * @param aStorage Cache storage
-     */
-    public abstract void action(
-            ExecutorService anExecutorService,
-            BlockingQueue<Task> aBlockingQueue,
-            Storage aStorage);
-}
+package it.infn.ct.futuregateway.apiserver.inframanager.state;

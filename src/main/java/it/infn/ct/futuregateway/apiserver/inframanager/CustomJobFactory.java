@@ -29,11 +29,14 @@ import it.infn.ct.futuregateway.apiserver.resources.Params;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
 import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.error.IncorrectURLException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
@@ -72,34 +75,49 @@ public final class CustomJobFactory {
      * some problem in the configuration or in the infrastructure
      * @throws BadParameterException The task cannot be submitted because some
      * parameters are missed or not correct
+     * @throws DoesNotExistException exception
      */
     public static Job createJob(final Task task, final Storage store)
-            throws InfrastructureException, BadParameterException {
+            throws InfrastructureException, BadParameterException,
+            DoesNotExistException {
         List<Params> infraParams = Utilities.mergeParams(
                 task.getAssociatedInfrastructure().getParameters(),
                 task.getApplicationDetail().getParameters()
                 );
-        String infraType = Utilities.getParamterValue(infraParams, "type");
+
+        String jobServiceEP = Utilities.getParameterValue(
+                    infraParams, "jobservice");
+        String nativeID = null;
+        if (task.getNativeId() != null) {
+            final Pattern pattern = Pattern.compile("\\[(.*)\\]-\\[(.*)\\]");
+            final Matcher matcher = pattern.matcher(task.getNativeId());
+            if (matcher.find()) {
+                jobServiceEP = matcher.group(1);
+                nativeID = matcher.group(2);
+            } else {
+                final String msg = "Native id '" + nativeID + "' for task "
+                        + task.getId() + " is not valid!";
+                LOG.error(msg);
+                throw new DoesNotExistException(msg);
+            }
+        }
+
+        String infraType = Utilities.getParameterValue(infraParams, "type");
         if (infraType == null) {
             LOG.debug("Infrastructure "
                     + task.getAssociatedInfrastructure().getId()
                     + " has not 'type' defined");
-            infraType = Utilities.getParamterValue(infraParams, "jobservice");
-            if (infraType == null) {
+            if (jobServiceEP == null || jobServiceEP.isEmpty()) {
                 String msg = "Infrastructure "
                         + task.getAssociatedInfrastructure().getId()
                         + " has not 'type' or 'jobservice' defined";
                 LOG.error(msg);
                 throw new InfrastructureException(msg);
             }
-            if (infraType.contains(":")) {
-                infraType = infraType.substring(0, infraType.indexOf(":"));
-            }
+            infraType = jobServiceEP.substring(0, infraType.indexOf(":"));
         }
 
         SessionBuilder sb;
-        String resource = Utilities.getParamterValue(infraParams, "jobservice");
-
         switch (infraType) {
             case "wsgram":
             case "gatekeeper":
@@ -108,9 +126,9 @@ public final class CustomJobFactory {
                 sb = new GridSessionBuilder(
                         task.getAssociatedInfrastructure(), task.getUserName());
                 ResourceDiscovery rd = new ResourceDiscovery(infraParams,
-                        sb.getVO());
+                        sb.getVO(), jobServiceEP);
                 try {
-                    resource = rd.getJobResource(
+                    jobServiceEP = rd.getJobResource(
                             ResourceDiscovery.ResourceType.WMS);
                 } catch (NoResorucesAvailable nra) {
                     throw new InfrastructureException("No service resources"
@@ -150,16 +168,22 @@ public final class CustomJobFactory {
                         + infraType + "' not supported");
         }
         try {
-            JobService js = JobFactory.createJobService(
+            final JobService jobService = JobFactory.createJobService(
                     System.getProperty("saga.factory", Defaults.SAGAFACTORY),
                     sb.getSession(),
                     URLFactory.createURL(
                             System.getProperty("saga.factory",
                                     Defaults.SAGAFACTORY),
-                            resource));
-            JobDescription jd = JobDescriptionFactory.createJobDescription(
-                    task, store);
-            return js.createJob(jd);
+                            jobServiceEP));
+            Job job;
+            if (nativeID == null) {
+                final JobDescription jobDescription =
+                        JobDescriptionFactory.createJobDescription(task, store);
+                job = jobService.createJob(jobDescription);
+            } else {
+                job = jobService.getJob(nativeID);
+            }
+            return job;
         } catch (AuthenticationFailedException | AuthorizationFailedException
                 | IncorrectURLException | NoSuccessException
                 | NotImplementedException | PermissionDeniedException
@@ -170,5 +194,4 @@ public final class CustomJobFactory {
                     + task.getAssociatedInfrastructureId());
         }
     }
-
 }

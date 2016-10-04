@@ -28,8 +28,7 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
 /**
- *
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
+ * API server root configuration.
  */
 @ApplicationPath("/v1.0")
 public class ApiServer extends ResourceConfig {

@@ -21,19 +21,16 @@
 
 package it.infn.ct.futuregateway.apiserver.inframanager.state;
 
-import it.infn.ct.futuregateway.apiserver.inframanager.MonitorQueue;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.resources.TaskFile;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 
 /**
  * Concrete state <i>Waiting</i> for the task.
  * When a task is in Waiting state the associated action will be to check the
  * required input and if present move to the next state.
- *
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
- * @author Mario Torrisi <mario.torrisi@ct.infn.it>
  */
 public class Waiting extends TaskState {
     /**
@@ -52,15 +49,15 @@ public class Waiting extends TaskState {
     @Override
     public final void action(
             final ExecutorService anExecutorService,
-            final MonitorQueue aMonitorQueue, final Storage aStorage) {
-        if (task.getInputFiles() != null) {
-            for (TaskFile tf: task.getInputFiles()) {
+            final BlockingQueue<Task> aBlockingQueue, final Storage aStorage) {
+        if (this.task.getInputFiles() != null) {
+            for (final TaskFile tf : this.task.getInputFiles()) {
                 if (tf.getStatus().equals(TaskFile.FILESTATUS.NEEDED)) {
                     return;
                 }
             }
         }
-        task.setState(Task.STATE.READY);
+        this.task.setState(Task.STATE.READY);
     }
 
 }

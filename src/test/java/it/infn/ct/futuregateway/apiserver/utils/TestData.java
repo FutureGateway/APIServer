@@ -86,6 +86,11 @@ public final class TestData {
     public static final String PATHTOTEMPSTORAGE = "/tmp/FGAPI/test";
 
     /**
+     * Param for jobservice.
+     */
+    public static final String PARAMJOBSERVICE = "jobservice";
+
+    /**
      * Avoid the class be instantiable.
      */
     private TestData() {
@@ -138,7 +143,7 @@ public final class TestData {
                 infraType.setName("type");
                 infraType.setValue("wms");
                 t.getAssociatedInfrastructure().getParameters().add(infraType);
-                res.setName("jobservice");
+                res.setName(PARAMJOBSERVICE);
                 res.setValue("wms://"
                         + RandomStringUtils.randomAlphanumeric(
                                 rand.nextInt(PROPERTYVALUEMAXLENGTH) + 1));
@@ -148,7 +153,7 @@ public final class TestData {
             case TOSCA:
                 break;
             case SSHFULL:
-                res.setName("jobservice");
+                res.setName(PARAMJOBSERVICE);
                 res.setValue("ssh://"
                         + RandomStringUtils.randomAlphanumeric(
                                 rand.nextInt(PROPERTYVALUEMAXLENGTH) + 1));

@@ -49,9 +49,9 @@ public final class Utilities {
      * @param name Parameter name
      * @return Parameter value or null is not present
      */
-    public static String getParamterValue(final List<Params> params,
+    public static String getParameterValue(final List<Params> params,
             final String name) {
-        return getParamterValue(params, name, null);
+        return getParameterValue(params, name, null);
     }
 
 
@@ -65,7 +65,7 @@ public final class Utilities {
      * @param defaultValue Default value if the parameter is not defined
      * @return Parameter value or null is not present
      */
-    public static String getParamterValue(final List<Params> params,
+    public static String getParameterValue(final List<Params> params,
             final String name, final String defaultValue) {
         Params tmpParam = IterableUtils.find(
                 params, new Predicate<Params>() {
@@ -79,7 +79,6 @@ public final class Utilities {
         }
         return defaultValue;
     }
-
 
     /**
      * Convert a Params list in a properties object.
@@ -127,10 +126,11 @@ public final class Utilities {
             final List<Params> newParameters) {
         List<Params> finalList = new LinkedList<>(newParameters);
         for (Params p: originalparameters) {
-            if (getParamterValue(finalList, p.getName()) == null) {
+            if (getParameterValue(finalList, p.getName()) == null) {
                 finalList.add(p);
             }
         }
         return finalList;
     }
+
 }

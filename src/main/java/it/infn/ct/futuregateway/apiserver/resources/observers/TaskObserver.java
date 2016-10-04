@@ -68,7 +68,7 @@ public class TaskObserver implements Observer {
     /**
      * The monitor queue responsible for manage task monitors.
      */
-    private MonitorQueue monitorQueue;
+    private final MonitorQueue monitorQueue;
 
 
     /**
@@ -123,7 +123,7 @@ public class TaskObserver implements Observer {
         log.debug("Task " + t.getId() + " updated");
         try {
             TaskState ts = t.getStateManager();
-            ts.action(es, monitorQueue, store);
+            ts.action(es, monitorQueue.getMonitorQueue(), store);
         } catch (TaskException te) {
             t.setState(Task.STATE.ABORTED);
             log.error(te.getMessage());

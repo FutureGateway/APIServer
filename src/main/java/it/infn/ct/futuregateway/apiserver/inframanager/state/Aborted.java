@@ -21,17 +21,14 @@
 
 package it.infn.ct.futuregateway.apiserver.inframanager.state;
 
-import it.infn.ct.futuregateway.apiserver.inframanager.MonitorQueue;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 
 /**
  * Concrete state <i>Aborted</i> for the task.
  * No specific action connected with the aborted state.
- *
- * @author Marco Fargetta <marco.fargetta@ct.infn.it>
- * @author Mario Torrisi <mario.torrisi@ct.infn.it>
  */
 public class Aborted extends TaskState {
     /**
@@ -50,7 +47,8 @@ public class Aborted extends TaskState {
     @Override
     public final void action(
             final ExecutorService anExecutorService,
-            final MonitorQueue aMonitorQueue, final Storage aStorage) {
+            final BlockingQueue<Task> aBlockingQueue, final Storage aStorage) {
+        // Aborted is a final state and no further actions have to be performed.
     }
 
 }

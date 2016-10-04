@@ -21,9 +21,9 @@
 
 package it.infn.ct.futuregateway.apiserver.inframanager.state;
 
-import it.infn.ct.futuregateway.apiserver.inframanager.MonitorQueue;
 import it.infn.ct.futuregateway.apiserver.resources.Task;
 import it.infn.ct.futuregateway.apiserver.storage.Storage;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -50,7 +50,9 @@ public class Cancelled extends TaskState {
     @Override
     public final void action(
             final ExecutorService anExecutorService,
-            final MonitorQueue aMonitorQueue, final Storage aStorage) {
+            final BlockingQueue<Task> aBlockingQueue, final Storage aStorage) {
+        // Cancelled is a final state and no further actions have
+        // to be performed.
     }
 
 }

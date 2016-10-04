@@ -125,19 +125,6 @@ public class MonitorQueue {
     }
 
     /**
-     * Adds a task to the monitor queue.
-     *
-     * @param aTask The task to add
-     */
-    public final void addTaskToMonitor(final Task aTask) {
-        try {
-            monitorQueue.put(aTask);
-        } catch (InterruptedException ex) {
-            log.warn("Task cannot be added to the queue. "
-                    + "Interrupted while waiting");
-        }
-    }
-    /**
      * Shutdown the monitor queue stopping all the associated threads.
      *
      * @return True is the monitor can be stopped.
