@@ -38,8 +38,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import org.mockito.ArgumentMatchers;
 
 /**
  * Test the Ready State.
@@ -77,8 +76,10 @@ public class ReadyTest {
     public final void testAction() {
         final Task task = TestData.createTask(TestData.TASKTYPE.SSH);
         task.setState(Task.STATE.READY);
-        Mockito.when(this.storage.getCachePath(eq(Storage.RESOURCE.TASKS),
-                anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
+        Mockito.when(this.storage.getCachePath(
+                ArgumentMatchers.eq(Storage.RESOURCE.TASKS),
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).
+                thenReturn(Paths.get(TMP_FOLDER));
 
         TaskState taskState;
         try {
@@ -109,8 +110,10 @@ public class ReadyTest {
                 + RandomStringUtils.randomAlphanumeric(TestData.IDLENGTH)
                 + "]");
 
-        Mockito.when(this.storage.getCachePath(eq(Storage.RESOURCE.TASKS),
-                anyString(), anyString())).thenReturn(Paths.get(TMP_FOLDER));
+        Mockito.when(this.storage.getCachePath(
+                ArgumentMatchers.eq(Storage.RESOURCE.TASKS),
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).
+                thenReturn(Paths.get(TMP_FOLDER));
 
         try {
             final TaskState taskState = task.getStateManager();
